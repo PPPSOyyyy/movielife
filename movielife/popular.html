@@ -1,0 +1,2627 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>인기영화 | movieLife</title>
+
+
+    <style>
+
+        /* ==================================================
+           기본 설정
+        ================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        :root {
+
+            --black: #000000;
+
+            --red: #D92234;
+
+            --white: #ffffff;
+
+            --gray-light: #cccccc;
+
+            --gray: #777777;
+
+            --gray-dark: #333333;
+
+            --card: #101010;
+
+            --border: #252525;
+
+        }
+
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            background:
+                radial-gradient(
+                    circle at 50% 0%,
+                    rgba(217, 34, 52, 0.10),
+                    transparent 32%
+                ),
+                #000000;
+
+            color: #ffffff;
+
+            font-family:
+                "Pretendard",
+                "Noto Sans KR",
+                Arial,
+                sans-serif;
+
+        }
+
+
+        a {
+
+            color: inherit;
+
+            text-decoration: none;
+
+        }
+
+
+        button {
+
+            font-family: inherit;
+
+            cursor: pointer;
+
+        }
+
+
+
+        /* ==================================================
+           HEADER
+        ================================================== */
+
+        .header {
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            z-index: 1000;
+
+            width: 100%;
+
+            height: 76px;
+
+            display: flex;
+
+            align-items: center;
+
+            padding: 0 6%;
+
+            background:
+                rgba(0, 0, 0, 0.95);
+
+            border-bottom:
+                1px solid rgba(255,255,255,0.07);
+
+            backdrop-filter: blur(10px);
+
+        }
+
+
+        /* 로고 */
+
+        .logo {
+
+            display: flex;
+
+            align-items: center;
+
+            width: 145px;
+
+            flex-shrink: 0;
+
+        }
+
+
+        .logo img {
+
+            display: block;
+
+            width: 145px;
+
+            height: auto;
+
+        }
+
+
+
+        /* ==================================================
+           NAVIGATION
+        ================================================== */
+
+        .nav {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 30px;
+
+            margin-left: 45px;
+
+        }
+
+
+        .nav a {
+
+            position: relative;
+
+            color: #bdbdbd;
+
+            font-size: 14px;
+
+            font-weight: 500;
+
+            transition: 0.25s;
+
+        }
+
+
+        .nav a:hover {
+
+            color: #ffffff;
+
+        }
+
+
+        .nav a.active {
+
+            color: #ffffff;
+
+            font-weight: 700;
+
+        }
+
+
+        .nav a.active::after {
+
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+
+            bottom: -9px;
+
+            width: 100%;
+
+            height: 2px;
+
+            background: var(--red);
+
+        }
+
+
+
+        /* ==================================================
+           HEADER RIGHT
+        ================================================== */
+
+        .header-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-left: auto;
+
+        }
+
+
+        .login-button {
+
+            padding: 9px 18px;
+
+            border:
+                1px solid #444;
+
+            border-radius: 5px;
+
+            background: transparent;
+
+            color: #ffffff;
+
+            font-size: 12px;
+
+        }
+
+
+        .signup-button {
+
+            padding: 9px 18px;
+
+            border:
+                1px solid var(--red);
+
+            border-radius: 5px;
+
+            background: var(--red);
+
+            color: #ffffff;
+
+            font-size: 12px;
+
+        }
+
+
+
+        /* ==================================================
+           MAIN
+        ================================================== */
+
+        .main {
+
+            max-width: 1200px;
+
+            margin: 0 auto;
+
+            padding:
+                130px 30px 100px;
+
+        }
+
+
+
+        /* ==================================================
+           PAGE HEADER
+        ================================================== */
+
+        .page-header {
+
+            margin-bottom: 35px;
+
+        }
+
+
+        .page-label {
+
+            margin-bottom: 10px;
+
+            color: var(--red);
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            letter-spacing: 2px;
+
+        }
+
+
+        .page-header h1 {
+
+            margin-bottom: 9px;
+
+            font-size: 40px;
+
+            letter-spacing: -2px;
+
+        }
+
+
+        .page-header p {
+
+            color: #666;
+
+            font-size: 13px;
+
+        }
+
+
+
+        /* ==================================================
+           POPULAR / TOP RATED TAB
+        ================================================== */
+
+        .ranking-tabs {
+
+            display: flex;
+
+            gap: 8px;
+
+            margin-bottom: 35px;
+
+        }
+
+
+        .ranking-tab {
+
+            padding: 11px 22px;
+
+            border:
+                1px solid #333;
+
+            border-radius: 5px;
+
+            background: transparent;
+
+            color: #777;
+
+            font-size: 12px;
+
+            transition: 0.25s;
+
+        }
+
+
+        .ranking-tab:hover {
+
+            color: #ffffff;
+
+            border-color: #555;
+
+        }
+
+
+        .ranking-tab.active {
+
+            border-color: var(--red);
+
+            background: var(--red);
+
+            color: #ffffff;
+
+        }
+
+
+
+        /* ==================================================
+           CONTENT 전환
+        ================================================== */
+
+        .ranking-content {
+
+            display: none;
+
+        }
+
+
+        .ranking-content.active {
+
+            display: block;
+
+        }
+
+
+
+        /* ==================================================
+           TOP 3
+        ================================================== */
+
+        .top-three {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 18px;
+
+            margin-bottom: 55px;
+
+        }
+
+
+        .top-card {
+
+            position: relative;
+
+            overflow: hidden;
+
+            height: 400px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 7px;
+
+            background: #101010;
+
+            transition: 0.3s;
+
+        }
+
+
+        .top-card:hover {
+
+            transform:
+                translateY(-5px);
+
+            border-color: #444;
+
+        }
+
+
+        .top-poster {
+
+            width: 100%;
+
+            height: 100%;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: flex-end;
+
+            padding: 28px;
+
+            background:
+
+                linear-gradient(
+                    180deg,
+                    transparent 20%,
+                    rgba(0,0,0,0.95) 90%
+                ),
+
+                linear-gradient(
+                    135deg,
+                    #65131e,
+                    #D92234,
+                    #050000
+                );
+
+        }
+
+
+        .top-card:nth-child(2)
+        .top-poster {
+
+            background:
+
+                linear-gradient(
+                    180deg,
+                    transparent 20%,
+                    rgba(0,0,0,0.95) 90%
+                ),
+
+                linear-gradient(
+                    135deg,
+                    #242424,
+                    #666666,
+                    #050505
+                );
+
+        }
+
+
+        .top-card:nth-child(3)
+        .top-poster {
+
+            background:
+
+                linear-gradient(
+                    180deg,
+                    transparent 20%,
+                    rgba(0,0,0,0.95) 90%
+                ),
+
+                linear-gradient(
+                    135deg,
+                    #39210f,
+                    #966031,
+                    #050403
+                );
+
+        }
+
+
+        /* 순위 숫자 */
+
+        .rank-number {
+
+            position: absolute;
+
+            top: 18px;
+
+            left: 20px;
+
+            z-index: 2;
+
+            font-size: 58px;
+
+            font-weight: 900;
+
+            font-style: italic;
+
+            line-height: 1;
+
+            color:
+                rgba(255,255,255,0.9);
+
+            text-shadow:
+                0 3px 20px
+                rgba(0,0,0,0.7);
+
+        }
+
+
+        .top-label {
+
+            display: inline-block;
+
+            width: fit-content;
+
+            margin-bottom: 10px;
+
+            padding: 5px 9px;
+
+            border-radius: 3px;
+
+            background: var(--red);
+
+            color: #ffffff;
+
+            font-size: 9px;
+
+            font-weight: 700;
+
+        }
+
+
+        .top-card h2 {
+
+            margin-bottom: 7px;
+
+            font-size: 24px;
+
+            letter-spacing: -1px;
+
+        }
+
+
+        .top-meta {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            color: #aaa;
+
+            font-size: 10px;
+
+        }
+
+
+        .top-rating {
+
+            color: #e9bd4e;
+
+            font-weight: 700;
+
+        }
+
+
+
+        /* ==================================================
+           4 ~ 10위
+        ================================================== */
+
+        .section-header {
+
+            display: flex;
+
+            align-items: flex-end;
+
+            justify-content: space-between;
+
+            margin-bottom: 18px;
+
+        }
+
+
+        .section-label {
+
+            margin-bottom: 6px;
+
+            color: var(--red);
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            letter-spacing: 2px;
+
+        }
+
+
+        .section-header h2 {
+
+            font-size: 23px;
+
+            letter-spacing: -1px;
+
+        }
+
+
+        .section-header p {
+
+            color: #555;
+
+            font-size: 11px;
+
+        }
+
+
+        .ranking-list {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 10px;
+
+        }
+
+
+        .ranking-item {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 18px;
+
+            min-height: 105px;
+
+            padding: 12px 18px;
+
+            border:
+                1px solid #222;
+
+            border-radius: 6px;
+
+            background: #0d0d0d;
+
+            transition: 0.25s;
+
+        }
+
+
+        .ranking-item:hover {
+
+            border-color: #444;
+
+            transform:
+                translateX(3px);
+
+        }
+
+
+        .ranking-number {
+
+            width: 35px;
+
+            flex-shrink: 0;
+
+            color: #555;
+
+            font-size: 22px;
+
+            font-weight: 800;
+
+            font-style: italic;
+
+            text-align: center;
+
+        }
+
+
+        .ranking-poster {
+
+            width: 55px;
+
+            height: 78px;
+
+            flex-shrink: 0;
+
+            display: flex;
+
+            align-items: flex-end;
+
+            padding: 7px;
+
+            border-radius: 3px;
+
+            background:
+
+                linear-gradient(
+                    135deg,
+                    #65131e,
+                    #D92234
+                );
+
+            color: #ffffff;
+
+            font-size: 7px;
+
+            font-weight: 700;
+
+        }
+
+
+        .ranking-info {
+
+            flex: 1;
+
+            min-width: 0;
+
+        }
+
+
+        .ranking-info h3 {
+
+            margin-bottom: 6px;
+
+            font-size: 14px;
+
+        }
+
+
+        .ranking-meta {
+
+            display: flex;
+
+            gap: 9px;
+
+            color: #555;
+
+            font-size: 9px;
+
+        }
+
+
+        .ranking-meta .rating {
+
+            color: #d9ad3e;
+
+        }
+
+
+
+        /* ==================================================
+           UPCOMING
+        ================================================== */
+
+        .upcoming-section {
+
+            margin-top: 75px;
+
+            padding-top: 50px;
+
+            border-top:
+                1px solid #222;
+
+        }
+
+
+        .upcoming-list {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 18px;
+
+        }
+
+
+        .upcoming-card {
+
+            overflow: hidden;
+
+            border:
+                1px solid #222;
+
+            border-radius: 6px;
+
+            background: #0d0d0d;
+
+            transition: 0.25s;
+
+        }
+
+
+        .upcoming-card:hover {
+
+            transform:
+                translateY(-4px);
+
+            border-color: #444;
+
+        }
+
+
+        .upcoming-poster {
+
+            width: 100%;
+
+            aspect-ratio: 2 / 3;
+
+            display: flex;
+
+            align-items: flex-end;
+
+            padding: 15px;
+
+            background:
+
+                linear-gradient(
+                    180deg,
+                    transparent 30%,
+                    rgba(0,0,0,0.9)
+                ),
+
+                linear-gradient(
+                    135deg,
+                    #151d28,
+                    #52677c,
+                    #05070a
+                );
+
+        }
+
+
+        .upcoming-card:nth-child(2)
+        .upcoming-poster {
+
+            background:
+
+                linear-gradient(
+                    180deg,
+                    transparent 30%,
+                    rgba(0,0,0,0.9)
+                ),
+
+                linear-gradient(
+                    135deg,
+                    #30131a,
+                    #81313d,
+                    #050505
+                );
+
+        }
+
+
+        .upcoming-card:nth-child(3)
+        .upcoming-poster {
+
+            background:
+
+                linear-gradient(
+                    180deg,
+                    transparent 30%,
+                    rgba(0,0,0,0.9)
+                ),
+
+                linear-gradient(
+                    135deg,
+                    #2a2110,
+                    #806832,
+                    #050505
+                );
+
+        }
+
+
+        .upcoming-card:nth-child(4)
+        .upcoming-poster {
+
+            background:
+
+                linear-gradient(
+                    180deg,
+                    transparent 30%,
+                    rgba(0,0,0,0.9)
+                ),
+
+                linear-gradient(
+                    135deg,
+                    #171327,
+                    #554c82,
+                    #050505
+                );
+
+        }
+
+
+        .upcoming-title {
+
+            font-size: 16px;
+
+            font-weight: 700;
+
+            line-height: 1.2;
+
+        }
+
+
+        .upcoming-info {
+
+            padding: 14px;
+
+        }
+
+
+        .upcoming-info h3 {
+
+            margin-bottom: 5px;
+
+            font-size: 13px;
+
+        }
+
+
+        .upcoming-date {
+
+            color: var(--red);
+
+            font-size: 10px;
+
+            font-weight: 600;
+
+        }
+
+
+
+        /* ==================================================
+           FOOTER
+        ================================================== */
+
+        .footer {
+
+            padding: 30px 6%;
+
+            border-top:
+                1px solid #181818;
+
+            text-align: center;
+
+            color: #444;
+
+            font-size: 10px;
+
+        }
+
+
+
+        /* ==================================================
+           TABLET
+        ================================================== */
+
+        @media (max-width: 900px) {
+
+
+            .nav {
+
+                gap: 18px;
+
+                margin-left: 25px;
+
+            }
+
+
+            .top-card {
+
+                height: 330px;
+
+            }
+
+
+            .ranking-list {
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+            .upcoming-list {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+            }
+
+        }
+
+
+
+        /* ==================================================
+           MOBILE
+        ================================================== */
+
+        @media (max-width: 700px) {
+
+
+            .header {
+
+                height: 68px;
+
+                padding: 0 20px;
+
+            }
+
+
+            .logo {
+
+                width: 125px;
+
+            }
+
+
+            .logo img {
+
+                width: 125px;
+
+            }
+
+
+            .nav {
+
+                display: none;
+
+            }
+
+
+            .login-button,
+            .signup-button {
+
+                display: none;
+
+            }
+
+
+            .main {
+
+                padding:
+                    100px 20px 70px;
+
+            }
+
+
+            .page-header h1 {
+
+                font-size: 30px;
+
+            }
+
+
+            .ranking-tabs {
+
+                overflow-x: auto;
+
+            }
+
+
+            .ranking-tab {
+
+                white-space: nowrap;
+
+            }
+
+
+            .top-three {
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+            .top-card {
+
+                height: 380px;
+
+            }
+
+
+            .section-header {
+
+                align-items: flex-start;
+
+                flex-direction: column;
+
+                gap: 7px;
+
+            }
+
+
+            .upcoming-list {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+
+<body>
+
+
+
+<!-- ==================================================
+     HEADER
+================================================== -->
+
+<header class="header">
+
+
+    <!-- 로고 -->
+
+    <a
+        href="index.html"
+        class="logo"
+    >
+
+        <img
+            src="images/logo.png"
+            alt="movieLife"
+        >
+
+    </a>
+
+
+
+    <!-- 네비게이션 -->
+
+    <nav class="nav">
+
+
+        <a href="index.html">
+            홈
+        </a>
+
+
+        <a href="movie-list.html">
+            영화
+        </a>
+
+
+        <a
+            href="popular.html"
+            class="active"
+        >
+            인기영화
+        </a>
+
+
+        <a href="movie-recommend.html">
+            영화추천
+        </a>
+
+
+        <a href="ott.html">
+            OTT
+        </a>
+
+
+        <a href="mypage.html">
+            마이페이지
+        </a>
+
+
+    </nav>
+
+
+
+    <!-- 로그인 / 회원가입 -->
+
+    <div class="header-right">
+
+
+        <a
+            href="login.html"
+            class="login-button"
+        >
+            로그인
+        </a>
+
+
+        <a
+            href="signup.html"
+            class="signup-button"
+        >
+            회원가입
+        </a>
+
+
+    </div>
+
+
+</header>
+
+
+
+<!-- ==================================================
+     MAIN
+================================================== -->
+
+<main class="main">
+
+
+
+    <!-- ==================================================
+         PAGE TITLE
+    ================================================== -->
+
+    <section class="page-header">
+
+
+        <div class="page-label">
+
+            MOVIE RANKING
+
+        </div>
+
+
+        <h1>
+
+            인기영화
+
+        </h1>
+
+
+        <p>
+
+            지금 많은 사람들이 보고 있는 영화와
+            높은 평가를 받은 영화를 만나보세요.
+
+        </p>
+
+
+    </section>
+
+
+
+    <!-- ==================================================
+         TAB
+    ================================================== -->
+
+    <div class="ranking-tabs">
+
+
+        <button
+            type="button"
+            class="ranking-tab active"
+            id="popularTab"
+        >
+
+            🔥 Popular
+
+        </button>
+
+
+        <button
+            type="button"
+            class="ranking-tab"
+            id="topRatedTab"
+        >
+
+            ⭐ Top Rated
+
+        </button>
+
+
+    </div>
+
+
+
+    <!-- ==================================================
+         POPULAR
+    ================================================== -->
+
+    <section
+        class="ranking-content active"
+        id="popularContent"
+    >
+
+
+        <!-- TOP 3 -->
+
+        <section
+            class="top-three"
+            id="popularTopThree"
+        >
+
+
+            <!-- 1위 -->
+
+            <article class="top-card">
+
+
+                <div class="rank-number">
+                    1
+                </div>
+
+
+                <div class="top-poster">
+
+
+                    <div class="top-label">
+                        1st
+                    </div>
+
+
+                    <h2>
+                        인셉션
+                    </h2>
+
+
+                    <div class="top-meta">
+
+                        <span class="top-rating">
+                            ★ 4.8
+                        </span>
+
+                        <span>
+                            2010
+                        </span>
+
+                        <span>
+                            SF · 액션
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+            </article>
+
+
+
+            <!-- 2위 -->
+
+            <article class="top-card">
+
+
+                <div class="rank-number">
+                    2
+                </div>
+
+
+                <div class="top-poster">
+
+
+                    <div class="top-label">
+                        2nd
+                    </div>
+
+
+                    <h2>
+                        인터스텔라
+                    </h2>
+
+
+                    <div class="top-meta">
+
+                        <span class="top-rating">
+                            ★ 4.9
+                        </span>
+
+                        <span>
+                            2014
+                        </span>
+
+                        <span>
+                            SF · 드라마
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+            </article>
+
+
+
+            <!-- 3위 -->
+
+            <article class="top-card">
+
+
+                <div class="rank-number">
+                    3
+                </div>
+
+
+                <div class="top-poster">
+
+
+                    <div class="top-label">
+                        3rd
+                    </div>
+
+
+                    <h2>
+                        기생충
+                    </h2>
+
+
+                    <div class="top-meta">
+
+                        <span class="top-rating">
+                            ★ 4.8
+                        </span>
+
+                        <span>
+                            2019
+                        </span>
+
+                        <span>
+                            드라마 · 스릴러
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+            </article>
+
+
+        </section>
+
+
+
+        <!-- 4 ~ 10 -->
+
+        <section>
+
+
+            <div class="section-header">
+
+
+                <div>
+
+                    <div class="section-label">
+                        RANKING 04 — 10
+                    </div>
+
+                    <h2>
+                        인기영화 TOP 10
+                    </h2>
+
+                </div>
+
+
+                <p>
+                    현재 인기 순위
+                </p>
+
+
+            </div>
+
+
+
+            <!--
+                API 연결 예정
+
+                나중에 Popular API 데이터를
+                이 영역에 출력하면 됩니다.
+            -->
+
+            <div
+                class="ranking-list"
+                id="popularList"
+            >
+
+
+                <!-- 4위 -->
+
+                <article class="ranking-item">
+
+                    <div class="ranking-number">
+                        04
+                    </div>
+
+                    <div class="ranking-poster">
+                        DUNE
+                    </div>
+
+                    <div class="ranking-info">
+
+                        <h3>
+                            듄: 파트 2
+                        </h3>
+
+                        <div class="ranking-meta">
+
+                            <span class="rating">
+                                ★ 4.8
+                            </span>
+
+                            <span>
+                                2024
+                            </span>
+
+                            <span>
+                                SF
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+
+                <!-- 5위 -->
+
+                <article class="ranking-item">
+
+                    <div class="ranking-number">
+                        05
+                    </div>
+
+                    <div class="ranking-poster">
+                        AVATAR
+                    </div>
+
+                    <div class="ranking-info">
+
+                        <h3>
+                            아바타
+                        </h3>
+
+                        <div class="ranking-meta">
+
+                            <span class="rating">
+                                ★ 4.6
+                            </span>
+
+                            <span>
+                                2009
+                            </span>
+
+                            <span>
+                                SF
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+
+                <!-- 6위 -->
+
+                <article class="ranking-item">
+
+                    <div class="ranking-number">
+                        06
+                    </div>
+
+                    <div class="ranking-poster">
+                        DARK KNIGHT
+                    </div>
+
+                    <div class="ranking-info">
+
+                        <h3>
+                            다크 나이트
+                        </h3>
+
+                        <div class="ranking-meta">
+
+                            <span class="rating">
+                                ★ 4.9
+                            </span>
+
+                            <span>
+                                2008
+                            </span>
+
+                            <span>
+                                액션
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+
+                <!-- 7위 -->
+
+                <article class="ranking-item">
+
+                    <div class="ranking-number">
+                        07
+                    </div>
+
+                    <div class="ranking-poster">
+                        LALALAND
+                    </div>
+
+                    <div class="ranking-info">
+
+                        <h3>
+                            라라랜드
+                        </h3>
+
+                        <div class="ranking-meta">
+
+                            <span class="rating">
+                                ★ 4.7
+                            </span>
+
+                            <span>
+                                2016
+                            </span>
+
+                            <span>
+                                로맨스
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+
+                <!-- 8위 -->
+
+                <article class="ranking-item">
+
+                    <div class="ranking-number">
+                        08
+                    </div>
+
+                    <div class="ranking-poster">
+                        FORREST
+                    </div>
+
+                    <div class="ranking-info">
+
+                        <h3>
+                            포레스트 검프
+                        </h3>
+
+                        <div class="ranking-meta">
+
+                            <span class="rating">
+                                ★ 4.7
+                            </span>
+
+                            <span>
+                                1994
+                            </span>
+
+                            <span>
+                                드라마
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+
+                <!-- 9위 -->
+
+                <article class="ranking-item">
+
+                    <div class="ranking-number">
+                        09
+                    </div>
+
+                    <div class="ranking-poster">
+                        MATRIX
+                    </div>
+
+                    <div class="ranking-info">
+
+                        <h3>
+                            매트릭스
+                        </h3>
+
+                        <div class="ranking-meta">
+
+                            <span class="rating">
+                                ★ 4.6
+                            </span>
+
+                            <span>
+                                1999
+                            </span>
+
+                            <span>
+                                SF
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+
+                <!-- 10위 -->
+
+                <article class="ranking-item">
+
+                    <div class="ranking-number">
+                        10
+                    </div>
+
+                    <div class="ranking-poster">
+                        WHIPLASH
+                    </div>
+
+                    <div class="ranking-info">
+
+                        <h3>
+                            위플래쉬
+                        </h3>
+
+                        <div class="ranking-meta">
+
+                            <span class="rating">
+                                ★ 4.8
+                            </span>
+
+                            <span>
+                                2014
+                            </span>
+
+                            <span>
+                                드라마
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+            </div>
+
+        </section>
+
+
+    </section>
+
+
+
+    <!-- ==================================================
+         TOP RATED
+    ================================================== -->
+
+    <section
+        class="ranking-content"
+        id="topRatedContent"
+    >
+
+
+        <!-- TOP 3 -->
+
+        <section
+            class="top-three"
+            id="topRatedTopThree"
+        >
+
+
+            <!-- 1위 -->
+
+            <article class="top-card">
+
+
+                <div class="rank-number">
+                    1
+                </div>
+
+
+                <div class="top-poster">
+
+
+                    <div class="top-label">
+                        1st
+                    </div>
+
+
+                    <h2>
+                        쇼생크 탈출
+                    </h2>
+
+
+                    <div class="top-meta">
+
+                        <span class="top-rating">
+                            ★ 4.9
+                        </span>
+
+                        <span>
+                            1994
+                        </span>
+
+                        <span>
+                            드라마
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+            </article>
+
+
+
+            <!-- 2위 -->
+
+            <article class="top-card">
+
+
+                <div class="rank-number">
+                    2
+                </div>
+
+
+                <div class="top-poster">
+
+
+                    <div class="top-label">
+                        2nd
+                    </div>
+
+
+                    <h2>
+                        대부
+                    </h2>
+
+
+                    <div class="top-meta">
+
+                        <span class="top-rating">
+                            ★ 4.8
+                        </span>
+
+                        <span>
+                            1972
+                        </span>
+
+                        <span>
+                            범죄 · 드라마
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+            </article>
+
+
+
+            <!-- 3위 -->
+
+            <article class="top-card">
+
+
+                <div class="rank-number">
+                    3
+                </div>
+
+
+                <div class="top-poster">
+
+
+                    <div class="top-label">
+                        3rd
+                    </div>
+
+
+                    <h2>
+                        다크 나이트
+                    </h2>
+
+
+                    <div class="top-meta">
+
+                        <span class="top-rating">
+                            ★ 4.8
+                        </span>
+
+                        <span>
+                            2008
+                        </span>
+
+                        <span>
+                            액션 · 범죄
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+            </article>
+
+
+        </section>
+
+
+
+        <!-- 4 ~ 10 -->
+
+        <section>
+
+
+            <div class="section-header">
+
+
+                <div>
+
+                    <div class="section-label">
+                        TOP RATED 04 — 10
+                    </div>
+
+                    <h2>
+                        평점 높은 영화 TOP 10
+                    </h2>
+
+                </div>
+
+
+                <p>
+                    사용자 평점 기준
+                </p>
+
+
+            </div>
+
+
+
+            <!--
+                API 연결 예정
+
+                Top Rated API 데이터를
+                이 영역에 출력하면 됩니다.
+            -->
+
+            <div
+                class="ranking-list"
+                id="topRatedList"
+            >
+
+
+                <!-- 4위 -->
+
+                <article class="ranking-item">
+
+                    <div class="ranking-number">
+                        04
+                    </div>
+
+                    <div class="ranking-poster">
+                        INCEPTION
+                    </div>
+
+                    <div class="ranking-info">
+
+                        <h3>
+                            인셉션
+                        </h3>
+
+                        <div class="ranking-meta">
+
+                            <span class="rating">
+                                ★ 4.8
+                            </span>
+
+                            <span>
+                                2010
+                            </span>
+
+                            <span>
+                                SF
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+
+                <!-- 5위 -->
+
+                <article class="ranking-item">
+
+                    <div class="ranking-number">
+                        05
+                    </div>
+
+                    <div class="ranking-poster">
+                        PARASITE
+                    </div>
+
+                    <div class="ranking-info">
+
+                        <h3>
+                            기생충
+                        </h3>
+
+                        <div class="ranking-meta">
+
+                            <span class="rating">
+                                ★ 4.8
+                            </span>
+
+                            <span>
+                                2019
+                            </span>
+
+                            <span>
+                                드라마
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+
+                <!-- 6위 -->
+
+                <article class="ranking-item">
+
+                    <div class="ranking-number">
+                        06
+                    </div>
+
+                    <div class="ranking-poster">
+                        INTERSTELLAR
+                    </div>
+
+                    <div class="ranking-info">
+
+                        <h3>
+                            인터스텔라
+                        </h3>
+
+                        <div class="ranking-meta">
+
+                            <span class="rating">
+                                ★ 4.7
+                            </span>
+
+                            <span>
+                                2014
+                            </span>
+
+                            <span>
+                                SF
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+
+                <!-- 7위 -->
+
+                <article class="ranking-item">
+
+                    <div class="ranking-number">
+                        07
+                    </div>
+
+                    <div class="ranking-poster">
+                        FORREST
+                    </div>
+
+                    <div class="ranking-info">
+
+                        <h3>
+                            포레스트 검프
+                        </h3>
+
+                        <div class="ranking-meta">
+
+                            <span class="rating">
+                                ★ 4.7
+                            </span>
+
+                            <span>
+                                1994
+                            </span>
+
+                            <span>
+                                드라마
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+
+                <!-- 8위 -->
+
+                <article class="ranking-item">
+
+                    <div class="ranking-number">
+                        08
+                    </div>
+
+                    <div class="ranking-poster">
+                        GODFATHER
+                    </div>
+
+                    <div class="ranking-info">
+
+                        <h3>
+                            대부 2
+                        </h3>
+
+                        <div class="ranking-meta">
+
+                            <span class="rating">
+                                ★ 4.7
+                            </span>
+
+                            <span>
+                                1974
+                            </span>
+
+                            <span>
+                                범죄
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+
+                <!-- 9위 -->
+
+                <article class="ranking-item">
+
+                    <div class="ranking-number">
+                        09
+                    </div>
+
+                    <div class="ranking-poster">
+                        WHIPLASH
+                    </div>
+
+                    <div class="ranking-info">
+
+                        <h3>
+                            위플래쉬
+                        </h3>
+
+                        <div class="ranking-meta">
+
+                            <span class="rating">
+                                ★ 4.6
+                            </span>
+
+                            <span>
+                                2014
+                            </span>
+
+                            <span>
+                                드라마
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+
+                <!-- 10위 -->
+
+                <article class="ranking-item">
+
+                    <div class="ranking-number">
+                        10
+                    </div>
+
+                    <div class="ranking-poster">
+                        MATRIX
+                    </div>
+
+                    <div class="ranking-info">
+
+                        <h3>
+                            매트릭스
+                        </h3>
+
+                        <div class="ranking-meta">
+
+                            <span class="rating">
+                                ★ 4.6
+                            </span>
+
+                            <span>
+                                1999
+                            </span>
+
+                            <span>
+                                SF · 액션
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+            </div>
+
+        </section>
+
+
+    </section>
+
+
+
+    <!-- ==================================================
+         UPCOMING
+         항상 표시
+    ================================================== -->
+
+    <section
+        class="upcoming-section"
+        id="upcomingContent"
+    >
+
+
+        <div class="section-header">
+
+
+            <div>
+
+                <div class="section-label">
+                    COMING SOON
+                </div>
+
+
+                <h2>
+                    개봉 예정작
+                </h2>
+
+            </div>
+
+
+            <p>
+                UPCOMING
+            </p>
+
+
+        </div>
+
+
+
+        <!--
+            API 연결 예정
+
+            Upcoming API 데이터를
+            이 영역에 출력하면 됩니다.
+        -->
+
+        <div
+            class="upcoming-list"
+            id="upcomingList"
+        >
+
+
+            <!-- 예정작 1 -->
+
+            <article class="upcoming-card">
+
+
+                <div class="upcoming-poster">
+
+                    <div class="upcoming-title">
+                        UPCOMING<br>
+                        MOVIE 01
+                    </div>
+
+                </div>
+
+
+                <div class="upcoming-info">
+
+                    <h3>
+                        개봉 예정 영화 01
+                    </h3>
+
+                    <div class="upcoming-date">
+                        개봉 예정
+                    </div>
+
+                </div>
+
+
+            </article>
+
+
+
+            <!-- 예정작 2 -->
+
+            <article class="upcoming-card">
+
+
+                <div class="upcoming-poster">
+
+                    <div class="upcoming-title">
+                        UPCOMING<br>
+                        MOVIE 02
+                    </div>
+
+                </div>
+
+
+                <div class="upcoming-info">
+
+                    <h3>
+                        개봉 예정 영화 02
+                    </h3>
+
+                    <div class="upcoming-date">
+                        개봉 예정
+                    </div>
+
+                </div>
+
+
+            </article>
+
+
+
+            <!-- 예정작 3 -->
+
+            <article class="upcoming-card">
+
+
+                <div class="upcoming-poster">
+
+                    <div class="upcoming-title">
+                        UPCOMING<br>
+                        MOVIE 03
+                    </div>
+
+                </div>
+
+
+                <div class="upcoming-info">
+
+                    <h3>
+                        개봉 예정 영화 03
+                    </h3>
+
+                    <div class="upcoming-date">
+                        개봉 예정
+                    </div>
+
+                </div>
+
+
+            </article>
+
+
+
+            <!-- 예정작 4 -->
+
+            <article class="upcoming-card">
+
+
+                <div class="upcoming-poster">
+
+                    <div class="upcoming-title">
+                        UPCOMING<br>
+                        MOVIE 04
+                    </div>
+
+                </div>
+
+
+                <div class="upcoming-info">
+
+                    <h3>
+                        개봉 예정 영화 04
+                    </h3>
+
+                    <div class="upcoming-date">
+                        개봉 예정
+                    </div>
+
+                </div>
+
+
+            </article>
+
+
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+
+<!-- ==================================================
+     FOOTER
+================================================== -->
+
+<footer class="footer">
+
+    © 2026 movieLife. All Rights Reserved.
+
+</footer>
+
+
+
+<!-- ==================================================
+     JAVASCRIPT
+     Popular ↔ Top Rated 전환
+================================================== -->
+
+<script>
+
+
+    /* ==================================================
+       요소 가져오기
+    ================================================== */
+
+    const popularTab =
+        document.getElementById("popularTab");
+
+
+    const topRatedTab =
+        document.getElementById("topRatedTab");
+
+
+    const popularContent =
+        document.getElementById("popularContent");
+
+
+    const topRatedContent =
+        document.getElementById("topRatedContent");
+
+
+
+    /* ==================================================
+       Popular 클릭
+    ================================================== */
+
+    popularTab.addEventListener(
+        "click",
+        function () {
+
+
+            /* 버튼 활성화 */
+
+            popularTab.classList.add("active");
+
+            topRatedTab.classList.remove("active");
+
+
+
+            /* 콘텐츠 변경 */
+
+            popularContent.classList.add("active");
+
+            topRatedContent.classList.remove("active");
+
+
+        }
+    );
+
+
+
+    /* ==================================================
+       Top Rated 클릭
+    ================================================== */
+
+    topRatedTab.addEventListener(
+        "click",
+        function () {
+
+
+            /* 버튼 활성화 */
+
+            topRatedTab.classList.add("active");
+
+            popularTab.classList.remove("active");
+
+
+
+            /* 콘텐츠 변경 */
+
+            topRatedContent.classList.add("active");
+
+            popularContent.classList.remove("active");
+
+
+        }
+    );
+
+
+</script>
+
+
+
+</body>
+
+</html>

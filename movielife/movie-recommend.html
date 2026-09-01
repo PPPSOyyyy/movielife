@@ -1,0 +1,1949 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>영화추천 | movieLife</title>
+
+
+    <style>
+
+        /* ==================================================
+           기본 설정
+        ================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        :root {
+
+            --black: #000000;
+            --red: #D92234;
+            --white: #ffffff;
+
+            --gray-light: #cccccc;
+            --gray: #777777;
+            --gray-dark: #333333;
+
+            --card: #101010;
+            --border: #252525;
+
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            background:
+                radial-gradient(
+                    circle at 50% 0%,
+                    rgba(217, 34, 52, 0.10),
+                    transparent 35%
+                ),
+                #000000;
+
+            color: #ffffff;
+
+            font-family:
+                "Pretendard",
+                "Noto Sans KR",
+                Arial,
+                sans-serif;
+
+        }
+
+
+        a {
+
+            color: inherit;
+
+            text-decoration: none;
+
+        }
+
+
+        button {
+
+            font-family: inherit;
+
+            cursor: pointer;
+
+        }
+
+
+
+        /* ==================================================
+           HEADER
+        ================================================== */
+
+        .header {
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            z-index: 1000;
+
+            width: 100%;
+
+            height: 76px;
+
+            display: flex;
+
+            align-items: center;
+
+            padding: 0 6%;
+
+            background:
+                rgba(0, 0, 0, 0.95);
+
+            border-bottom:
+                1px solid rgba(255,255,255,0.07);
+
+            backdrop-filter: blur(10px);
+
+        }
+
+
+        .logo {
+
+            display: flex;
+
+            align-items: center;
+
+            width: 145px;
+
+            flex-shrink: 0;
+
+        }
+
+
+        .logo img {
+
+            display: block;
+
+            width: 145px;
+
+            height: auto;
+
+        }
+
+
+        /* ==================================================
+           NAV
+        ================================================== */
+
+        .nav {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 30px;
+
+            margin-left: 45px;
+
+        }
+
+
+        .nav a {
+
+            position: relative;
+
+            color: #bdbdbd;
+
+            font-size: 14px;
+
+            font-weight: 500;
+
+            transition: 0.25s;
+
+        }
+
+
+        .nav a:hover {
+
+            color: #ffffff;
+
+        }
+
+
+        .nav a.active {
+
+            color: #ffffff;
+
+            font-weight: 700;
+
+        }
+
+
+        .nav a.active::after {
+
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+
+            bottom: -9px;
+
+            width: 100%;
+
+            height: 2px;
+
+            background: var(--red);
+
+        }
+
+
+
+        /* ==================================================
+           HEADER RIGHT
+        ================================================== */
+
+        .header-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-left: auto;
+
+        }
+
+
+        .login-button {
+
+            padding: 9px 18px;
+
+            border:
+                1px solid #444;
+
+            border-radius: 5px;
+
+            background: transparent;
+
+            color: #ffffff;
+
+            font-size: 12px;
+
+        }
+
+
+        .signup-button {
+
+            padding: 9px 18px;
+
+            border:
+                1px solid var(--red);
+
+            border-radius: 5px;
+
+            background: var(--red);
+
+            color: #ffffff;
+
+            font-size: 12px;
+
+        }
+
+
+
+        /* ==================================================
+           MAIN
+        ================================================== */
+
+        .main {
+
+            max-width: 1100px;
+
+            margin: 0 auto;
+
+            padding:
+                130px 30px 100px;
+
+        }
+
+
+
+        /* ==================================================
+           PAGE TITLE
+        ================================================== */
+
+        .page-header {
+
+            margin-bottom: 40px;
+
+        }
+
+
+        .page-label {
+
+            margin-bottom: 10px;
+
+            color: var(--red);
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            letter-spacing: 2px;
+
+        }
+
+
+        .page-header h1 {
+
+            margin-bottom: 10px;
+
+            font-size: 40px;
+
+            letter-spacing: -2px;
+
+        }
+
+
+        .page-header p {
+
+            color: #777;
+
+            font-size: 13px;
+
+            line-height: 1.7;
+
+        }
+
+
+
+        /* ==================================================
+           RECOMMENDATION BOX
+        ================================================== */
+
+        .recommend-box {
+
+            padding: 35px;
+
+            border:
+                1px solid #242424;
+
+            border-radius: 8px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #111111,
+                    #080808
+                );
+
+        }
+
+
+        .recommend-title {
+
+            margin-bottom: 30px;
+
+        }
+
+
+        .recommend-title h2 {
+
+            margin-bottom: 7px;
+
+            font-size: 21px;
+
+        }
+
+
+        .recommend-title p {
+
+            color: #666;
+
+            font-size: 11px;
+
+        }
+
+
+
+        /* ==================================================
+           QUESTION
+        ================================================== */
+
+        .question {
+
+            margin-bottom: 32px;
+
+        }
+
+
+        .question:last-of-type {
+
+            margin-bottom: 0;
+
+        }
+
+
+        .question-title {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            margin-bottom: 13px;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+        }
+
+
+        .question-number {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            width: 23px;
+
+            height: 23px;
+
+            border-radius: 50%;
+
+            background: var(--red);
+
+            font-size: 10px;
+
+        }
+
+
+
+        /* ==================================================
+           CHOICE BUTTON
+        ================================================== */
+
+        .choices {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 8px;
+
+        }
+
+
+        .choice {
+
+            padding: 10px 16px;
+
+            border:
+                1px solid #303030;
+
+            border-radius: 5px;
+
+            background: #0b0b0b;
+
+            color: #888;
+
+            font-size: 11px;
+
+            transition: 0.2s;
+
+        }
+
+
+        .choice:hover {
+
+            border-color: #555;
+
+            color: #ffffff;
+
+        }
+
+
+        .choice.selected {
+
+            border-color: var(--red);
+
+            background:
+                rgba(217, 34, 52, 0.12);
+
+            color: #ffffff;
+
+        }
+
+
+
+        /* ==================================================
+           RECOMMEND BUTTON
+        ================================================== */
+
+        .recommend-action {
+
+            display: flex;
+
+            justify-content: center;
+
+            margin-top: 38px;
+
+            padding-top: 30px;
+
+            border-top:
+                1px solid #222;
+
+        }
+
+
+        .recommend-button {
+
+            min-width: 210px;
+
+            padding: 14px 25px;
+
+            border: none;
+
+            border-radius: 5px;
+
+            background: var(--red);
+
+            color: #ffffff;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            transition: 0.2s;
+
+        }
+
+
+        .recommend-button:hover {
+
+            background: #b91d2e;
+
+            transform:
+                translateY(-2px);
+
+        }
+
+
+
+        /* ==================================================
+           RESULT
+        ================================================== */
+
+        .result-section {
+
+            margin-top: 60px;
+
+            display: none;
+
+        }
+
+
+        .result-section.show {
+
+            display: block;
+
+        }
+
+
+        .result-header {
+
+            display: flex;
+
+            align-items: flex-end;
+
+            justify-content: space-between;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .result-label {
+
+            margin-bottom: 7px;
+
+            color: var(--red);
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            letter-spacing: 2px;
+
+        }
+
+
+        .result-header h2 {
+
+            font-size: 24px;
+
+            letter-spacing: -1px;
+
+        }
+
+
+        .result-header p {
+
+            color: #555;
+
+            font-size: 10px;
+
+        }
+
+
+
+        /* ==================================================
+           MOVIE RESULT LIST
+        ================================================== */
+
+        .recommendation-list {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 16px;
+
+        }
+
+
+        .movie-card {
+
+            overflow: hidden;
+
+            border:
+                1px solid #242424;
+
+            border-radius: 6px;
+
+            background: #0d0d0d;
+
+            transition: 0.25s;
+
+        }
+
+
+        .movie-card:hover {
+
+            transform:
+                translateY(-5px);
+
+            border-color: #444;
+
+        }
+
+
+        .movie-poster {
+
+            position: relative;
+
+            width: 100%;
+
+            aspect-ratio: 2 / 3;
+
+            display: flex;
+
+            align-items: flex-end;
+
+            padding: 14px;
+
+            background:
+
+                linear-gradient(
+                    180deg,
+                    transparent 35%,
+                    rgba(0,0,0,0.95)
+                ),
+
+                linear-gradient(
+                    135deg,
+                    #65131e,
+                    #D92234,
+                    #050000
+                );
+
+        }
+
+
+        .movie-card:nth-child(2)
+        .movie-poster {
+
+            background:
+
+                linear-gradient(
+                    180deg,
+                    transparent 35%,
+                    rgba(0,0,0,0.95)
+                ),
+
+                linear-gradient(
+                    135deg,
+                    #171d27,
+                    #586879,
+                    #050505
+                );
+
+        }
+
+
+        .movie-card:nth-child(3)
+        .movie-poster {
+
+            background:
+
+                linear-gradient(
+                    180deg,
+                    transparent 35%,
+                    rgba(0,0,0,0.95)
+                ),
+
+                linear-gradient(
+                    135deg,
+                    #302010,
+                    #9a6832,
+                    #050403
+                );
+
+        }
+
+
+        .movie-card:nth-child(4)
+        .movie-poster {
+
+            background:
+
+                linear-gradient(
+                    180deg,
+                    transparent 35%,
+                    rgba(0,0,0,0.95)
+                ),
+
+                linear-gradient(
+                    135deg,
+                    #20182e,
+                    #625087,
+                    #050505
+                );
+
+        }
+
+
+        .movie-rank {
+
+            position: absolute;
+
+            top: 12px;
+
+            left: 12px;
+
+            font-size: 27px;
+
+            font-weight: 900;
+
+            font-style: italic;
+
+        }
+
+
+        .movie-poster-title {
+
+            font-size: 17px;
+
+            font-weight: 800;
+
+            line-height: 1.2;
+
+        }
+
+
+        .movie-info {
+
+            padding: 14px;
+
+        }
+
+
+        .movie-info h3 {
+
+            margin-bottom: 7px;
+
+            font-size: 13px;
+
+        }
+
+
+        .movie-meta {
+
+            display: flex;
+
+            gap: 8px;
+
+            color: #555;
+
+            font-size: 9px;
+
+        }
+
+
+        .movie-rating {
+
+            color: #d9ad3e;
+
+        }
+
+
+        .movie-actions {
+
+            display: flex;
+
+            gap: 7px;
+
+            margin-top: 13px;
+
+        }
+
+
+        .detail-button,
+        .like-button {
+
+            flex: 1;
+
+            padding: 7px 5px;
+
+            border:
+                1px solid #292929;
+
+            border-radius: 4px;
+
+            background: transparent;
+
+            color: #888;
+
+            font-size: 9px;
+
+        }
+
+
+        .detail-button:hover,
+        .like-button:hover {
+
+            border-color: #555;
+
+            color: #ffffff;
+
+        }
+
+
+        .like-button.liked {
+
+            border-color: var(--red);
+
+            color: var(--red);
+
+        }
+
+
+
+        /* ==================================================
+           FOOTER
+        ================================================== */
+
+        .footer {
+
+            padding: 30px 6%;
+
+            border-top:
+                1px solid #181818;
+
+            text-align: center;
+
+            color: #444;
+
+            font-size: 10px;
+
+        }
+
+
+
+        /* ==================================================
+           TABLET
+        ================================================== */
+
+        @media (max-width: 900px) {
+
+            .nav {
+
+                gap: 18px;
+
+                margin-left: 25px;
+
+            }
+
+
+            .recommendation-list {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+            }
+
+        }
+
+
+
+        /* ==================================================
+           MOBILE
+        ================================================== */
+
+        @media (max-width: 700px) {
+
+            .header {
+
+                height: 68px;
+
+                padding: 0 20px;
+
+            }
+
+
+            .logo,
+            .logo img {
+
+                width: 125px;
+
+            }
+
+
+            .nav {
+
+                display: none;
+
+            }
+
+
+            .login-button,
+            .signup-button {
+
+                display: none;
+
+            }
+
+
+            .main {
+
+                padding:
+                    100px 20px 70px;
+
+            }
+
+
+            .page-header h1 {
+
+                font-size: 30px;
+
+            }
+
+
+            .recommend-box {
+
+                padding: 23px;
+
+            }
+
+
+            .recommendation-list {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+            }
+
+
+            .result-header {
+
+                align-items: flex-start;
+
+                flex-direction: column;
+
+                gap: 7px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+
+<body>
+
+
+
+<!-- ==================================================
+     HEADER
+================================================== -->
+
+<header class="header">
+
+
+    <!-- 로고 -->
+
+    <a
+        href="index.html"
+        class="logo"
+    >
+
+        <img
+            src="images/logo.png"
+            alt="movieLife"
+        >
+
+    </a>
+
+
+
+    <!-- 네비게이션 -->
+
+    <nav class="nav">
+
+
+        <a href="index.html">
+            홈
+        </a>
+
+
+        <a href="movie-list.html">
+            영화
+        </a>
+
+
+        <a href="popular.html">
+            인기영화
+        </a>
+
+
+        <a
+            href="movie-recommend.html"
+            class="active"
+        >
+            영화추천
+        </a>
+
+
+        <a href="ott.html">
+            OTT
+        </a>
+
+
+        <a href="mypage.html">
+            마이페이지
+        </a>
+
+
+    </nav>
+
+
+
+    <!-- 로그인 / 회원가입 -->
+
+    <div class="header-right">
+
+
+        <a
+            href="login.html"
+            class="login-button"
+        >
+            로그인
+        </a>
+
+
+        <a
+            href="signup.html"
+            class="signup-button"
+        >
+            회원가입
+        </a>
+
+
+    </div>
+
+
+</header>
+
+
+
+<!-- ==================================================
+     MAIN
+================================================== -->
+
+<main class="main">
+
+
+
+    <!-- ==================================================
+         PAGE HEADER
+    ================================================== -->
+
+    <section class="page-header">
+
+
+        <div class="page-label">
+            MOVIE RECOMMEND
+        </div>
+
+
+        <h1>
+            영화추천
+        </h1>
+
+
+        <p>
+            지금의 취향과 기분을 선택해주세요.<br>
+            movieLife가 당신에게 어울리는 영화를 찾아드릴게요.
+        </p>
+
+
+    </section>
+
+
+
+    <!-- ==================================================
+         RECOMMENDATION BOX
+    ================================================== -->
+
+    <section class="recommend-box">
+
+
+        <div class="recommend-title">
+
+            <h2>
+                어떤 영화를 찾고 있나요?
+            </h2>
+
+            <p>
+                원하는 조건을 선택하면 맞춤 영화를 추천해드립니다.
+            </p>
+
+        </div>
+
+
+
+        <!-- ==================================================
+             QUESTION 1 : 장르
+        ================================================== -->
+
+        <div class="question">
+
+
+            <div class="question-title">
+
+                <span class="question-number">
+                    1
+                </span>
+
+                선호하는 장르를 선택해주세요.
+
+            </div>
+
+
+            <div class="choices">
+
+
+                <button
+                    type="button"
+                    class="choice"
+                    data-group="genre"
+                >
+                    액션
+                </button>
+
+
+                <button
+                    type="button"
+                    class="choice"
+                    data-group="genre"
+                >
+                    코미디
+                </button>
+
+
+                <button
+                    type="button"
+                    class="choice"
+                    data-group="genre"
+                >
+                    로맨스
+                </button>
+
+
+                <button
+                    type="button"
+                    class="choice"
+                    data-group="genre"
+                >
+                    드라마
+                </button>
+
+
+                <button
+                    type="button"
+                    class="choice"
+                    data-group="genre"
+                >
+                    SF
+                </button>
+
+
+                <button
+                    type="button"
+                    class="choice"
+                    data-group="genre"
+                >
+                    스릴러
+                </button>
+
+
+                <button
+                    type="button"
+                    class="choice"
+                    data-group="genre"
+                >
+                    공포
+                </button>
+
+
+                <button
+                    type="button"
+                    class="choice"
+                    data-group="genre"
+                >
+                    애니메이션
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ==================================================
+             QUESTION 2 : 기분
+        ================================================== -->
+
+        <div class="question">
+
+
+            <div class="question-title">
+
+                <span class="question-number">
+                    2
+                </span>
+
+                지금 어떤 기분인가요?
+
+            </div>
+
+
+            <div class="choices">
+
+
+                <button
+                    type="button"
+                    class="choice"
+                    data-group="mood"
+                >
+                    😂 웃고 싶어요
+                </button>
+
+
+                <button
+                    type="button"
+                    class="choice"
+                    data-group="mood"
+                >
+                    😭 감동받고 싶어요
+                </button>
+
+
+                <button
+                    type="button"
+                    class="choice"
+                    data-group="mood"
+                >
+                    💕 설레고 싶어요
+                </button>
+
+
+                <button
+                    type="button"
+                    class="choice"
+                    data-group="mood"
+                >
+                    😱 긴장하고 싶어요
+                </button>
+
+
+                <button
+                    type="button"
+                    class="choice"
+                    data-group="mood"
+                >
+                    🧠 생각할 거리가 필요해요
+                </button>
+
+
+                <button
+                    type="button"
+                    class="choice"
+                    data-group="mood"
+                >
+                    😌 편하게 보고 싶어요
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ==================================================
+             QUESTION 3 : 평점
+        ================================================== -->
+
+        <div class="question">
+
+
+            <div class="question-title">
+
+                <span class="question-number">
+                    3
+                </span>
+
+                평점 기준은 어떻게 할까요?
+
+            </div>
+
+
+            <div class="choices">
+
+
+                <button
+                    type="button"
+                    class="choice"
+                    data-group="rating"
+                >
+                    ⭐ 4.5 이상
+                </button>
+
+
+                <button
+                    type="button"
+                    class="choice"
+                    data-group="rating"
+                >
+                    ⭐ 4.0 이상
+                </button>
+
+
+                <button
+                    type="button"
+                    class="choice"
+                    data-group="rating"
+                >
+                    ⭐ 상관없어요
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ==================================================
+             RECOMMEND BUTTON
+        ================================================== -->
+
+        <div class="recommend-action">
+
+
+            <button
+                type="button"
+                class="recommend-button"
+                id="recommendButton"
+            >
+
+                🎬 나에게 맞는 영화 찾기
+
+            </button>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- ==================================================
+         RECOMMENDATION RESULT
+    ================================================== -->
+
+    <section
+        class="result-section"
+        id="recommendationResult"
+    >
+
+
+        <div class="result-header">
+
+
+            <div>
+
+                <div class="result-label">
+                    FOR YOU
+                </div>
+
+
+                <h2>
+                    당신을 위한 추천 영화
+                </h2>
+
+            </div>
+
+
+            <p>
+                선택한 취향을 바탕으로 추천합니다.
+            </p>
+
+
+        </div>
+
+
+
+        <!--
+            ==================================================
+            API 연결 예정 영역
+
+            나중에 영화 추천 API 데이터를
+            이 영역에 출력하면 됩니다.
+
+            ID : recommendationList
+            ==================================================
+        -->
+
+        <div
+            class="recommendation-list"
+            id="recommendationList"
+        >
+
+
+            <!-- 영화 1 -->
+
+            <article class="movie-card">
+
+
+                <div class="movie-poster">
+
+
+                    <div class="movie-rank">
+                        01
+                    </div>
+
+
+                    <div class="movie-poster-title">
+                        인셉션
+                    </div>
+
+
+                </div>
+
+
+                <div class="movie-info">
+
+
+                    <h3>
+                        인셉션
+                    </h3>
+
+
+                    <div class="movie-meta">
+
+                        <span class="movie-rating">
+                            ★ 4.8
+                        </span>
+
+                        <span>
+                            2010
+                        </span>
+
+                        <span>
+                            SF
+                        </span>
+
+                    </div>
+
+
+                    <div class="movie-actions">
+
+
+                        <button
+                            type="button"
+                            class="detail-button"
+                            onclick="location.href='movie-detail.html'"
+                        >
+                            상세정보
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="like-button"
+                        >
+                            ♡ 찜하기
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </article>
+
+
+
+            <!-- 영화 2 -->
+
+            <article class="movie-card">
+
+
+                <div class="movie-poster">
+
+
+                    <div class="movie-rank">
+                        02
+                    </div>
+
+
+                    <div class="movie-poster-title">
+                        라라랜드
+                    </div>
+
+
+                </div>
+
+
+                <div class="movie-info">
+
+
+                    <h3>
+                        라라랜드
+                    </h3>
+
+
+                    <div class="movie-meta">
+
+                        <span class="movie-rating">
+                            ★ 4.7
+                        </span>
+
+                        <span>
+                            2016
+                        </span>
+
+                        <span>
+                            로맨스
+                        </span>
+
+                    </div>
+
+
+                    <div class="movie-actions">
+
+
+                        <button
+                            type="button"
+                            class="detail-button"
+                            onclick="location.href='movie-detail.html'"
+                        >
+                            상세정보
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="like-button"
+                        >
+                            ♡ 찜하기
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </article>
+
+
+
+            <!-- 영화 3 -->
+
+            <article class="movie-card">
+
+
+                <div class="movie-poster">
+
+
+                    <div class="movie-rank">
+                        03
+                    </div>
+
+
+                    <div class="movie-poster-title">
+                        인터스텔라
+                    </div>
+
+
+                </div>
+
+
+                <div class="movie-info">
+
+
+                    <h3>
+                        인터스텔라
+                    </h3>
+
+
+                    <div class="movie-meta">
+
+                        <span class="movie-rating">
+                            ★ 4.9
+                        </span>
+
+                        <span>
+                            2014
+                        </span>
+
+                        <span>
+                            SF
+                        </span>
+
+                    </div>
+
+
+                    <div class="movie-actions">
+
+
+                        <button
+                            type="button"
+                            class="detail-button"
+                            onclick="location.href='movie-detail.html'"
+                        >
+                            상세정보
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="like-button"
+                        >
+                            ♡ 찜하기
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </article>
+
+
+
+            <!-- 영화 4 -->
+
+            <article class="movie-card">
+
+
+                <div class="movie-poster">
+
+
+                    <div class="movie-rank">
+                        04
+                    </div>
+
+
+                    <div class="movie-poster-title">
+                        기생충
+                    </div>
+
+
+                </div>
+
+
+                <div class="movie-info">
+
+
+                    <h3>
+                        기생충
+                    </h3>
+
+
+                    <div class="movie-meta">
+
+                        <span class="movie-rating">
+                            ★ 4.8
+                        </span>
+
+                        <span>
+                            2019
+                        </span>
+
+                        <span>
+                            드라마
+                        </span>
+
+                    </div>
+
+
+                    <div class="movie-actions">
+
+
+                        <button
+                            type="button"
+                            class="detail-button"
+                            onclick="location.href='movie-detail.html'"
+                        >
+                            상세정보
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="like-button"
+                        >
+                            ♡ 찜하기
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </article>
+
+
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+
+<!-- ==================================================
+     FOOTER
+================================================== -->
+
+<footer class="footer">
+
+    © 2026 movieLife. All Rights Reserved.
+
+</footer>
+
+
+
+<!-- ==================================================
+     JAVASCRIPT
+================================================== -->
+
+<script>
+
+
+    /* ==================================================
+       선택 버튼
+    ================================================== */
+
+    const choices =
+        document.querySelectorAll(".choice");
+
+
+    choices.forEach(function(choice) {
+
+
+        choice.addEventListener(
+            "click",
+            function() {
+
+
+                const group =
+                    choice.dataset.group;
+
+
+                const sameGroup =
+                    document.querySelectorAll(
+                        '.choice[data-group="' + group + '"]'
+                    );
+
+
+                /*
+                    같은 항목에서는 하나만 선택
+                */
+
+                sameGroup.forEach(function(item) {
+
+                    item.classList.remove("selected");
+
+                });
+
+
+                choice.classList.add("selected");
+
+
+            }
+        );
+
+
+    });
+
+
+
+    /* ==================================================
+       추천 버튼
+    ================================================== */
+
+    const recommendButton =
+        document.getElementById(
+            "recommendButton"
+        );
+
+
+    const recommendationResult =
+        document.getElementById(
+            "recommendationResult"
+        );
+
+
+    recommendButton.addEventListener(
+        "click",
+        function() {
+
+
+            /*
+                현재는 디자인 확인용으로
+                추천 결과를 보여줍니다.
+
+                나중에는 여기서
+                API를 호출하면 됩니다.
+            */
+
+
+            recommendationResult.classList.add(
+                "show"
+            );
+
+
+            recommendationResult.scrollIntoView({
+                behavior: "smooth"
+            });
+
+
+        }
+    );
+
+
+
+    /* ==================================================
+       찜하기 버튼
+    ================================================== */
+
+    const likeButtons =
+        document.querySelectorAll(
+            ".like-button"
+        );
+
+
+    likeButtons.forEach(function(button) {
+
+
+        button.addEventListener(
+            "click",
+            function() {
+
+
+                button.classList.toggle(
+                    "liked"
+                );
+
+
+                if (
+                    button.classList.contains(
+                        "liked"
+                    )
+                ) {
+
+                    button.textContent =
+                        "♥ 찜 완료";
+
+                } else {
+
+                    button.textContent =
+                        "♡ 찜하기";
+
+                }
+
+
+            }
+        );
+
+
+    });
+
+
+</script>
+
+
+
+</body>
+
+</html>

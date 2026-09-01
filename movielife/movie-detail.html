@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>영화 상세정보 | movieLife</title>
+
+
+    <style>
+
+        /* ==================================================
+           기본 설정
+        ================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        :root {
+
+            --black: #000000;
+
+            --red: #D92234;
+
+            --white: #ffffff;
+
+            --gray-100: #f5f5f5;
+
+            --gray-300: #cccccc;
+
+            --gray-500: #777777;
+
+            --gray-700: #333333;
+
+        }
+
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            background:
+                radial-gradient(
+                    circle at 70% 20%,
+                    rgba(217, 34, 52, 0.12),
+                    transparent 30%
+                ),
+                #000000;
+
+            color: var(--white);
+
+            font-family:
+                "Pretendard",
+                "Noto Sans KR",
+                Arial,
+                sans-serif;
+
+            line-height: 1.5;
+
+        }
+
+
+        a {
+
+            color: inherit;
+
+            text-decoration: none;
+
+        }
+
+
+        button {
+
+            font-family: inherit;
+
+            cursor: pointer;
+
+        }
+
+
+
+        /* ==================================================
+           HEADER
+        ================================================== */
+
+        .header {
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            z-index: 1000;
+
+            width: 100%;
+
+            height: 76px;
+
+            display: flex;
+
+            align-items: center;
+
+            padding: 0 6%;
+
+            background:
+                rgba(0, 0, 0, 0.94);
+
+            border-bottom:
+                1px solid rgba(255,255,255,0.07);
+
+            backdrop-filter: blur(10px);
+
+        }
+
+
+        /* 로고 */
+
+        .logo {
+
+            display: flex;
+
+            align-items: center;
+
+            width: 145px;
+
+            flex-shrink: 0;
+
+        }
+
+
+        .logo img {
+
+            display: block;
+
+            width: 145px;
+
+            height: auto;
+
+        }
+
+
+        /* 네비게이션 */
+
+        .nav {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 30px;
+
+            margin-left: 45px;
+
+        }
+
+
+        .nav a {
+
+            position: relative;
+
+            color: #bdbdbd;
+
+            font-size: 14px;
+
+            font-weight: 500;
+
+            transition: 0.25s;
+
+        }
+
+
+        .nav a:hover {
+
+            color: white;
+
+        }
+
+
+        .nav a.active {
+
+            color: white;
+
+            font-weight: 700;
+
+        }
+
+
+        .nav a.active::after {
+
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+
+            bottom: -9px;
+
+            width: 100%;
+
+            height: 2px;
+
+            background: var(--red);
+
+        }
+
+
+        /* 헤더 오른쪽 */
+
+        .header-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-left: auto;
+
+        }
+
+
+        .login-button {
+
+            padding: 9px 18px;
+
+            border:
+                1px solid #444;
+
+            border-radius: 5px;
+
+            background: transparent;
+
+            color: white;
+
+            font-size: 12px;
+
+        }
+
+
+        .signup-button {
+
+            padding: 9px 18px;
+
+            border:
+                1px solid var(--red);
+
+            border-radius: 5px;
+
+            background: var(--red);
+
+            color: white;
+
+            font-size: 12px;
+
+        }
+
+
+
+        /* ==================================================
+           MAIN
+        ================================================== */
+
+        .movie-detail {
+
+            max-width: 1150px;
+
+            margin: 0 auto;
+
+            padding:
+                130px 30px 100px;
+
+        }
+
+
+
+        /* ==================================================
+           뒤로가기
+        ================================================== */
+
+        .back-button {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            margin-bottom: 25px;
+
+            color: #777;
+
+            font-size: 12px;
+
+            transition: 0.2s;
+
+        }
+
+
+        .back-button:hover {
+
+            color: white;
+
+        }
+
+
+
+        /* ==================================================
+           영화 정보 메인 영역
+        ================================================== */
+
+        .movie-main {
+
+            display: grid;
+
+            grid-template-columns:
+                300px 1fr;
+
+            gap: 55px;
+
+            padding-bottom: 55px;
+
+            border-bottom:
+                1px solid #222;
+
+        }
+
+
+
+        /* ==================================================
+           포스터
+        ================================================== */
+
+        .poster-wrapper {
+
+            width: 100%;
+
+        }
+
+
+        .movie-poster {
+
+            position: relative;
+
+            width: 100%;
+
+            aspect-ratio: 2 / 3;
+
+            overflow: hidden;
+
+            border-radius: 7px;
+
+            background:
+
+                linear-gradient(
+                    180deg,
+                    transparent 30%,
+                    rgba(0,0,0,0.9)
+                ),
+
+                linear-gradient(
+                    135deg,
+                    #54101a,
+                    #D92234,
+                    #080000
+                );
+
+            box-shadow:
+                0 25px 60px
+                rgba(0,0,0,0.7);
+
+        }
+
+
+        /* 실제 포스터 이미지가 들어갈 자리 */
+
+        .movie-poster img {
+
+            width: 100%;
+
+            height: 100%;
+
+            display: block;
+
+            object-fit: cover;
+
+        }
+
+
+        /* 이미지가 없을 때 */
+
+        .poster-placeholder {
+
+            position: absolute;
+
+            inset: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            flex-direction: column;
+
+            gap: 10px;
+
+            color: white;
+
+        }
+
+
+        .poster-placeholder strong {
+
+            font-size: 30px;
+
+            letter-spacing: -2px;
+
+        }
+
+
+        .poster-placeholder span {
+
+            color: #ddd;
+
+            font-size: 10px;
+
+            letter-spacing: 2px;
+
+        }
+
+
+
+        /* ==================================================
+           영화 정보
+        ================================================== */
+
+        .movie-info {
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+        }
+
+
+        .movie-label {
+
+            display: inline-block;
+
+            margin-bottom: 12px;
+
+            color: var(--red);
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            letter-spacing: 2px;
+
+        }
+
+
+        .movie-title {
+
+            margin-bottom: 10px;
+
+            font-size: 42px;
+
+            line-height: 1.15;
+
+            letter-spacing: -2.5px;
+
+        }
+
+
+        .movie-original-title {
+
+            margin-bottom: 25px;
+
+            color: #555;
+
+            font-size: 12px;
+
+        }
+
+
+
+        /* ==================================================
+           평점
+        ================================================== */
+
+        .rating-box {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin-bottom: 28px;
+
+        }
+
+
+        .star {
+
+            color: #f3c54e;
+
+            font-size: 24px;
+
+        }
+
+
+        .rating-score {
+
+            font-size: 24px;
+
+            font-weight: 700;
+
+        }
+
+
+        .rating-text {
+
+            color: #666;
+
+            font-size: 11px;
+
+        }
+
+
+
+        /* ==================================================
+           기본 영화 정보
+        ================================================== */
+
+        .movie-meta {
+
+            display: grid;
+
+            grid-template-columns:
+                90px 1fr;
+
+            row-gap: 13px;
+
+            max-width: 550px;
+
+            padding-top: 22px;
+
+            border-top:
+                1px solid #222;
+
+        }
+
+
+        .meta-label {
+
+            color: #666;
+
+            font-size: 11px;
+
+        }
+
+
+        .meta-value {
+
+            color: #ccc;
+
+            font-size: 12px;
+
+        }
+
+
+
+        /* ==================================================
+           액션 버튼
+        ================================================== */
+
+        .movie-actions {
+
+            display: flex;
+
+            gap: 9px;
+
+            margin-top: 30px;
+
+        }
+
+
+        .action-button {
+
+            height: 43px;
+
+            padding: 0 20px;
+
+            border-radius: 5px;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+        }
+
+
+        .favorite-button {
+
+            border:
+                1px solid #444;
+
+            background: transparent;
+
+            color: white;
+
+        }
+
+
+        .favorite-button:hover {
+
+            border-color: var(--red);
+
+            color: var(--red);
+
+        }
+
+
+        .review-button {
+
+            border: none;
+
+            background: var(--red);
+
+            color: white;
+
+        }
+
+
+        .review-button:hover {
+
+            background: #ed3043;
+
+        }
+
+
+
+        /* ==================================================
+           상세 정보 SECTION
+        ================================================== */
+
+        .detail-section {
+
+            padding-top: 50px;
+
+        }
+
+
+        .section-title {
+
+            margin-bottom: 18px;
+
+            font-size: 21px;
+
+            letter-spacing: -1px;
+
+        }
+
+
+        .section-label {
+
+            margin-bottom: 7px;
+
+            color: var(--red);
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            letter-spacing: 2px;
+
+        }
+
+
+
+        /* ==================================================
+           줄거리
+        ================================================== */
+
+        .story {
+
+            padding: 25px;
+
+            border:
+                1px solid #252525;
+
+            border-radius: 7px;
+
+            background: #101010;
+
+        }
+
+
+        .story p {
+
+            color: #999;
+
+            font-size: 13px;
+
+            line-height: 2;
+
+        }
+
+
+
+        /* ==================================================
+           출연진
+        ================================================== */
+
+        .cast-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(5, 1fr);
+
+            gap: 15px;
+
+        }
+
+
+        .cast-card {
+
+            overflow: hidden;
+
+            border:
+                1px solid #252525;
+
+            border-radius: 6px;
+
+            background: #101010;
+
+        }
+
+
+        .cast-image {
+
+            width: 100%;
+
+            aspect-ratio: 1 / 1.15;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background:
+
+                linear-gradient(
+                    135deg,
+                    #222,
+                    #555
+                );
+
+            color: #777;
+
+            font-size: 28px;
+
+        }
+
+
+        .cast-info {
+
+            padding: 13px;
+
+        }
+
+
+        .cast-name {
+
+            margin-bottom: 3px;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+        }
+
+
+        .cast-role {
+
+            color: #666;
+
+            font-size: 10px;
+
+        }
+
+
+
+        /* ==================================================
+           FOOTER
+        ================================================== */
+
+        .footer {
+
+            padding: 30px 6%;
+
+            border-top:
+                1px solid #181818;
+
+            text-align: center;
+
+            color: #444;
+
+            font-size: 10px;
+
+        }
+
+
+
+        /* ==================================================
+           TABLET
+        ================================================== */
+
+        @media (max-width: 900px) {
+
+
+            .nav {
+
+                gap: 18px;
+
+                margin-left: 25px;
+
+            }
+
+
+            .movie-main {
+
+                grid-template-columns:
+                    240px 1fr;
+
+                gap: 35px;
+
+            }
+
+
+            .movie-title {
+
+                font-size: 35px;
+
+            }
+
+
+            .cast-grid {
+
+                grid-template-columns:
+                    repeat(3, 1fr);
+
+            }
+
+        }
+
+
+
+        /* ==================================================
+           MOBILE
+        ================================================== */
+
+        @media (max-width: 700px) {
+
+
+            .header {
+
+                height: 68px;
+
+                padding: 0 20px;
+
+            }
+
+
+            .logo {
+
+                width: 125px;
+
+            }
+
+
+            .logo img {
+
+                width: 125px;
+
+            }
+
+
+            .nav {
+
+                display: none;
+
+            }
+
+
+            .login-button,
+            .signup-button {
+
+                display: none;
+
+            }
+
+
+            .movie-detail {
+
+                padding:
+                    100px 20px 70px;
+
+            }
+
+
+            .movie-main {
+
+                grid-template-columns: 1fr;
+
+                gap: 35px;
+
+            }
+
+
+            .poster-wrapper {
+
+                max-width: 280px;
+
+                margin: 0 auto;
+
+            }
+
+
+            .movie-info {
+
+                display: block;
+
+            }
+
+
+            .movie-title {
+
+                font-size: 32px;
+
+            }
+
+
+            .movie-meta {
+
+                grid-template-columns:
+                    75px 1fr;
+
+            }
+
+
+            .movie-actions {
+
+                flex-direction: column;
+
+            }
+
+
+            .action-button {
+
+                width: 100%;
+
+            }
+
+
+            .cast-grid {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+
+<body>
+
+
+<!-- ==================================================
+     HEADER
+================================================== -->
+
+<header class="header">
+
+
+    <!-- movieLife 로고 -->
+
+    <a
+        href="index.html"
+        class="logo"
+    >
+
+        <img
+            src="images/logo.png"
+            alt="movieLife"
+        >
+
+    </a>
+
+
+
+    <!-- 네비게이션 -->
+
+    <nav class="nav">
+
+
+        <a href="index.html">
+            홈
+        </a>
+
+
+        <a
+            href="#"
+            class="active"
+        >
+            영화
+        </a>
+
+
+        <a href="#">
+            인기영화
+        </a>
+
+
+        <a href="#">
+            영화추천
+        </a>
+
+
+        <a href="#">
+            OTT
+        </a>
+
+
+        <a href="mypage.html">
+            마이페이지
+        </a>
+
+
+    </nav>
+
+
+
+    <!-- 로그인 / 회원가입 -->
+
+    <div class="header-right">
+
+
+        <a
+            href="login.html"
+            class="login-button"
+        >
+
+            로그인
+
+        </a>
+
+
+        <a
+            href="signup.html"
+            class="signup-button"
+        >
+
+            회원가입
+
+        </a>
+
+
+    </div>
+
+
+</header>
+
+
+
+<!-- ==================================================
+     MAIN
+================================================== -->
+
+<main class="movie-detail">
+
+
+    <!-- 뒤로가기 -->
+
+    <a
+        href="#"
+        class="back-button"
+    >
+
+        ← 영화 목록으로
+
+    </a>
+
+
+
+    <!-- ==================================================
+         영화 메인 정보
+    ================================================== -->
+
+    <section class="movie-main">
+
+
+        <!-- ==============================================
+             포스터
+        =============================================== -->
+
+        <div class="poster-wrapper">
+
+
+            <div class="movie-poster">
+
+
+                <!--
+
+                나중에 실제 영화 API 연결 시
+                아래 img의 src에 포스터 주소를 넣으면 됩니다.
+
+                -->
+
+                <!--
+
+                <img
+                    src="포스터주소"
+                    alt="영화 포스터"
+                >
+
+                -->
+
+
+                <!-- 현재 임시 포스터 -->
+
+                <div class="poster-placeholder">
+
+                    <span>
+                        MOVIE
+                    </span>
+
+                    <strong>
+                        인셉션
+                    </strong>
+
+                    <span>
+                        INCEPTION
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ==============================================
+             영화 정보
+        =============================================== -->
+
+        <div class="movie-info">
+
+
+            <div class="movie-label">
+
+                MOVIE INFORMATION
+
+            </div>
+
+
+            <h1 class="movie-title">
+
+                인셉션
+
+            </h1>
+
+
+            <p class="movie-original-title">
+
+                Inception
+
+            </p>
+
+
+
+            <!-- 평점 -->
+
+            <div class="rating-box">
+
+
+                <span class="star">
+
+                    ★
+
+                </span>
+
+
+                <span class="rating-score">
+
+                    4.8
+
+                </span>
+
+
+                <span class="rating-text">
+
+                    사용자 평점
+
+                </span>
+
+
+            </div>
+
+
+
+            <!-- 영화 기본 정보 -->
+
+            <div class="movie-meta">
+
+
+                <!-- 장르 -->
+
+                <span class="meta-label">
+
+                    장르
+
+                </span>
+
+
+                <span class="meta-value">
+
+                    SF · 액션 · 스릴러
+
+                </span>
+
+
+
+                <!-- 개봉일 -->
+
+                <span class="meta-label">
+
+                    개봉일
+
+                </span>
+
+
+                <span class="meta-value">
+
+                    2010년 7월 21일
+
+                </span>
+
+
+
+                <!-- 러닝타임 -->
+
+                <span class="meta-label">
+
+                    러닝타임
+
+                </span>
+
+
+                <span class="meta-value">
+
+                    148분
+
+                </span>
+
+
+
+                <!-- 감독 -->
+
+                <span class="meta-label">
+
+                    감독
+
+                </span>
+
+
+                <span class="meta-value">
+
+                    크리스토퍼 놀란
+
+                </span>
+
+
+            </div>
+
+
+
+            <!-- 버튼 -->
+
+            <div class="movie-actions">
+
+
+                <button
+                    type="button"
+                    class="action-button favorite-button"
+                >
+
+                    ♡ 찜하기
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="action-button review-button"
+                >
+
+                    ⭐ 평점 남기기
+
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- ==================================================
+         줄거리
+    ================================================== -->
+
+    <section class="detail-section">
+
+
+        <div class="section-label">
+
+            STORY
+
+        </div>
+
+
+        <h2 class="section-title">
+
+            줄거리
+
+        </h2>
+
+
+        <div class="story">
+
+
+            <p>
+
+                타인의 꿈에 들어가 생각을 훔치는 특수한 능력을 가진
+                돔 코브는 기업의 비밀을 빼내는 산업 스파이로 활동한다.
+                어느 날 코브는 자신의 과거를 청산하고 가족에게 돌아갈
+                수 있는 마지막 기회를 제안받는다.
+
+                <br><br>
+
+                하지만 이번 임무는 생각을 훔치는 것이 아니라
+                한 사람의 생각 속에 새로운 생각을 심는 것.
+                코브와 그의 팀은 여러 겹으로 이루어진 꿈속으로
+                들어가면서 예측할 수 없는 사건에 맞닥뜨리게 된다.
+
+            </p>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- ==================================================
+         출연진
+    ================================================== -->
+
+    <section class="detail-section">
+
+
+        <div class="section-label">
+
+            CAST
+
+        </div>
+
+
+        <h2 class="section-title">
+
+            출연진
+
+        </h2>
+
+
+
+        <div class="cast-grid">
+
+
+            <!-- 출연진 1 -->
+
+            <div class="cast-card">
+
+
+                <div class="cast-image">
+
+                    👤
+
+                </div>
+
+
+                <div class="cast-info">
+
+
+                    <div class="cast-name">
+
+                        레오나르도 디카프리오
+
+                    </div>
+
+
+                    <div class="cast-role">
+
+                        돔 코브
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- 출연진 2 -->
+
+            <div class="cast-card">
+
+
+                <div class="cast-image">
+
+                    👤
+
+                </div>
+
+
+                <div class="cast-info">
+
+
+                    <div class="cast-name">
+
+                        조셉 고든 레빗
+
+                    </div>
+
+
+                    <div class="cast-role">
+
+                        아서
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- 출연진 3 -->
+
+            <div class="cast-card">
+
+
+                <div class="cast-image">
+
+                    👤
+
+                </div>
+
+
+                <div class="cast-info">
+
+
+                    <div class="cast-name">
+
+                        엘렌 페이지
+
+                    </div>
+
+
+                    <div class="cast-role">
+
+                        아리아드네
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- 출연진 4 -->
+
+            <div class="cast-card">
+
+
+                <div class="cast-image">
+
+                    👤
+
+                </div>
+
+
+                <div class="cast-info">
+
+
+                    <div class="cast-name">
+
+                        톰 하디
+
+                    </div>
+
+
+                    <div class="cast-role">
+
+                        임스
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- 출연진 5 -->
+
+            <div class="cast-card">
+
+
+                <div class="cast-image">
+
+                    👤
+
+                </div>
+
+
+                <div class="cast-info">
+
+
+                    <div class="cast-name">
+
+                        켄 와타나베
+
+                    </div>
+
+
+                    <div class="cast-role">
+
+                        사이토
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+
+<!-- ==================================================
+     FOOTER
+================================================== -->
+
+<footer class="footer">
+
+    © 2026 movieLife. All Rights Reserved.
+
+</footer>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>OTT | movieLife</title>
+
+
+    <style>
+        /* ==================================================
+           기본 설정
+        ================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        :root {
+
+            --black: #000000;
+
+            --red: #D92234;
+
+            --white: #ffffff;
+
+            --gray-light: #cccccc;
+
+            --gray: #777777;
+
+            --gray-dark: #333333;
+
+            --card: #101010;
+
+            --border: #252525;
+
+        }
+
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            background:
+                radial-gradient(circle at 50% 0%,
+                    rgba(217, 34, 52, 0.10),
+                    transparent 32%),
+                #000000;
+
+            color: #ffffff;
+
+            font-family:
+                "Pretendard",
+                "Noto Sans KR",
+                Arial,
+                sans-serif;
+
+        }
+
+
+        a {
+
+            color: inherit;
+
+            text-decoration: none;
+
+        }
+
+
+        button {
+
+            font-family: inherit;
+
+            cursor: pointer;
+
+        }
+
+
+
+        /* ==================================================
+           HEADER
+        ================================================== */
+
+        .header {
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            z-index: 1000;
+
+            width: 100%;
+
+            height: 76px;
+
+            display: flex;
+
+            align-items: center;
+
+            padding: 0 6%;
+
+            background:
+                rgba(0, 0, 0, 0.95);
+
+            border-bottom:
+                1px solid rgba(255, 255, 255, 0.07);
+
+            backdrop-filter: blur(10px);
+
+        }
+
+
+        /* 로고 */
+
+        .logo {
+
+            display: flex;
+
+            align-items: center;
+
+            width: 145px;
+
+            flex-shrink: 0;
+
+        }
+
+
+        .logo img {
+
+            display: block;
+
+            width: 145px;
+
+            height: auto;
+
+        }
+
+
+
+        /* ==================================================
+           NAVIGATION
+        ================================================== */
+
+        .nav {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 30px;
+
+            margin-left: 45px;
+
+        }
+
+
+        .nav a {
+
+            position: relative;
+
+            color: #bdbdbd;
+
+            font-size: 14px;
+
+            font-weight: 500;
+
+            transition: 0.25s;
+
+        }
+
+
+        .nav a:hover {
+
+            color: #ffffff;
+
+        }
+
+
+        .nav a.active {
+
+            color: #ffffff;
+
+            font-weight: 700;
+
+        }
+
+
+        .nav a.active::after {
+
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+
+            bottom: -9px;
+
+            width: 100%;
+
+            height: 2px;
+
+            background: var(--red);
+
+        }
+
+
+
+        /* ==================================================
+           HEADER RIGHT
+        ================================================== */
+
+        .header-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-left: auto;
+
+        }
+
+
+        .login-button {
+
+            padding: 9px 18px;
+
+            border:
+                1px solid #444;
+
+            border-radius: 5px;
+
+            background: transparent;
+
+            color: #ffffff;
+
+            font-size: 12px;
+
+        }
+
+
+        .signup-button {
+
+            padding: 9px 18px;
+
+            border:
+                1px solid var(--red);
+
+            border-radius: 5px;
+
+            background: var(--red);
+
+            color: #ffffff;
+
+            font-size: 12px;
+
+        }
+
+
+
+        /* ==================================================
+           MAIN
+        ================================================== */
+
+        .main {
+
+            max-width: 1200px;
+
+            margin: 0 auto;
+
+            padding:
+                130px 30px 100px;
+
+        }
+
+
+
+        /* ==================================================
+           PAGE HEADER
+        ================================================== */
+
+        .page-header {
+
+            margin-bottom: 35px;
+
+        }
+
+
+        .page-label {
+
+            margin-bottom: 10px;
+
+            color: var(--red);
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            letter-spacing: 2px;
+
+        }
+
+
+        .page-header h1 {
+
+            margin-bottom: 9px;
+
+            font-size: 40px;
+
+            letter-spacing: -2px;
+
+        }
+
+
+        .page-header p {
+
+            color: #666;
+
+            font-size: 13px;
+
+            line-height: 1.7;
+
+        }
+
+
+
+        /* ==================================================
+           OTT FILTER
+        ================================================== */
+
+        .ott-filter {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 8px;
+
+            margin-bottom: 45px;
+
+            padding-bottom: 25px;
+
+            border-bottom:
+                1px solid #222;
+
+        }
+
+
+        .filter-button {
+
+            padding: 10px 20px;
+
+            border:
+                1px solid #333;
+
+            border-radius: 5px;
+
+            background: transparent;
+
+            color: #777;
+
+            font-size: 11px;
+
+            transition: 0.25s;
+
+        }
+
+
+        .filter-button:hover {
+
+            border-color: #555;
+
+            color: #ffffff;
+
+        }
+
+
+        .filter-button.active {
+
+            border-color: var(--red);
+
+            background: var(--red);
+
+            color: #ffffff;
+
+        }
+
+
+
+        /* ==================================================
+           SECTION HEADER
+        ================================================== */
+
+        .section-header {
+
+            display: flex;
+
+            align-items: flex-end;
+
+            justify-content: space-between;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .section-label {
+
+            margin-bottom: 7px;
+
+            color: var(--red);
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            letter-spacing: 2px;
+
+        }
+
+
+        .section-header h2 {
+
+            font-size: 24px;
+
+            letter-spacing: -1px;
+
+        }
+
+
+        .section-header p {
+
+            color: #555;
+
+            font-size: 10px;
+
+        }
+
+
+
+        /* ==================================================
+           MOVIE LIST
+        ================================================== */
+
+        .ott-movie-list {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 18px;
+
+        }
+
+
+
+        /* ==================================================
+           MOVIE CARD
+        ================================================== */
+
+        .movie-card {
+
+            overflow: hidden;
+
+            border:
+                1px solid #242424;
+
+            border-radius: 6px;
+
+            background: #0d0d0d;
+
+            transition: 0.25s;
+
+        }
+
+
+        .movie-card:hover {
+
+            transform:
+                translateY(-5px);
+
+            border-color: #444;
+
+        }
+
+
+
+        /* ==================================================
+           POSTER
+        ================================================== */
+
+        .movie-poster {
+
+            position: relative;
+
+            width: 100%;
+
+            aspect-ratio: 2 / 3;
+
+            display: flex;
+
+            align-items: flex-end;
+
+            padding: 15px;
+
+            background:
+
+                linear-gradient(180deg,
+                    transparent 30%,
+                    rgba(0, 0, 0, 0.95)),
+
+                linear-gradient(135deg,
+                    #65131e,
+                    #D92234,
+                    #050000);
+
+        }
+
+
+        .movie-card:nth-child(2) .movie-poster {
+
+            background:
+
+                linear-gradient(180deg,
+                    transparent 30%,
+                    rgba(0, 0, 0, 0.95)),
+
+                linear-gradient(135deg,
+                    #171d27,
+                    #52677c,
+                    #050505);
+
+        }
+
+
+        .movie-card:nth-child(3) .movie-poster {
+
+            background:
+
+                linear-gradient(180deg,
+                    transparent 30%,
+                    rgba(0, 0, 0, 0.95)),
+
+                linear-gradient(135deg,
+                    #302010,
+                    #96632f,
+                    #050403);
+
+        }
+
+
+        .movie-card:nth-child(4) .movie-poster {
+
+            background:
+
+                linear-gradient(180deg,
+                    transparent 30%,
+                    rgba(0, 0, 0, 0.95)),
+
+                linear-gradient(135deg,
+                    #20182e,
+                    #625087,
+                    #050505);
+
+        }
+
+
+        .movie-card:nth-child(5) .movie-poster {
+
+            background:
+
+                linear-gradient(180deg,
+                    transparent 30%,
+                    rgba(0, 0, 0, 0.95)),
+
+                linear-gradient(135deg,
+                    #152c27,
+                    #427c6d,
+                    #050505);
+
+        }
+
+
+        .movie-card:nth-child(6) .movie-poster {
+
+            background:
+
+                linear-gradient(180deg,
+                    transparent 30%,
+                    rgba(0, 0, 0, 0.95)),
+
+                linear-gradient(135deg,
+                    #302020,
+                    #825151,
+                    #050505);
+
+        }
+
+
+        .movie-card:nth-child(7) .movie-poster {
+
+            background:
+
+                linear-gradient(180deg,
+                    transparent 30%,
+                    rgba(0, 0, 0, 0.95)),
+
+                linear-gradient(135deg,
+                    #272117,
+                    #766244,
+                    #050505);
+
+        }
+
+
+        .movie-card:nth-child(8) .movie-poster {
+
+            background:
+
+                linear-gradient(180deg,
+                    transparent 30%,
+                    rgba(0, 0, 0, 0.95)),
+
+                linear-gradient(135deg,
+                    #191f32,
+                    #4b597c,
+                    #050505);
+
+        }
+
+
+
+        /* 포스터 제목 */
+
+        .poster-title {
+
+            font-size: 18px;
+
+            font-weight: 800;
+
+            line-height: 1.2;
+
+        }
+
+
+
+        /* ==================================================
+           MOVIE INFO
+        ================================================== */
+
+        .movie-info {
+
+            padding: 15px;
+
+        }
+
+
+        .movie-info h3 {
+
+            margin-bottom: 7px;
+
+            font-size: 14px;
+
+        }
+
+
+        .movie-meta {
+
+            display: flex;
+
+            gap: 8px;
+
+            margin-bottom: 13px;
+
+            color: #555;
+
+            font-size: 9px;
+
+        }
+
+
+        .movie-rating {
+
+            color: #d9ad3e;
+
+        }
+
+
+
+        /* ==================================================
+           OTT TAG
+        ================================================== */
+
+        .ott-info {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-bottom: 12px;
+
+            padding-top: 10px;
+
+            border-top:
+                1px solid #202020;
+
+        }
+
+
+        .ott-name {
+
+            color: #ffffff;
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+        }
+
+
+        .available {
+
+            color: #666;
+
+            font-size: 8px;
+
+        }
+
+
+
+        /* ==================================================
+           WATCH BUTTON
+        ================================================== */
+
+        .watch-button {
+
+            display: block;
+
+            width: 100%;
+
+            padding: 9px;
+
+            border:
+                1px solid #333;
+
+            border-radius: 4px;
+
+            background: transparent;
+
+            color: #aaa;
+
+            font-size: 10px;
+
+            text-align: center;
+
+            transition: 0.2s;
+
+        }
+
+
+        .watch-button:hover {
+
+            border-color: var(--red);
+
+            background: var(--red);
+
+            color: #ffffff;
+
+        }
+
+
+
+        /* ==================================================
+           FOOTER
+        ================================================== */
+
+        .footer {
+
+            padding: 30px 6%;
+
+            border-top:
+                1px solid #181818;
+
+            text-align: center;
+
+            color: #444;
+
+            font-size: 10px;
+
+        }
+
+
+
+        /* ==================================================
+           TABLET
+        ================================================== */
+
+        @media (max-width: 900px) {
+
+
+            .nav {
+
+                gap: 18px;
+
+                margin-left: 25px;
+
+            }
+
+
+            .ott-movie-list {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+            }
+
+        }
+
+
+
+        /* ==================================================
+           MOBILE
+        ================================================== */
+
+        @media (max-width: 700px) {
+
+
+            .header {
+
+                height: 68px;
+
+                padding: 0 20px;
+
+            }
+
+
+            .logo,
+            .logo img {
+
+                width: 125px;
+
+            }
+
+
+            .nav {
+
+                display: none;
+
+            }
+
+
+            .login-button,
+            .signup-button {
+
+                display: none;
+
+            }
+
+
+            .main {
+
+                padding:
+                    100px 20px 70px;
+
+            }
+
+
+            .page-header h1 {
+
+                font-size: 30px;
+
+            }
+
+
+            .ott-filter {
+
+                overflow-x: auto;
+
+                flex-wrap: nowrap;
+
+                padding-bottom: 18px;
+
+            }
+
+
+            .filter-button {
+
+                white-space: nowrap;
+
+            }
+
+
+            .section-header {
+
+                align-items: flex-start;
+
+                flex-direction: column;
+
+                gap: 7px;
+
+            }
+
+
+            .ott-movie-list {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+                gap: 10px;
+
+            }
+
+
+            .movie-info {
+
+                padding: 12px;
+
+            }
+
+        }
+    </style>
+
+</head>
+
+
+
+<body>
+
+
+
+    <!-- ==================================================
+     HEADER
+================================================== -->
+
+    <header class="header">
+
+
+        <!-- 로고 -->
+
+        <a href="index.html" class="logo">
+
+            <img src="images/logo.png" alt="movieLife">
+
+        </a>
+
+
+
+        <!-- 네비게이션 -->
+
+        <nav class="nav">
+
+
+            <a href="index.html">
+                홈
+            </a>
+
+
+            <a href="movie-list.html">
+                영화
+            </a>
+
+
+            <a href="popular.html">
+                인기영화
+            </a>
+
+
+            <a href="movie-recommend.html">
+                영화추천
+            </a>
+
+
+            <a href="ott.html" class="active">
+                OTT
+            </a>
+
+
+            <a href="mypage.html">
+                마이페이지
+            </a>
+
+
+        </nav>
+
+
+
+        <!-- 로그인 / 회원가입 -->
+
+        <div class="header-right">
+
+
+            <a href="login.html" class="login-button">
+                로그인
+            </a>
+
+
+            <a href="signup.html" class="signup-button">
+                회원가입
+            </a>
+
+
+        </div>
+
+
+    </header>
+
+
+
+    <!-- ==================================================
+     MAIN
+================================================== -->
+
+    <main class="main">
+
+
+
+        <!-- ==================================================
+         PAGE TITLE
+    ================================================== -->
+
+        <section class="page-header">
+
+
+            <div class="page-label">
+                WATCH MOVIES
+            </div>
+
+
+            <h1>
+                OTT
+            </h1>
+
+
+            <p>
+                보고 싶은 영화가 어디에서 제공되는지 확인해보세요.<br>
+                원하는 OTT 서비스를 선택하면 해당 영화들을 확인할 수 있습니다.
+            </p>
+
+
+        </section>
+
+
+
+        <!-- ==================================================
+         OTT FILTER
+    ================================================== -->
+
+        <div class="ott-filter">
+
+
+            <button type="button" class="filter-button active" data-ott="all">
+                전체
+            </button>
+
+
+            <button type="button" class="filter-button" data-ott="netflix">
+                Netflix
+            </button>
+
+
+            <button type="button" class="filter-button" data-ott="disney">
+                Disney+
+            </button>
+
+
+            <button type="button" class="filter-button" data-ott="watcha">
+                Watcha
+            </button>
+
+
+            <button type="button" class="filter-button" data-ott="wavve">
+                Wavve
+            </button>
+
+
+            <button type="button" class="filter-button" data-ott="tving">
+                TVING
+            </button>
+            
+
+
+        </div>
+
+
+
+        <!-- ==================================================
+         MOVIE SECTION
+    ================================================== -->
+
+        <section>
+
+
+            <div class="section-header">
+
+
+                <div>
+
+                    <div class="section-label">
+                        STREAMING MOVIES
+                    </div>
+
+
+                    <h2>
+                        OTT에서 볼 수 있는 영화
+                    </h2>
+
+                </div>
+
+
+                <p>
+                    서비스별 영화 조회
+                </p>
+
+
+            </div>
+
+
+
+            <!--
+            ==================================================
+            API 연결 예정
+
+            나중에 OTT API 데이터를
+            이 영역에 출력합니다.
+
+            ID : ottMovieList
+            ==================================================
+        -->
+
+            <div class="ott-movie-list" id="ottMovieList">
+
+
+
+                <!-- ==================================================
+                 영화 1
+            ================================================== -->
+
+                <article class="movie-card" data-ott="netflix">
+
+
+                    <div class="movie-poster">
+
+
+                        <div class="poster-title">
+                            INCEPTION
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="movie-info">
+
+
+                        <h3>
+                            인셉션
+                        </h3>
+
+
+                        <div class="movie-meta">
+
+                            <span class="movie-rating">
+                                ★ 4.8
+                            </span>
+
+                            <span>
+                                2010
+                            </span>
+
+                            <span>
+                                SF
+                            </span>
+
+                        </div>
+
+
+                        <div class="ott-info">
+
+                            <span class="ott-name">
+                                Netflix
+                            </span>
+
+                            <span class="available">
+                                시청 가능
+                            </span>
+
+                        </div>
+
+
+                        <a href="https://www.netflix.com/kr" class="watch-button">
+                            Netflix에서 보기 →
+                        </a>
+
+
+                    </div>
+
+
+                </article>
+
+
+
+                <!-- ==================================================
+                 영화 2
+            ================================================== -->
+
+                <article class="movie-card" data-ott="watcha">
+
+
+                    <div class="movie-poster">
+
+
+                        <div class="poster-title">
+                            PARASITE
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="movie-info">
+
+
+                        <h3>
+                            기생충
+                        </h3>
+
+
+                        <div class="movie-meta">
+
+                            <span class="movie-rating">
+                                ★ 4.8
+                            </span>
+
+                            <span>
+                                2019
+                            </span>
+
+                            <span>
+                                드라마
+                            </span>
+
+                        </div>
+
+
+                        <div class="ott-info">
+
+                            <span class="ott-name">
+                                Watcha
+                            </span>
+
+                            <span class="available">
+                                시청 가능
+                            </span>
+
+                        </div>
+
+
+                        <a href="https://watcha.com/ko/browse/all" class="watch-button">
+                            Watcha에서 보기 →
+                        </a>
+
+
+                    </div>
+
+
+                </article>
+
+
+
+                <!-- ==================================================
+                 영화 3
+            ================================================== -->
+
+                <article class="movie-card" data-ott="disney">
+
+
+                    <div class="movie-poster">
+
+
+                        <div class="poster-title">
+                            INTERSTELLAR
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="movie-info">
+
+
+                        <h3>
+                            인터스텔라
+                        </h3>
+
+
+                        <div class="movie-meta">
+
+                            <span class="movie-rating">
+                                ★ 4.9
+                            </span>
+
+                            <span>
+                                2014
+                            </span>
+
+                            <span>
+                                SF
+                            </span>
+
+                        </div>
+
+
+                        <div class="ott-info">
+
+                            <span class="ott-name">
+                                Disney+
+                            </span>
+
+                            <span class="available">
+                                시청 가능
+                            </span>
+
+                        </div>
+
+
+                        <a href="https://www.disneyplus.com/ko-kr" class="watch-button">
+                            Disney+에서 보기 →
+                        </a>
+
+
+                    </div>
+
+
+                </article>
+
+
+
+                <!-- ==================================================
+                 영화 4
+            ================================================== -->
+
+                <article class="movie-card" data-ott="tving">
+
+
+                    <div class="movie-poster">
+
+
+                        <div class="poster-title">
+                            LALALAND
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="movie-info">
+
+
+                        <h3>
+                            라라랜드
+                        </h3>
+
+
+                        <div class="movie-meta">
+
+                            <span class="movie-rating">
+                                ★ 4.7
+                            </span>
+
+                            <span>
+                                2016
+                            </span>
+
+                            <span>
+                                로맨스
+                            </span>
+
+                        </div>
+
+
+                        <div class="ott-info">
+
+                            <span class="ott-name">
+                                TVING
+                            </span>
+
+                            <span class="available">
+                                시청 가능
+                            </span>
+
+                        </div>
+
+
+                        <a href="https://www.tving.com/" class="watch-button">
+                            TVING에서 보기 →
+                        </a>
+
+
+                    </div>
+
+
+                </article>
+
+
+
+                <!-- ==================================================
+                 영화 5
+            ================================================== -->
+
+                <article class="movie-card" data-ott="netflix">
+
+
+                    <div class="movie-poster">
+
+
+                        <div class="poster-title">
+                            AVATAR
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="movie-info">
+
+
+                        <h3>
+                            아바타
+                        </h3>
+
+
+                        <div class="movie-meta">
+
+                            <span class="movie-rating">
+                                ★ 4.6
+                            </span>
+
+                            <span>
+                                2009
+                            </span>
+
+                            <span>
+                                SF
+                            </span>
+
+                        </div>
+
+
+                        <div class="ott-info">
+
+                            <span class="ott-name">
+                                Netflix
+                            </span>
+
+                            <span class="available">
+                                시청 가능
+                            </span>
+
+                        </div>
+
+
+                        <a href="https://www.netflix.com/kr" class="watch-button">
+                            Netflix에서 보기 →
+                        </a>
+
+
+                    </div>
+
+
+                </article>
+
+
+
+                <!-- ==================================================
+                 영화 6
+            ================================================== -->
+
+                <article class="movie-card" data-ott="wavve">
+
+
+                    <div class="movie-poster">
+
+
+                        <div class="poster-title">
+                            WHIPLASH
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="movie-info">
+
+
+                        <h3>
+                            위플래쉬
+                        </h3>
+
+
+                        <div class="movie-meta">
+
+                            <span class="movie-rating">
+                                ★ 4.8
+                            </span>
+
+                            <span>
+                                2014
+                            </span>
+
+                            <span>
+                                드라마
+                            </span>
+
+                        </div>
+
+
+                        <div class="ott-info">
+
+                            <span class="ott-name">
+                                Wavve
+                            </span>
+
+                            <span class="available">
+                                시청 가능
+                            </span>
+
+                        </div>
+
+
+                        <a href="https://www.wavve.com" class="watch-button">
+                            Wavve에서 보기 →
+                        </a>
+
+
+                    </div>
+
+
+                </article>
+
+
+
+                <!-- ==================================================
+                 영화 7
+            ================================================== -->
+
+                <article class="movie-card" data-ott="watcha">
+
+
+                    <div class="movie-poster">
+
+
+                        <div class="poster-title">
+                            FORREST
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="movie-info">
+
+
+                        <h3>
+                            포레스트 검프
+                        </h3>
+
+
+                        <div class="movie-meta">
+
+                            <span class="movie-rating">
+                                ★ 4.7
+                            </span>
+
+                            <span>
+                                1994
+                            </span>
+
+                            <span>
+                                드라마
+                            </span>
+
+                        </div>
+
+
+                        <div class="ott-info">
+
+                            <span class="ott-name">
+                                Watcha
+                            </span>
+
+                            <span class="available">
+                                시청 가능
+                            </span>
+
+                        </div>
+
+
+                        <a href="https://watcha.com/ko/browse/all" class="watch-button">
+                            Watcha에서 보기 →
+                        </a>
+
+
+                    </div>
+
+
+                </article>
+
+
+
+                <!-- ==================================================
+                 영화 8
+            ================================================== -->
+
+                <article class="movie-card" data-ott="disney">
+
+
+                    <div class="movie-poster">
+
+
+                        <div class="poster-title">
+                            DUNE
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="movie-info">
+
+
+                        <h3>
+                            듄: 파트 2
+                        </h3>
+
+
+                        <div class="movie-meta">
+
+                            <span class="movie-rating">
+                                ★ 4.8
+                            </span>
+
+                            <span>
+                                2024
+                            </span>
+
+                            <span>
+                                SF
+                            </span>
+
+                        </div>
+
+
+                        <div class="ott-info">
+
+                            <span class="ott-name">
+                                Disney+
+                            </span>
+
+                            <span class="available">
+                                시청 가능
+                            </span>
+
+                        </div>
+
+
+                        <a href="https://www.disneyplus.com" class="watch-button">
+                            Disney+에서 보기 →
+                        </a>
+
+
+                    </div>
+
+
+                </article>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- ==================================================
+     FOOTER
+================================================== -->
+
+    <footer class="footer">
+
+        © 2026 movieLife. All Rights Reserved.
+
+    </footer>
+
+
+
+    <!-- ==================================================
+     JAVASCRIPT
+     OTT 필터
+================================================== -->
+
+    <script>
+
+
+        /* ==================================================
+           OTT 필터
+        ================================================== */
+
+        const filterButtons =
+            document.querySelectorAll(
+                ".filter-button"
+            );
+
+
+        const movieCards =
+            document.querySelectorAll(
+                ".movie-card"
+            );
+
+
+
+        filterButtons.forEach(
+            function (button) {
+
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+
+                        /* 현재 선택된 버튼 */
+
+                        filterButtons.forEach(
+                            function (item) {
+
+                                item.classList.remove(
+                                    "active"
+                                );
+
+                            }
+                        );
+
+
+                        button.classList.add(
+                            "active"
+                        );
+
+
+
+                        /* 선택한 OTT */
+
+                        const selectedOTT =
+                            button.dataset.ott;
+
+
+
+                        /* 영화 필터링 */
+
+                        movieCards.forEach(
+                            function (card) {
+
+
+                                const movieOTT =
+                                    card.dataset.ott;
+
+
+                                if (
+                                    selectedOTT === "all"
+                                    ||
+                                    movieOTT === selectedOTT
+                                ) {
+
+                                    card.style.display =
+                                        "block";
+
+                                } else {
+
+                                    card.style.display =
+                                        "none";
+
+                                }
+
+
+                            }
+                        );
+
+
+                    }
+                );
+
+
+            }
+
+
+        );
+
+    </script>
+
+
+
+</body>
+
+</html>
