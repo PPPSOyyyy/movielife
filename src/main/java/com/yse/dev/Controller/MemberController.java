@@ -1,7 +1,14 @@
 package com.yse.dev.Controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.yse.dev.DTO.LoginDto;
 import com.yse.dev.DTO.MemberDto;
@@ -45,6 +52,7 @@ public class MemberController {
     }
 
 
+
     // ==========================================
     // 로그인
     // ==========================================
@@ -55,15 +63,41 @@ public class MemberController {
 
         try {
 
-            // DB에서 아이디와 비밀번호 확인
-            Member loginMember =
+            // 아이디 / 비밀번호 확인
+            Member member =
                     memberService.login(loginDto);
 
 
-            // 로그인 성공한 회원 아이디를 세션에 저장
+            // ★ 로그인 성공한 회원 아이디를 세션에 저장
             session.setAttribute(
                     "loginUserId",
-                    loginMember.getUserId()
+                    member.getUserId()
+            );
+
+
+            // 콘솔 확인용
+            System.out.println(
+                    "================================"
+            );
+
+            System.out.println(
+                    "로그인 성공"
+            );
+
+            System.out.println(
+                    "세션 ID : "
+                    + session.getId()
+            );
+
+            System.out.println(
+                    "로그인 회원 아이디 : "
+                    + session.getAttribute(
+                            "loginUserId"
+                    )
+            );
+
+            System.out.println(
+                    "================================"
             );
 
 
@@ -74,12 +108,77 @@ public class MemberController {
 
         } catch (IllegalArgumentException e) {
 
-            // 아이디 또는 비밀번호가 틀렸을 경우
             return ResponseEntity
-                    .status(401)
+                    .badRequest()
                     .body(e.getMessage());
         }
     }
+
+
+
+    // ==========================================
+    // 현재 로그인한 회원 정보
+    // ==========================================
+    @GetMapping("/me")
+    public ResponseEntity<?> getMyInfo(
+            HttpSession session) {
+
+
+        // 세션에서 로그인한 아이디 꺼내기
+        String userId =
+                (String) session.getAttribute(
+                        "loginUserId"
+                );
+
+
+        // 콘솔 확인용
+        System.out.println(
+                "================================"
+        );
+
+        System.out.println(
+                "/me 요청"
+        );
+
+        System.out.println(
+                "현재 세션 ID : "
+                + session.getId()
+        );
+
+        System.out.println(
+                "세션 로그인 아이디 : "
+                + userId
+        );
+
+        System.out.println(
+                "================================"
+        );
+
+
+        // 로그인하지 않은 상태
+        if (userId == null) {
+
+            return ResponseEntity
+                    .status(401)
+                    .body(
+                            "로그인이 필요합니다."
+                    );
+        }
+
+
+        // DB에서 로그인 회원 정보 찾기
+        Member member =
+                memberService
+                        .getMemberByUserId(
+                                userId
+                        );
+
+
+        return ResponseEntity.ok(
+                member
+        );
+    }
+
 
 
     // ==========================================
@@ -89,12 +188,24 @@ public class MemberController {
     public ResponseEntity<String> logout(
             HttpSession session) {
 
+
+        System.out.println(
+                "로그아웃 회원 : "
+                + session.getAttribute(
+                        "loginUserId"
+                )
+        );
+
+
+        // 세션 삭제
         session.invalidate();
+
 
         return ResponseEntity.ok(
                 "로그아웃 되었습니다."
         );
     }
+
 
 
     // ==========================================
@@ -105,41 +216,34 @@ public class MemberController {
             @RequestBody ProfileDto profileDto,
             HttpSession session) {
 
+
         String userId =
                 (String) session.getAttribute(
                         "loginUserId"
                 );
 
 
-        // 로그인 안 되어있으면
         if (userId == null) {
 
             return ResponseEntity
                     .status(401)
-                    .body("로그인이 필요합니다.");
+                    .body(
+                            "로그인이 필요합니다."
+                    );
         }
 
 
-        try {
-
-            memberService.updateProfile(
-                    userId,
-                    profileDto
-            );
+        memberService.updateProfile(
+                userId,
+                profileDto
+        );
 
 
-            return ResponseEntity.ok(
-                    "프로필 정보가 수정되었습니다."
-            );
-
-
-        } catch (IllegalArgumentException e) {
-
-            return ResponseEntity
-                    .badRequest()
-                    .body(e.getMessage());
-        }
+        return ResponseEntity.ok(
+                "프로필 정보가 수정되었습니다."
+        );
     }
+
 
 
     // ==========================================
@@ -149,41 +253,37 @@ public class MemberController {
     public ResponseEntity<String> withdraw(
             HttpSession session) {
 
+
         String userId =
                 (String) session.getAttribute(
                         "loginUserId"
                 );
 
 
-        // 로그인 안 되어있으면
         if (userId == null) {
 
             return ResponseEntity
                     .status(401)
-                    .body("로그인이 필요합니다.");
+                    .body(
+                            "로그인이 필요합니다."
+                    );
         }
 
 
-        try {
-
-            memberService.withdraw(userId);
-
-            // 탈퇴한 뒤 세션 종료
-            session.invalidate();
+        memberService.withdraw(
+                userId
+        );
 
 
-            return ResponseEntity.ok(
-                    "회원 탈퇴 처리가 완료되었습니다."
-            );
+        // 탈퇴 후 세션 삭제
+        session.invalidate();
 
 
-        } catch (IllegalArgumentException e) {
-
-            return ResponseEntity
-                    .badRequest()
-                    .body(e.getMessage());
-        }
+        return ResponseEntity.ok(
+                "회원 탈퇴 처리가 완료되었습니다."
+        );
     }
+
 
 
     // ==========================================
@@ -191,11 +291,16 @@ public class MemberController {
     // ==========================================
     @GetMapping("/check-userid")
     public ResponseEntity<Boolean> checkUserId(
-            @RequestParam("userId") String userId) {
+
+            @RequestParam("userId")
+            String userId) {
+
 
         boolean duplicate =
                 memberService
-                        .isUserIdDuplicate(userId);
+                        .isUserIdDuplicate(
+                                userId
+                        );
 
 
         return ResponseEntity.ok(
@@ -204,16 +309,22 @@ public class MemberController {
     }
 
 
+
     // ==========================================
     // 닉네임 중복확인
     // ==========================================
     @GetMapping("/check-nickname")
     public ResponseEntity<Boolean> checkNickname(
-            @RequestParam("nickname") String nickname) {
+
+            @RequestParam("nickname")
+            String nickname) {
+
 
         boolean duplicate =
                 memberService
-                        .isNicknameDuplicate(nickname);
+                        .isNicknameDuplicate(
+                                nickname
+                        );
 
 
         return ResponseEntity.ok(
