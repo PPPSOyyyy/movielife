@@ -1,0 +1,73 @@
+package com.yse.dev.Controller;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.yse.dev.DTO.LoginDto;
+import com.yse.dev.DTO.MemberDto;
+import com.yse.dev.DTO.ProfileDto;
+
+import jakarta.servlet.http.HttpSession; // Spring Boot 2.x 버전이라면 javax.servlet.http.HttpSession 입니다.
+
+
+// 	[1. 회원 관리] 요구사항 구현 Controller
+//  - 경로: /api/members 하위로 매핑
+
+@RestController
+@RequestMapping("/api/members")
+public class MemberController {
+
+//     REQ-100: 회원가입
+//     - 클라이언트로부터 회원정보를 받아 DB에 저장
+	
+    @PostMapping("/signup")
+    public ResponseEntity<String> signup(@RequestBody MemberDto memberDto) {
+        // TODO: 비밀번호 암호화(BCrypt 등) 및 DB 저장 로직 (memberService.signup)
+        return ResponseEntity.ok("회원가입이 성공적으로 완료되었습니다.");
+    }
+
+//		REQ-101: 로그인
+//		- 아이디/비밀번호를 확인하고 성공 시 세션을 생성
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginDto loginDto, HttpSession session) {
+        // TODO: DB 정보와 일치하는지 확인 (memberService.login)
+        // 일치한다면 세션에 로그인 유저 정보를 저장
+        // session.setAttribute("loginUser", loginMember);
+        
+        return ResponseEntity.ok("로그인에 성공했습니다.");
+    }
+
+//     REQ-101: 로그아웃
+//     - 현재 유지되고 있는 세션을 만료시킴
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpSession session) {
+        session.invalidate(); // 세션 무효화
+        return ResponseEntity.ok("로그아웃 되었습니다.");
+    }
+
+//     REQ-102: 프로필 수정
+//     - 로그인한 유저의 비밀번호나 닉네임 등을 변경
+
+    @PutMapping("/profile")
+    public ResponseEntity<String> updateProfile(@RequestBody ProfileDto profileDto, HttpSession session) {
+        // TODO: 세션에서 현재 로그인한 유저 정보를 확인 후 DB 업데이트
+        return ResponseEntity.ok("프로필 정보가 수정되었습니다.");
+    }
+
+//     REQ-103: 회원 탈퇴
+//     - 회원의 개인정보를 파기(또는 비활성 상태로 변경)하고 세션을 종료합니다.
+
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<String> withdraw(HttpSession session) {
+        // TODO: 세션 확인 후 DB에서 해당 회원 데이터 삭제/비활성화 처리
+        session.invalidate(); // 탈퇴 후 자동 로그아웃 처리
+        return ResponseEntity.ok("회원 탈퇴 처리가 완료되었습니다.");
+    }
+}
