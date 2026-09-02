@@ -26,28 +26,22 @@ public class MemberService {
     public void signup(MemberDto memberDto) {
 
         if (isUserIdDuplicate(memberDto.getUserId())) {
-
             throw new IllegalArgumentException(
                     "이미 사용 중인 아이디입니다."
             );
         }
 
-
         if (isNicknameDuplicate(memberDto.getNickname())) {
-
             throw new IllegalArgumentException(
                     "이미 사용 중인 닉네임입니다."
             );
         }
 
-
         Member member =
                 Member.toEntity(memberDto);
 
-
         memberRepository.save(member);
     }
-
 
 
     // ==========================================
@@ -58,9 +52,7 @@ public class MemberService {
 
         Member member =
                 memberRepository
-                        .findByUserId(
-                                loginDto.getUserId()
-                        )
+                        .findByUserId(loginDto.getUserId())
                         .orElseThrow(() ->
                                 new IllegalArgumentException(
                                         "존재하지 않는 아이디입니다."
@@ -81,9 +73,8 @@ public class MemberService {
     }
 
 
-
     // ==========================================
-    // 회원 아이디로 정보 조회
+    // 회원 정보 조회
     // ==========================================
     @Transactional(readOnly = true)
     public Member getMemberByUserId(
@@ -99,7 +90,6 @@ public class MemberService {
     }
 
 
-
     // ==========================================
     // 프로필 수정
     // ==========================================
@@ -108,9 +98,71 @@ public class MemberService {
             String userId,
             ProfileDto profileDto) {
 
-        // 아직 다음 단계에서 구현
-    }
+        // 현재 로그인 회원 찾기
+        Member member =
+                memberRepository
+                        .findByUserId(userId)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "회원 정보를 찾을 수 없습니다."
+                                )
+                        );
 
+
+        // 닉네임이 입력된 경우
+        if (
+            profileDto.getNickname() != null &&
+            !profileDto.getNickname().trim().isEmpty()
+        ) {
+
+            String newNickname =
+                    profileDto
+                            .getNickname()
+                            .trim();
+
+
+            // 기존 닉네임과 다른 경우만 중복검사
+            if (
+                !newNickname.equals(
+                        member.getNickname()
+                )
+            ) {
+
+                if (
+                    memberRepository
+                            .existsByNickname(
+                                    newNickname
+                            )
+                ) {
+
+                    throw new IllegalArgumentException(
+                            "이미 사용 중인 닉네임입니다."
+                    );
+                }
+
+                member.setNickname(
+                        newNickname
+                );
+            }
+        }
+
+
+        // 비밀번호가 입력된 경우
+        if (
+            profileDto.getPassword() != null &&
+            !profileDto.getPassword().isEmpty()
+        ) {
+
+            member.setPassword(
+                    profileDto.getPassword()
+            );
+        }
+
+
+        // JPA 변경 감지로 저장되지만
+        // 명확하게 save 호출
+        memberRepository.save(member);
+    }
 
 
     // ==========================================
@@ -120,9 +172,17 @@ public class MemberService {
     public void withdraw(
             String userId) {
 
-        // 아직 다음 단계에서 구현
-    }
+        Member member =
+                memberRepository
+                        .findByUserId(userId)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "회원 정보를 찾을 수 없습니다."
+                                )
+                        );
 
+        memberRepository.delete(member);
+    }
 
 
     // ==========================================
@@ -135,7 +195,6 @@ public class MemberService {
         return memberRepository
                 .existsByUserId(userId);
     }
-
 
 
     // ==========================================
