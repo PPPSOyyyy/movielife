@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>영화 상세 | movieLife</title>
+
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        :root {
+            --red: #D92234;
+            --white: #ffffff;
+            --gray: #888888;
+            --card: #101010;
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            background: #000;
+
+            color: white;
+
+            font-family:
+                "Pretendard",
+                "Noto Sans KR",
+                Arial,
+                sans-serif;
+
+        }
+
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+
+        .header {
+
+            width: 100%;
+            height: 76px;
+
+            display: flex;
+            align-items: center;
+
+            padding: 0 6%;
+
+            background:
+                rgba(0,0,0,0.95);
+
+            border-bottom:
+                1px solid #191919;
+
+        }
+
+
+        .logo {
+            width: 145px;
+        }
+
+
+        .logo img {
+            width: 145px;
+        }
+
+
+        .nav {
+
+            display: flex;
+
+            gap: 30px;
+
+            margin-left: 45px;
+
+        }
+
+
+        .nav a {
+
+            color: #bbb;
+
+            font-size: 14px;
+
+        }
+
+
+        .nav a:hover {
+            color: white;
+        }
+
+
+        .detail-hero {
+
+            position: relative;
+
+            min-height: 650px;
+
+            overflow: hidden;
+
+        }
+
+
+        .backdrop {
+
+            position: absolute;
+
+            inset: 0;
+
+            background-size: cover;
+            background-position: center;
+
+            opacity: 0.26;
+
+        }
+
+
+        .backdrop::after {
+
+            content: "";
+
+            position: absolute;
+
+            inset: 0;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #000 15%,
+                    rgba(0,0,0,0.75),
+                    #000 100%
+                );
+
+        }
+
+
+        .detail-container {
+
+            position: relative;
+
+            z-index: 2;
+
+            width: 100%;
+            max-width: 1200px;
+
+            margin: 0 auto;
+
+            display: grid;
+
+            grid-template-columns:
+                300px 1fr;
+
+            gap: 50px;
+
+            padding:
+                80px 30px;
+
+        }
+
+
+        .poster {
+
+            width: 100%;
+
+            border-radius: 8px;
+
+            box-shadow:
+                0 25px 70px
+                rgba(0,0,0,0.8);
+
+        }
+
+
+        .no-poster {
+
+            width: 100%;
+
+            aspect-ratio: 2 / 3;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 8px;
+
+            background: #191919;
+
+            color: #555;
+
+        }
+
+
+        .label {
+
+            margin-bottom: 12px;
+
+            color: var(--red);
+
+            font-size: 11px;
+            font-weight: 700;
+
+            letter-spacing: 2px;
+
+        }
+
+
+        .movie-title {
+
+            font-size: 45px;
+
+            letter-spacing: -2px;
+
+            margin-bottom: 8px;
+
+        }
+
+
+        .original-title {
+
+            color: #666;
+
+            font-size: 13px;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .meta {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .meta-item {
+
+            padding:
+                7px 10px;
+
+            border:
+                1px solid #333;
+
+            border-radius: 4px;
+
+            color: #bbb;
+
+            font-size: 11px;
+
+        }
+
+
+        .rating {
+
+            color: #ffd54a;
+
+        }
+
+
+        .overview-title {
+
+            margin-bottom: 10px;
+
+            font-size: 18px;
+
+        }
+
+
+        .overview {
+
+            max-width: 750px;
+
+            color: #aaa;
+
+            font-size: 14px;
+
+            line-height: 1.9;
+
+        }
+
+
+        .info-section {
+
+            margin-top: 35px;
+
+        }
+
+
+        .info-section h3 {
+
+            margin-bottom: 13px;
+
+            font-size: 17px;
+
+        }
+
+
+        .tag-list {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 8px;
+
+        }
+
+
+        .tag {
+
+            padding:
+                7px 11px;
+
+            border-radius: 4px;
+
+            background: #151515;
+
+            border:
+                1px solid #292929;
+
+            color: #bbb;
+
+            font-size: 11px;
+
+        }
+
+
+        .ott-empty {
+
+            color: #666;
+
+            font-size: 12px;
+
+        }
+
+
+        .back-button {
+
+            display: inline-block;
+
+            margin-top: 35px;
+
+            padding:
+                11px 18px;
+
+            border:
+                1px solid #444;
+
+            border-radius: 5px;
+
+            color: #bbb;
+
+            font-size: 12px;
+
+        }
+
+
+        .back-button:hover {
+
+            color: white;
+
+            border-color: var(--red);
+
+        }
+
+
+        @media (max-width: 800px) {
+
+            .nav {
+                display: none;
+            }
+
+
+            .detail-container {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+
+            .poster {
+
+                max-width: 280px;
+
+            }
+
+
+            .movie-title {
+
+                font-size: 34px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+
+<body>
+
+
+<header class="header">
+
+
+    <a
+        href="/"
+        class="logo"
+    >
+
+        <img
+            src="/images/logo.png"
+            alt="movieLife"
+        >
+
+    </a>
+
+
+    <nav class="nav">
+
+        <a href="/">
+            홈
+        </a>
+
+        <a href="/movies">
+            영화
+        </a>
+
+        <a href="/movies">
+            인기영화
+        </a>
+
+        <a href="#">
+            영화추천
+        </a>
+
+        <a href="#">
+            OTT
+        </a>
+
+        <a href="/mypage">
+            마이페이지
+        </a>
+
+    </nav>
+
+
+</header>
+
+
+
+<section class="detail-hero">
+
+
+    <div
+        class="backdrop"
+        th:if="${movie.backdropPath != null}"
+        th:style="'background-image:url('
+            + ${movie.backdropUrl}
+            + ')'"
+    >
+    </div>
+
+
+
+    <div class="detail-container">
+
+
+        <div>
+
+
+            <img
+                class="poster"
+                th:if="${movie.posterPath != null}"
+                th:src="${movie.posterUrl}"
+                th:alt="${movie.title}"
+            >
+
+
+            <div
+                class="no-poster"
+                th:if="${movie.posterPath == null}"
+            >
+                포스터 없음
+            </div>
+
+
+        </div>
+
+
+
+        <div>
+
+
+            <div class="label">
+                MOVIE DETAIL
+            </div>
+
+
+            <h1
+                class="movie-title"
+                th:text="${movie.title}"
+            >
+                영화 제목
+            </h1>
+
+
+            <div
+                class="original-title"
+                th:text="${movie.originalTitle}"
+            >
+                Original Title
+            </div>
+
+
+
+            <div class="meta">
+
+
+                <div
+                    class="meta-item"
+                    th:text="'개봉일 '
+                        + ${movie.releaseDate}"
+                >
+                    개봉일
+                </div>
+
+
+                <div
+                    class="meta-item"
+                    th:if="${movie.runtime != null}"
+                    th:text="${movie.runtime}
+                        + '분'"
+                >
+                    상영시간
+                </div>
+
+
+                <div
+                    class="meta-item rating"
+                    th:text="'★ '
+                        + ${#numbers.formatDecimal(
+                            movie.voteAverage,
+                            1,
+                            1
+                        )}"
+                >
+                    ★ 0.0
+                </div>
+
+
+            </div>
+
+
+
+            <h2 class="overview-title">
+                줄거리
+            </h2>
+
+
+            <p
+                class="overview"
+                th:text="
+                    ${movie.overview != null
+                    && !movie.overview.isEmpty()}
+                    ? ${movie.overview}
+                    : '줄거리 정보가 없습니다.'
+                "
+            >
+                영화 줄거리
+            </p>
+
+
+
+            <div class="info-section">
+
+
+                <h3>
+                    장르
+                </h3>
+
+
+                <div class="tag-list">
+
+
+                    <span
+                        class="tag"
+                        th:each="genre : ${movie.genres}"
+                        th:text="${genre}"
+                    >
+                        장르
+                    </span>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="info-section">
+
+
+                <h3>
+                    주요 출연진
+                </h3>
+
+
+                <div class="tag-list">
+
+
+                    <span
+                        class="tag"
+                        th:each="actor : ${movie.cast}"
+                        th:text="${actor}"
+                    >
+                        배우
+                    </span>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="info-section">
+
+
+                <h3>
+                    한국 OTT
+                </h3>
+
+
+                <div
+                    class="tag-list"
+                    th:if="${movie.ottProviders != null
+                        && !movie.ottProviders.isEmpty()}"
+                >
+
+
+                    <span
+                        class="tag"
+                        th:each="ott : ${movie.ottProviders}"
+                        th:text="${ott}"
+                    >
+                        OTT
+                    </span>
+
+
+                </div>
+
+
+                <div
+                    class="ott-empty"
+                    th:if="${movie.ottProviders == null
+                        || movie.ottProviders.isEmpty()}"
+                >
+                    현재 한국 OTT 제공 정보가 없습니다.
+                </div>
+
+
+            </div>
+
+
+
+            <a
+                href="/movies"
+                class="back-button"
+            >
+                ← 영화 목록으로
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+</body>
+
+</html>
