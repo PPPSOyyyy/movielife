@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>회원가입 | 인생작품</title>
+
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        :root {
+
+            --black: #000000;
+            --red: #D92234;
+            --white: #ffffff;
+            --gray-100: #f5f5f5;
+            --gray-300: #cccccc;
+            --gray-500: #777777;
+            --gray-700: #333333;
+            --dark-card: #101010;
+
+        }
+
+
+        html {
+            height: 100%;
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            background:
+                radial-gradient(
+                    circle at 50% 20%,
+                    rgba(217, 34, 52, 0.12),
+                    transparent 35%
+                ),
+                #000000;
+
+            color: white;
+
+            font-family:
+                "Pretendard",
+                "Noto Sans KR",
+                Arial,
+                sans-serif;
+
+        }
+
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+
+        button,
+        input {
+            font-family: inherit;
+        }
+
+
+        button {
+            cursor: pointer;
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+
+            width: 100%;
+            height: 76px;
+
+            display: flex;
+            align-items: center;
+
+            padding: 0 6%;
+
+            border-bottom:
+                1px solid rgba(255,255,255,0.07);
+
+            background:
+                rgba(0,0,0,0.92);
+
+        }
+
+
+        .logo {
+
+            display: flex;
+            align-items: center;
+
+            width: 145px;
+
+        }
+
+
+        .logo img {
+
+            display: block;
+
+            width: 145px;
+            height: auto;
+
+        }
+
+
+        .header-right {
+            margin-left: auto;
+        }
+
+
+        .back-home {
+
+            color: #888;
+
+            font-size: 13px;
+
+            transition: 0.2s;
+
+        }
+
+
+        .back-home:hover {
+            color: white;
+        }
+
+
+        /* =========================
+           회원가입
+        ========================= */
+
+        .signup-container {
+
+            min-height:
+                calc(100vh - 76px);
+
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            padding: 70px 20px;
+
+        }
+
+
+        .signup-wrapper {
+
+            width: 100%;
+            max-width: 470px;
+
+        }
+
+
+        .signup-title {
+
+            text-align: center;
+
+            margin-bottom: 35px;
+
+        }
+
+
+        .signup-title .small-title {
+
+            color: var(--red);
+
+            font-size: 11px;
+            font-weight: 700;
+
+            letter-spacing: 2px;
+
+            margin-bottom: 12px;
+
+        }
+
+
+        .signup-title h1 {
+
+            font-size: 32px;
+
+            letter-spacing: -2px;
+
+            margin-bottom: 9px;
+
+        }
+
+
+        .signup-title p {
+
+            color: #777;
+
+            font-size: 13px;
+
+        }
+
+
+        /* =========================
+           카드
+        ========================= */
+
+        .signup-card {
+
+            padding: 38px;
+
+            border:
+                1px solid #252525;
+
+            border-radius: 8px;
+
+            background:
+                rgba(16,16,16,0.95);
+
+            box-shadow:
+                0 30px 80px rgba(0,0,0,0.5);
+
+        }
+
+
+        /* =========================
+           입력
+        ========================= */
+
+        .input-group {
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .input-group label {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+            color: #d0d0d0;
+
+            font-size: 12px;
+            font-weight: 600;
+
+        }
+
+
+        .required {
+
+            color: var(--red);
+
+            margin-left: 3px;
+
+        }
+
+
+        .input-row {
+
+            display: flex;
+
+            gap: 8px;
+
+        }
+
+
+        .input-row input {
+            flex: 1;
+        }
+
+
+        input {
+
+            width: 100%;
+            height: 48px;
+
+            padding: 0 14px;
+
+            outline: none;
+
+            border:
+                1px solid #333;
+
+            border-radius: 5px;
+
+            background: #080808;
+
+            color: white;
+
+            font-size: 13px;
+
+            transition: 0.2s;
+
+        }
+
+
+        input::placeholder {
+            color: #555;
+        }
+
+
+        input:focus {
+
+            border-color: var(--red);
+
+            background: #0c0c0c;
+
+            box-shadow:
+                0 0 0 2px rgba(217,34,52,0.08);
+
+        }
+
+
+        .check-button {
+
+            width: 95px;
+
+            flex-shrink: 0;
+
+            border:
+                1px solid #444;
+
+            border-radius: 5px;
+
+            background: #181818;
+
+            color: #ddd;
+
+            font-size: 11px;
+
+            transition: 0.2s;
+
+        }
+
+
+        .check-button:hover {
+
+            border-color: var(--red);
+
+            color: var(--red);
+
+        }
+
+
+        .input-help {
+
+            margin-top: 7px;
+
+            color: #555;
+
+            font-size: 10px;
+
+        }
+
+
+        /* =========================
+           약관
+        ========================= */
+
+        .terms {
+
+            margin-top: 25px;
+
+            padding-top: 23px;
+
+            border-top:
+                1px solid #222;
+
+        }
+
+
+        .terms-title {
+
+            margin-bottom: 14px;
+
+            color: #ddd;
+
+            font-size: 12px;
+            font-weight: 600;
+
+        }
+
+
+        .term-item {
+
+            display: flex;
+            align-items: center;
+
+            gap: 8px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .term-item input[type="checkbox"] {
+
+            width: 15px;
+            height: 15px;
+
+            accent-color: var(--red);
+
+        }
+
+
+        .term-item label {
+
+            color: #777;
+
+            font-size: 11px;
+
+            cursor: pointer;
+
+        }
+
+
+        .term-item.required-term label {
+            color: #aaa;
+        }
+
+
+        .term-item a {
+
+            margin-left: auto;
+
+            color: #555;
+
+            font-size: 10px;
+
+        }
+
+
+        /* =========================
+           회원가입 버튼
+        ========================= */
+
+        .signup-button {
+
+            width: 100%;
+            height: 52px;
+
+            margin-top: 27px;
+
+            border: none;
+            border-radius: 5px;
+
+            background: var(--red);
+
+            color: white;
+
+            font-size: 14px;
+            font-weight: 700;
+
+            transition: 0.25s;
+
+        }
+
+
+        .signup-button:hover {
+
+            background: #ed3043;
+
+            transform: translateY(-2px);
+
+        }
+
+
+        /* =========================
+           로그인 링크
+        ========================= */
+
+        .login-link {
+
+            text-align: center;
+
+            margin-top: 22px;
+
+            color: #666;
+
+            font-size: 12px;
+
+        }
+
+
+        .login-link a {
+
+            margin-left: 5px;
+
+            color: white;
+
+            font-weight: 600;
+
+        }
+
+
+        .login-link a:hover {
+            color: var(--red);
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+
+            padding: 25px 6%;
+
+            border-top:
+                1px solid #181818;
+
+            text-align: center;
+
+            color: #444;
+
+            font-size: 10px;
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .header {
+                height: 68px;
+                padding: 0 20px;
+            }
+
+            .signup-container {
+                padding: 50px 15px;
+            }
+
+            .signup-card {
+                padding: 28px 20px;
+            }
+
+            .signup-title h1 {
+                font-size: 28px;
+            }
+
+            .check-button {
+                width: 80px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+
+<body>
+
+
+<header class="header">
+
+    <a href="/" class="logo">
+
+        <img
+            src="/images/logo.png"
+            alt="인생작품"
+        >
+
+    </a>
+
+
+    <div class="header-right">
+
+        <a href="/" class="back-home">
+            ← 메인으로
+        </a>
+
+    </div>
+
+</header>
+
+
+
+<main class="signup-container">
+
+
+    <div class="signup-wrapper">
+
+
+        <div class="signup-title">
+
+            <div class="small-title">
+                MY MOVIE, MY LIFE
+            </div>
+
+
+            <h1>
+                회원가입
+            </h1>
+
+
+            <p>
+                MovieLife와 함께
+                나만의 영화 이야기를 시작해보세요.
+            </p>
+
+        </div>
+
+
+
+        <div class="signup-card">
+
+
+            <!-- 아이디 -->
+
+            <div class="input-group">
+
+                <label for="userId">
+
+                    아이디
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+
+                <div class="input-row">
+
+                    <input
+                        type="text"
+                        id="userId"
+                        placeholder="아이디를 입력해주세요."
+                    >
+
+
+                    <button
+                        type="button"
+                        class="check-button"
+                        onclick="checkUserId()"
+                    >
+
+                        중복확인
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- 비밀번호 -->
+
+            <div class="input-group">
+
+                <label for="password">
+
+                    비밀번호
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="비밀번호를 입력해주세요."
+                >
+
+
+                <p class="input-help">
+
+                    영문, 숫자, 특수문자를 포함하여
+                    8자 이상 입력해주세요.
+
+                </p>
+
+            </div>
+
+
+
+            <!-- 비밀번호 확인 -->
+
+            <div class="input-group">
+
+                <label for="password-confirm">
+
+                    비밀번호 확인
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+
+                <input
+                    type="password"
+                    id="password-confirm"
+                    placeholder="비밀번호를 다시 입력해주세요."
+                >
+
+            </div>
+
+
+
+            <!-- 닉네임 -->
+
+            <div class="input-group">
+
+                <label for="nickname">
+
+                    닉네임
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+
+                <div class="input-row">
+
+                    <input
+                        type="text"
+                        id="nickname"
+                        placeholder="사용할 닉네임을 입력해주세요."
+                    >
+
+
+                    <button
+                        type="button"
+                        class="check-button"
+                        onclick="checkNickname()"
+                    >
+
+                        중복확인
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- 약관 -->
+
+            <div class="terms">
+
+
+                <div class="terms-title">
+
+                    이용약관 동의
+
+                </div>
+
+
+
+                <div class="term-item">
+
+                    <input
+                        type="checkbox"
+                        id="agree-all"
+                    >
+
+
+                    <label for="agree-all">
+
+                        전체 약관에 동의합니다.
+
+                    </label>
+
+                </div>
+
+
+
+                <div class="term-item required-term">
+
+                    <input
+                        type="checkbox"
+                        id="agree-service"
+                    >
+
+
+                    <label for="agree-service">
+
+                        서비스 이용약관 동의 (필수)
+
+                    </label>
+
+
+                    <a href="#">
+                        보기
+                    </a>
+
+                </div>
+
+
+
+                <div class="term-item required-term">
+
+                    <input
+                        type="checkbox"
+                        id="agree-privacy"
+                    >
+
+
+                    <label for="agree-privacy">
+
+                        개인정보 수집 및 이용 동의 (필수)
+
+                    </label>
+
+
+                    <a href="#">
+                        보기
+                    </a>
+
+                </div>
+
+
+
+                <div class="term-item">
+
+                    <input
+                        type="checkbox"
+                        id="agree-marketing"
+                    >
+
+
+                    <label for="agree-marketing">
+
+                        마케팅 정보 수신 동의 (선택)
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- 회원가입 -->
+
+            <button
+                type="button"
+                class="signup-button"
+                onclick="signup()"
+            >
+
+                회원가입
+
+            </button>
+
+
+        </div>
+
+
+
+        <div class="login-link">
+
+            이미 계정이 있으신가요?
+
+            <a href="/login">
+
+                로그인
+
+            </a>
+
+        </div>
+
+
+    </div>
+
+
+</main>
+
+
+
+<footer class="footer">
+
+    © 2026 인생작품. All Rights Reserved.
+
+</footer>
+
+
+
+<script>
+
+
+    /* =========================
+       중복확인 여부
+    ========================= */
+
+    let userIdChecked = false;
+    let nicknameChecked = false;
+
+
+
+    /* =========================
+       전체 약관 동의
+    ========================= */
+
+    const agreeAll =
+        document.getElementById("agree-all");
+
+    const agreeService =
+        document.getElementById("agree-service");
+
+    const agreePrivacy =
+        document.getElementById("agree-privacy");
+
+    const agreeMarketing =
+        document.getElementById("agree-marketing");
+
+
+    agreeAll.addEventListener(
+        "change",
+        function () {
+
+            agreeService.checked =
+                agreeAll.checked;
+
+            agreePrivacy.checked =
+                agreeAll.checked;
+
+            agreeMarketing.checked =
+                agreeAll.checked;
+
+        }
+    );
+
+
+
+    /* =========================
+       아이디 변경 시
+       다시 중복확인 필요
+    ========================= */
+
+    document
+        .getElementById("userId")
+        .addEventListener(
+            "input",
+            function () {
+
+                userIdChecked = false;
+
+            }
+        );
+
+
+
+    /* =========================
+       닉네임 변경 시
+       다시 중복확인 필요
+    ========================= */
+
+    document
+        .getElementById("nickname")
+        .addEventListener(
+            "input",
+            function () {
+
+                nicknameChecked = false;
+
+            }
+        );
+
+
+
+    /* =========================
+       아이디 중복확인
+    ========================= */
+
+    function checkUserId() {
+
+
+        const userId =
+            document.getElementById("userId").value.trim();
+
+
+        if (userId === "") {
+
+            alert("아이디를 입력해주세요.");
+
+            return;
+
+        }
+
+
+        fetch(
+            "/api/members/check-userid?userId="
+            + encodeURIComponent(userId)
+        )
+
+        .then(response => {
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "아이디 중복확인 실패"
+                );
+
+            }
+
+            return response.json();
+
+        })
+
+        .then(duplicate => {
+
+
+            if (duplicate) {
+
+                alert(
+                    "이미 사용 중인 아이디입니다."
+                );
+
+                userIdChecked = false;
+
+            }
+
+            else {
+
+                alert(
+                    "사용 가능한 아이디입니다."
+                );
+
+                userIdChecked = true;
+
+            }
+
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+            alert(
+                "아이디 중복확인 중 오류가 발생했습니다."
+            );
+
+        });
+
+    }
+
+
+
+    /* =========================
+       닉네임 중복확인
+    ========================= */
+
+    function checkNickname() {
+
+
+        const nickname =
+            document.getElementById("nickname").value.trim();
+
+
+        if (nickname === "") {
+
+            alert("닉네임을 입력해주세요.");
+
+            return;
+
+        }
+
+
+        fetch(
+            "/api/members/check-nickname?nickname="
+            + encodeURIComponent(nickname)
+        )
+
+        .then(response => {
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "닉네임 중복확인 실패"
+                );
+
+            }
+
+            return response.json();
+
+        })
+
+        .then(duplicate => {
+
+
+            if (duplicate) {
+
+                alert(
+                    "이미 사용 중인 닉네임입니다."
+                );
+
+                nicknameChecked = false;
+
+            }
+
+            else {
+
+                alert(
+                    "사용 가능한 닉네임입니다."
+                );
+
+                nicknameChecked = true;
+
+            }
+
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+            alert(
+                "닉네임 중복확인 중 오류가 발생했습니다."
+            );
+
+        });
+
+    }
+
+
+
+    /* =========================
+       회원가입
+    ========================= */
+
+    function signup() {
+
+
+        const userId =
+            document.getElementById("userId").value.trim();
+
+
+        const password =
+            document.getElementById("password").value;
+
+
+        const passwordConfirm =
+            document.getElementById("password-confirm").value;
+
+
+        const nickname =
+            document.getElementById("nickname").value.trim();
+
+
+
+        /* 입력 검사 */
+
+        if (
+            userId === "" ||
+            password === "" ||
+            passwordConfirm === "" ||
+            nickname === ""
+        ) {
+
+            alert(
+                "모든 필수 항목을 입력해주세요."
+            );
+
+            return;
+
+        }
+
+
+
+        /* 비밀번호 확인 */
+
+        if (
+            password !== passwordConfirm
+        ) {
+
+            alert(
+                "비밀번호가 일치하지 않습니다."
+            );
+
+            return;
+
+        }
+
+
+
+        /* 아이디 중복검사 확인 */
+
+        if (!userIdChecked) {
+
+            alert(
+                "아이디 중복확인을 해주세요."
+            );
+
+            return;
+
+        }
+
+
+
+        /* 닉네임 중복검사 확인 */
+
+        if (!nicknameChecked) {
+
+            alert(
+                "닉네임 중복확인을 해주세요."
+            );
+
+            return;
+
+        }
+
+
+
+        /* 필수 약관 */
+
+        if (
+            !agreeService.checked ||
+            !agreePrivacy.checked
+        ) {
+
+            alert(
+                "필수 약관에 동의해주세요."
+            );
+
+            return;
+
+        }
+
+
+
+        /* 회원가입 요청 */
+
+        fetch(
+            "/api/members/signup",
+            {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                },
+
+                body: JSON.stringify({
+
+                    userId: userId,
+
+                    password: password,
+
+                    nickname: nickname
+
+                })
+
+            }
+        )
+
+        .then(async response => {
+
+
+            const message =
+                await response.text();
+
+
+            if (!response.ok) {
+
+                throw new Error(message);
+
+            }
+
+
+            return message;
+
+        })
+
+        .then(message => {
+
+
+            alert(message);
+
+
+            /* 로그인 화면 이동 */
+
+            window.location.href =
+                "/login";
+
+        })
+
+        .catch(error => {
+
+
+            console.error(error);
+
+
+            alert(
+                "회원가입 실패: "
+                + error.message
+            );
+
+        });
+
+    }
+
+
+</script>
+
+
+</body>
+
+</html>
