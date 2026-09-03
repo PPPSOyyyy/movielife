@@ -1107,22 +1107,22 @@
         </a>
 
 
-        <a href="#">
+        <a href="/movies">
             영화
         </a>
 
 
-        <a href="#">
+        <a href="/popular">
             인기영화
         </a>
 
 
-        <a href="#">
+        <a href="/movie-recommend">
             영화추천
         </a>
 
 
-        <a href="#">
+        <a href="/ott">
             OTT
         </a>
 
@@ -1274,7 +1274,7 @@
             </div>
 
             <div class="stat-number">
-                0<span>개</span>
+                <b id="favoriteCount">0</b><span>개</span>
             </div>
 
         </div>
@@ -1288,7 +1288,7 @@
             </div>
 
             <div class="stat-number">
-                0<span>개</span>
+                <b id="ratingCount">0</b><span>개</span>
             </div>
 
         </div>
@@ -1302,7 +1302,7 @@
             </div>
 
             <div class="stat-number">
-                0<span>개</span>
+                <b id="reviewCount">0</b><span>개</span>
             </div>
 
         </div>
@@ -1334,7 +1334,7 @@
 
 
         <a
-            href="#"
+            href="/favorite-movies"
             class="movie-menu-card"
         >
 
@@ -1359,7 +1359,7 @@
 
 
         <a
-            href="#"
+            href="/my-reviews"
             class="movie-menu-card"
         >
 
@@ -1384,7 +1384,7 @@
 
 
         <a
-            href="#"
+            href="/review"
             class="movie-menu-card"
         >
 
@@ -1393,11 +1393,11 @@
             </div>
 
             <h3>
-                나의 리뷰
+                리뷰 작성
             </h3>
 
             <p>
-                지금까지 작성한 리뷰를 확인해보세요.
+                시청한 영화에 리뷰를 남겨보세요.
             </p>
 
             <div class="movie-menu-arrow">
@@ -1452,7 +1452,7 @@
 
 
             <a
-                href="/"
+                href="/movies"
                 class="recent-button"
             >
                 영화 찾아보기
@@ -2098,15 +2098,54 @@
 
 
     /* =========================
-       최초 회원정보 로딩
+       찜·평점·리뷰 개수 불러오기
+    ========================= */
+
+    async function loadActivityCounts() {
+
+        try {
+
+            const [favoriteResponse, reviewResponse] =
+                await Promise.all([
+                    fetch("/api/favorites/my"),
+                    fetch("/api/reviews/my")
+                ]);
+
+            if (!favoriteResponse.ok || !reviewResponse.ok) {
+                throw new Error("활동 정보를 불러오지 못했습니다.");
+            }
+
+            const favorites = await favoriteResponse.json();
+            const reviews = await reviewResponse.json();
+
+            document.getElementById("favoriteCount").textContent =
+                favorites.length;
+
+            /* 현재 별점은 리뷰와 함께 저장되므로 개수가 같습니다. */
+            document.getElementById("ratingCount").textContent =
+                reviews.length;
+
+            document.getElementById("reviewCount").textContent =
+                reviews.length;
+
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+
+    /* =========================
+       최초 화면 데이터 로딩
     ========================= */
 
     loadMyInfo();
+    loadActivityCounts();
 
 
 </script>
 
 
+<script src="/js/auth-header.js" defer></script>
 </body>
 
 </html>

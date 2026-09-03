@@ -29,7 +29,7 @@ public class MovieController {
     // 영화 목록
     // 인기 / 검색 / 장르 / 페이지네이션
     // ==========================================
-    @GetMapping("/movies")
+    @GetMapping({"/movies", "/movie-list"})
     public String movieList(
 
             @RequestParam(

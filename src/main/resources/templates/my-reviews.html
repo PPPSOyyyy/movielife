@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>나의 리뷰 | MovieLife</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --black: #000000;
+            --red: #D92234;
+            --white: #ffffff;
+            --gray-100: #f5f5f5;
+            --gray-200: #dddddd;
+            --gray-400: #999999;
+            --gray-500: #777777;
+            --gray-700: #333333;
+            --dark-card: #111111;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--black);
+            color: var(--white);
+            font-family:
+                "Pretendard",
+                "Noto Sans KR",
+                Arial,
+                sans-serif;
+            line-height: 1.5;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+
+        /* ==================================================
+           HEADER
+        ================================================== */
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 76px;
+            z-index: 1000;
+
+            display: flex;
+            align-items: center;
+
+            padding: 0 6%;
+
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(12px);
+
+            border-bottom:
+                1px solid rgba(255, 255, 255, 0.07);
+        }
+
+
+        /* 로고 */
+
+        .logo {
+            display: flex;
+            align-items: center;
+
+            width: 145px;
+            flex-shrink: 0;
+        }
+
+        .logo img {
+            display: block;
+
+            width: 145px;
+            height: auto;
+        }
+
+
+        /* 네비게이션 */
+
+        .nav {
+            display: flex;
+            align-items: center;
+
+            gap: 30px;
+            margin-left: 45px;
+        }
+
+        .nav a {
+            position: relative;
+
+            color: #bdbdbd;
+
+            font-size: 14px;
+            font-weight: 500;
+
+            transition: 0.25s;
+        }
+
+        .nav a:hover {
+            color: var(--white);
+        }
+
+        .nav a.active {
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        .nav a.active::after {
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+            bottom: -9px;
+
+            width: 100%;
+            height: 2px;
+
+            background-color: var(--red);
+        }
+
+
+        /* 헤더 오른쪽 */
+
+        .header-right {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        .login-button,
+        .signup-button {
+            padding: 9px 19px;
+
+            border-radius: 5px;
+
+            font-size: 13px;
+
+            transition: 0.25s;
+        }
+
+        .login-button {
+            border: 1px solid #444;
+
+            background: transparent;
+
+            color: white;
+        }
+
+        .login-button:hover {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .signup-button {
+            border: 1px solid var(--red);
+
+            background: var(--red);
+
+            color: white;
+
+            font-weight: 600;
+        }
+
+        .signup-button:hover {
+            background: #ed3043;
+            border-color: #ed3043;
+
+            transform: translateY(-1px);
+        }
+
+
+        /* ==================================================
+           MAIN
+        ================================================== */
+
+        .main {
+            min-height: calc(100vh - 220px);
+
+            padding:
+                150px 7% 100px;
+        }
+
+        .page-header {
+            max-width: 900px;
+
+            margin:
+                0 auto 45px;
+        }
+
+
+        /* 뒤로가기 */
+
+        .back-link {
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            margin-bottom: 25px;
+
+            color: #777;
+
+            font-size: 13px;
+
+            transition: 0.25s;
+        }
+
+        .back-link:hover {
+            color: var(--red);
+        }
+
+
+        /* 페이지 제목 */
+
+        .page-label {
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-bottom: 18px;
+
+            color: var(--red);
+
+            font-size: 12px;
+            font-weight: 700;
+
+            letter-spacing: 2px;
+        }
+
+        .page-label::before {
+            content: "";
+
+            width: 30px;
+            height: 2px;
+
+            background: var(--red);
+        }
+
+        .page-header h1 {
+            font-size:
+                clamp(38px, 5vw, 58px);
+
+            line-height: 1.1;
+
+            letter-spacing: -3px;
+
+            margin-bottom: 12px;
+        }
+
+        .page-header p {
+            color: #777;
+
+            font-size: 14px;
+        }
+
+
+        /* ==================================================
+           REVIEW
+        ================================================== */
+
+        .review-container {
+            max-width: 900px;
+
+            margin: 0 auto;
+        }
+
+        .review-count {
+            margin-bottom: 15px;
+
+            color: #777;
+
+            font-size: 12px;
+        }
+
+        .review-list {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 15px;
+        }
+
+
+        /* 리뷰 카드 */
+
+        .review-card {
+            padding: 28px 30px;
+
+            border:
+                1px solid #252525;
+
+            border-radius: 7px;
+
+            background: #0d0d0d;
+
+            transition: 0.3s;
+        }
+
+        .review-card:hover {
+            transform: translateY(-3px);
+
+            border-color: #444;
+        }
+
+
+        /* 영화 정보 + 별점 */
+
+        .review-top {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            margin-bottom: 15px;
+        }
+
+        .movie-info {
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+        }
+
+        .movie-icon {
+            width: 42px;
+            height: 42px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border:
+                1px solid #333;
+
+            border-radius: 5px;
+
+            background: #151515;
+
+            font-size: 20px;
+        }
+
+        .movie-title {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .movie-id {
+            margin-top: 3px;
+
+            color: #666;
+
+            font-size: 11px;
+        }
+
+        .rating {
+            color: #e8bd50;
+
+            font-size: 15px;
+
+            letter-spacing: 1px;
+
+            white-space: nowrap;
+        }
+
+
+        /* 리뷰 내용 */
+
+        .review-content {
+            padding:
+                18px 0;
+
+            border-top:
+                1px solid #1e1e1e;
+
+            border-bottom:
+                1px solid #1e1e1e;
+
+            color: #c5c5c5;
+
+            font-size: 14px;
+
+            line-height: 1.8;
+
+            white-space: pre-wrap;
+
+            word-break: break-word;
+        }
+
+
+        /* 날짜 + 버튼 */
+
+        .review-bottom {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            margin-top: 15px;
+        }
+
+        .review-date {
+            color: #555;
+
+            font-size: 11px;
+        }
+
+        .review-actions {
+            display: flex;
+
+            gap: 8px;
+        }
+
+        .review-action {
+            padding:
+                6px 12px;
+
+            border:
+                1px solid #333;
+
+            border-radius: 4px;
+
+            background: transparent;
+
+            color: #888;
+
+            font-size: 11px;
+
+            transition: 0.2s;
+        }
+
+        .review-action:hover {
+            border-color: #666;
+
+            color: white;
+        }
+
+        .review-action.delete:hover {
+            border-color: var(--red);
+
+            color: var(--red);
+        }
+
+
+        /* ==================================================
+           EMPTY
+        ================================================== */
+
+        .empty-state {
+            padding:
+                80px 20px;
+
+            border:
+                1px solid #252525;
+
+            border-radius: 7px;
+
+            background: #0d0d0d;
+
+            text-align: center;
+        }
+
+        .empty-icon {
+            margin-bottom: 15px;
+
+            font-size: 42px;
+        }
+
+        .empty-state h2 {
+            margin-bottom: 8px;
+
+            font-size: 20px;
+        }
+
+        .empty-state p {
+            margin-bottom: 25px;
+
+            color: #666;
+
+            font-size: 13px;
+        }
+
+        .review-write-button {
+            display: inline-block;
+
+            padding:
+                12px 20px;
+
+            border-radius: 5px;
+
+            background: var(--red);
+
+            color: white;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            transition: 0.25s;
+        }
+
+        .review-write-button:hover {
+            background: #ed3043;
+
+            transform: translateY(-2px);
+        }
+
+
+        /* ==================================================
+           MESSAGE
+        ================================================== */
+
+        .message {
+            padding: 50px;
+
+            color: #777;
+
+            text-align: center;
+
+            font-size: 13px;
+        }
+
+
+        /* ==================================================
+           FOOTER
+        ================================================== */
+
+        footer {
+            padding:
+                55px 7% 30px;
+
+            background: #050505;
+        }
+
+        .footer-top {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding-bottom: 30px;
+
+            border-bottom:
+                1px solid #222;
+        }
+
+        .footer-logo {
+            font-size: 19px;
+
+            font-weight: 800;
+        }
+
+        .footer-logo span {
+            color: var(--red);
+        }
+
+        .footer-links {
+            display: flex;
+
+            gap: 25px;
+
+            color: #666;
+
+            font-size: 11px;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            display: flex;
+
+            justify-content: space-between;
+
+            padding-top: 22px;
+
+            color: #444;
+
+            font-size: 10px;
+        }
+
+
+        /* ==================================================
+           MOBILE
+        ================================================== */
+
+        @media (max-width: 800px) {
+
+            .header {
+                height: 68px;
+
+                padding:
+                    0 20px;
+            }
+
+            .logo,
+            .logo img {
+                width: 125px;
+            }
+
+            .nav {
+                display: none;
+            }
+
+            .login-button {
+                display: none;
+            }
+
+            .main {
+                padding:
+                    120px 20px 70px;
+            }
+
+            .page-header h1 {
+                font-size: 42px;
+
+                letter-spacing: -2px;
+            }
+
+            .review-card {
+                padding: 22px;
+            }
+
+            .review-top,
+            .review-bottom {
+                align-items: flex-start;
+
+                flex-direction: column;
+            }
+
+            .review-actions {
+                width: 100%;
+            }
+
+            .review-action {
+                flex: 1;
+            }
+
+            .footer-top,
+            .footer-bottom {
+                flex-direction: column;
+
+                gap: 20px;
+            }
+
+            .footer-links {
+                flex-wrap: wrap;
+
+                gap: 15px;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+<!-- ==================================================
+     HEADER
+================================================== -->
+
+<header class="header">
+
+    <a href="/" class="logo">
+
+        <img
+            src="/images/logo.png"
+            alt="MovieLife"
+        >
+
+    </a>
+
+
+    <nav class="nav">
+
+        <a href="/">
+            홈
+        </a>
+
+        <a href="/movie-list">
+            영화
+        </a>
+
+        <a href="/popular">
+            인기영화
+        </a>
+
+        <a href="/movie-recommend">
+            영화추천
+        </a>
+
+        <a href="/ott">
+            OTT
+        </a>
+
+        <a href="/mypage" class="active">
+            마이페이지
+        </a>
+
+    </nav>
+
+
+    <div class="header-right">
+
+        <a href="/login" class="login-button">
+            로그인
+        </a>
+
+        <a href="/signup" class="signup-button">
+            회원가입
+        </a>
+
+    </div>
+
+</header>
+
+
+
+<!-- ==================================================
+     MAIN
+================================================== -->
+
+<main class="main">
+
+
+    <div class="page-header">
+
+
+        <a href="/mypage" class="back-link">
+
+            ← 마이페이지
+
+        </a>
+
+
+        <div class="page-label">
+
+            MY MOVIE, MY LIFE
+
+        </div>
+
+
+        <h1>
+
+            나의 리뷰
+
+        </h1>
+
+
+        <p>
+
+            내가 남긴 영화 이야기를 확인해보세요.
+
+        </p>
+
+
+    </div>
+
+
+
+    <div class="review-container">
+
+
+        <div
+            class="review-count"
+            id="reviewCount"
+        >
+
+            리뷰를 불러오는 중...
+
+        </div>
+
+
+        <div
+            id="reviewList"
+            class="review-list"
+        >
+
+            <div class="message">
+
+                리뷰를 불러오는 중입니다.
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</main>
+
+
+
+<!-- ==================================================
+     FOOTER
+================================================== -->
+
+<footer>
+
+
+    <div class="footer-top">
+
+
+        <div class="footer-logo">
+
+            Movie<span>Life</span>
+
+        </div>
+
+
+        <div class="footer-links">
+
+            <a href="#">
+                서비스 소개
+            </a>
+
+            <a href="#">
+                이용약관
+            </a>
+
+            <a href="#">
+                개인정보처리방침
+            </a>
+
+            <a href="#">
+                문의하기
+            </a>
+
+        </div>
+
+
+    </div>
+
+
+
+    <div class="footer-bottom">
+
+        <span>
+            © 2026 MovieLife. All Rights Reserved.
+        </span>
+
+        <span>
+            MY MOVIE, MY LIFE
+        </span>
+
+    </div>
+
+
+</footer>
+
+
+
+<!-- ==================================================
+     JAVASCRIPT
+================================================== -->
+
+<script>
+
+
+    // 내 리뷰 가져오기
+
+    async function loadMyReviews() {
+
+
+        const reviewList =
+            document.getElementById("reviewList");
+
+        const reviewCount =
+            document.getElementById("reviewCount");
+
+
+        try {
+
+
+            const response =
+                await fetch("/api/reviews/my");
+
+
+            // 로그인하지 않은 경우
+
+            if (response.status === 401) {
+
+                reviewList.innerHTML = `
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            🔒
+                        </div>
+
+                        <h2>
+                            로그인이 필요합니다.
+                        </h2>
+
+                        <p>
+                            나의 리뷰를 확인하려면
+                            로그인해주세요.
+                        </p>
+
+                        <a
+                            href="/login"
+                            class="review-write-button"
+                        >
+                            로그인하기
+                        </a>
+
+                    </div>
+
+                `;
+
+                reviewCount.textContent = "";
+
+                return;
+            }
+
+
+            // 서버 오류
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "리뷰를 불러오지 못했습니다."
+                );
+
+            }
+
+
+            // JSON 데이터 가져오기
+
+            const reviews =
+                await response.json();
+
+
+            // 리뷰 개수
+
+            reviewCount.textContent =
+                `총 ${reviews.length}개의 리뷰`;
+
+
+            // 리뷰가 없는 경우
+
+            if (reviews.length === 0) {
+
+                reviewList.innerHTML = `
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            ✏️
+                        </div>
+
+                        <h2>
+                            작성한 리뷰가 없습니다.
+                        </h2>
+
+                        <p>
+                            영화를 보고 나만의 이야기를
+                            남겨보세요.
+                        </p>
+
+                        <a
+                            href="/review"
+                            class="review-write-button"
+                        >
+                            리뷰 작성하기
+                        </a>
+
+                    </div>
+
+                `;
+
+                return;
+            }
+
+
+
+            // 리뷰 출력
+
+            reviewList.innerHTML =
+                reviews.map(review => {
+
+
+                    // 별점
+
+                    const rating =
+                        Number(review.rating) || 0;
+
+
+                    const stars =
+                        "★".repeat(rating) +
+                        "☆".repeat(5 - rating);
+
+
+
+                    // 날짜
+
+                    const date =
+                        review.createdAt
+                            ? new Date(
+                                review.createdAt
+                              ).toLocaleDateString(
+                                "ko-KR"
+                              )
+                            : "";
+
+
+
+                    return `
+
+                        <article
+                            class="review-card"
+                        >
+
+
+                            <div
+                                class="review-top"
+                            >
+
+
+                                <div
+                                    class="movie-info"
+                                >
+
+
+                                    <div
+                                        class="movie-icon"
+                                    >
+                                        🎬
+                                    </div>
+
+
+                                    <div>
+
+                                        <div
+                                            class="movie-title"
+                                        >
+                                            ${escapeHtml(
+                                                review.movieTitle
+                                                || "영화"
+                                            )}
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+
+
+
+                                <div
+                                    class="rating"
+                                >
+                                    ${stars}
+                                </div>
+
+
+                            </div>
+
+
+
+                            <div
+                                class="review-content"
+                            >
+                                ${escapeHtml(
+                                    review.content
+                                )}
+                            </div>
+
+
+
+                            <div
+                                class="review-bottom"
+                            >
+
+
+                                <div
+                                    class="review-date"
+                                >
+
+                                    작성일 ${date}
+
+                                </div>
+
+
+
+                                <div
+                                    class="review-actions"
+                                >
+
+
+                                    <button
+                                        type="button"
+                                        class="review-action"
+                                        onclick="editReview(${review.id})"
+                                    >
+                                        수정
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="review-action delete"
+                                        onclick="deleteReview(${review.id})"
+                                    >
+                                        삭제
+                                    </button>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                        </article>
+
+                    `;
+
+                }).join("");
+
+
+        } catch (error) {
+
+
+            console.error(error);
+
+
+            reviewCount.textContent = "";
+
+
+            reviewList.innerHTML = `
+
+                <div class="message">
+
+                    리뷰를 불러오는 중
+                    오류가 발생했습니다.
+
+                </div>
+
+            `;
+
+        }
+
+    }
+	async function editReview(reviewId) {
+
+	    // 현재 리뷰 찾기
+	    const response = await fetch("/api/reviews/my");
+
+	    if (!response.ok) {
+	        alert("리뷰 정보를 불러오지 못했습니다.");
+	        return;
+	    }
+
+	    const reviews = await response.json();
+
+	    const review = reviews.find(
+	        review => review.id === reviewId
+	    );
+
+	    if (!review) {
+	        alert("리뷰를 찾을 수 없습니다.");
+	        return;
+	    }
+
+	    // 수정할 별점
+	    const ratingInput = prompt(
+	        "별점을 입력해주세요. (1~5)",
+	        review.rating
+	    );
+
+	    if (ratingInput === null) {
+	        return;
+	    }
+
+	    const rating = Number(ratingInput);
+
+	    if (
+	        !Number.isInteger(rating) ||
+	        rating < 1 ||
+	        rating > 5
+	    ) {
+	        alert("별점은 1점부터 5점까지 입력해주세요.");
+	        return;
+	    }
+
+	    // 수정할 리뷰 내용
+	    const content = prompt(
+	        "리뷰 내용을 입력해주세요.",
+	        review.content
+	    );
+
+	    if (content === null) {
+	        return;
+	    }
+
+	    if (content.trim() === "") {
+	        alert("리뷰 내용을 입력해주세요.");
+	        return;
+	    }
+
+	    // 수정 요청
+	    const formData = new FormData();
+
+	    formData.append("rating", rating);
+	    formData.append("content", content);
+
+	    try {
+
+	        const updateResponse = await fetch(
+	            `/api/reviews/${reviewId}`,
+	            {
+	                method: "PUT",
+	                body: formData
+	            }
+	        );
+
+	        const message =
+	            await updateResponse.text();
+
+	        if (!updateResponse.ok) {
+	            alert(message);
+	            return;
+	        }
+
+	        alert("리뷰가 수정되었습니다.");
+
+	        // 수정된 리뷰 다시 불러오기
+	        loadMyReviews();
+
+	    } catch (error) {
+
+	        console.error(error);
+
+	        alert("리뷰 수정 중 오류가 발생했습니다.");
+	    }
+	}
+	async function deleteReview(reviewId) {
+
+	    const confirmed = confirm(
+	        "정말 이 리뷰를 삭제하시겠습니까?"
+	    );
+
+	    if (!confirmed) {
+	        return;
+	    }
+
+	    try {
+
+	        const response = await fetch(
+	            `/api/reviews/${reviewId}`,
+	            {
+	                method: "DELETE"
+	            }
+	        );
+
+	        const message = await response.text();
+
+	        if (!response.ok) {
+	            alert(message);
+	            return;
+	        }
+
+	        alert(message);
+
+	        // 삭제 후 리뷰 목록 다시 불러오기
+	        loadMyReviews();
+
+	    } catch (error) {
+
+	        console.error(error);
+
+	        alert("리뷰 삭제 중 오류가 발생했습니다.");
+	    }
+	}
+
+
+    // HTML 특수문자 처리
+
+    function escapeHtml(text) {
+
+
+        if (text == null) {
+
+            return "";
+
+        }
+
+
+        return String(text)
+
+            .replace(/&/g, "&amp;")
+
+            .replace(/</g, "&lt;")
+
+            .replace(/>/g, "&gt;")
+
+            .replace(/"/g, "&quot;")
+
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+
+	async function editReview(reviewId) {
+
+	    // 현재 내 리뷰 목록 가져오기
+	    const response = await fetch("/api/reviews/my");
+
+	    if (!response.ok) {
+	        alert("리뷰 정보를 불러오지 못했습니다.");
+	        return;
+	    }
+
+	    const reviews = await response.json();
+
+	    // 선택한 리뷰 찾기
+	    const review = reviews.find(
+	        review => review.id === reviewId
+	    );
+
+	    if (!review) {
+	        alert("리뷰를 찾을 수 없습니다.");
+	        return;
+	    }
+
+	    // 별점 수정
+	    const ratingInput = prompt(
+	        "별점을 입력해주세요. (1~5)",
+	        review.rating
+	    );
+
+	    if (ratingInput === null) {
+	        return;
+	    }
+
+	    const rating = Number(ratingInput);
+
+	    if (
+	        !Number.isInteger(rating) ||
+	        rating < 1 ||
+	        rating > 5
+	    ) {
+	        alert("별점은 1점부터 5점까지 입력해주세요.");
+	        return;
+	    }
+
+	    // 리뷰 내용 수정
+	    const content = prompt(
+	        "리뷰 내용을 입력해주세요.",
+	        review.content
+	    );
+
+	    if (content === null) {
+	        return;
+	    }
+
+	    if (content.trim() === "") {
+	        alert("리뷰 내용을 입력해주세요.");
+	        return;
+	    }
+
+	    // 서버로 수정 요청
+	    const formData = new FormData();
+
+	    formData.append("rating", rating);
+	    formData.append("content", content);
+
+	    try {
+
+	        const updateResponse = await fetch(
+	            `/api/reviews/${reviewId}`,
+	            {
+	                method: "PUT",
+	                body: formData
+	            }
+	        );
+
+	        const message = await updateResponse.text();
+
+	        if (!updateResponse.ok) {
+	            alert(message);
+	            return;
+	        }
+
+	        alert("리뷰가 수정되었습니다.");
+
+	        // 수정된 리뷰 다시 불러오기
+	        loadMyReviews();
+
+	    } catch (error) {
+
+	        console.error(error);
+
+	        alert("리뷰 수정 중 오류가 발생했습니다.");
+	    }
+	}
+
+
+
+	async function deleteReview(reviewId) {
+
+	    const confirmed = confirm(
+	        "정말 이 리뷰를 삭제하시겠습니까?"
+	    );
+
+	    if (!confirmed) {
+	        return;
+	    }
+
+	    try {
+
+	        const response = await fetch(
+	            `/api/reviews/${reviewId}`,
+	            {
+	                method: "DELETE"
+	            }
+	        );
+
+	        const message = await response.text();
+
+	        if (!response.ok) {
+	            alert(message);
+	            return;
+	        }
+
+	        alert(message);
+
+	        // 삭제 후 목록 새로고침
+	        loadMyReviews();
+
+	    } catch (error) {
+
+	        console.error(error);
+
+	        alert("리뷰 삭제 중 오류가 발생했습니다.");
+	    }
+	}
+
+
+
+    // 페이지가 열리면 리뷰 조회
+
+    loadMyReviews();
+
+
+</script>
+
+
+<script src="/js/auth-header.js" defer></script>
+</body>
+</html>

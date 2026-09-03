@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>찜한 영화 | movieLife</title>
+
+    <style>
+        :root {
+            --black: #000;
+            --red: #D92234;
+            --white: #fff;
+            --gray: #999;
+            --dark-gray: #222;
+            --card: #0d0d0d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--black);
+            color: var(--white);
+            font-family: Pretendard, "Noto Sans KR", Arial, sans-serif;
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* ==================================================
+           HEADER
+        ================================================== */
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 76px;
+
+            display: flex;
+            align-items: center;
+
+            padding: 0 60px;
+
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+
+            border-bottom: 1px solid #222;
+
+            z-index: 1000;
+        }
+
+        .logo img {
+            width: 125px;
+            display: block;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 35px;
+
+            margin-left: 70px;
+        }
+
+        .nav a {
+            position: relative;
+
+            color: #aaa;
+            font-size: 14px;
+
+            padding: 29px 0;
+
+            transition: 0.25s;
+        }
+
+        .nav a:hover {
+            color: var(--white);
+        }
+
+        .nav a.active {
+            color: var(--white);
+        }
+
+        .nav a.active::after {
+            content: "";
+
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 19px;
+
+            height: 2px;
+
+            background: var(--red);
+        }
+
+        .header-right {
+            margin-left: auto;
+
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .login-button,
+        .signup-button {
+            padding: 9px 18px;
+
+            border-radius: 5px;
+
+            font-size: 13px;
+
+            transition: 0.25s;
+        }
+
+        .login-button {
+            border: 1px solid #444;
+            color: #fff;
+        }
+
+        .login-button:hover {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .signup-button {
+            background: var(--red);
+            color: #fff;
+        }
+
+        .signup-button:hover {
+            opacity: 0.85;
+        }
+
+        /* ==================================================
+           MAIN
+        ================================================== */
+
+        .main {
+            max-width: 1200px;
+
+            margin: 0 auto;
+
+            padding: 140px 40px 100px;
+        }
+
+        /* ==================================================
+           PAGE HEADER
+        ================================================== */
+
+        .page-header {
+            margin-bottom: 55px;
+        }
+
+        .page-label {
+            margin-bottom: 12px;
+
+            color: var(--red);
+
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .page-header h1 {
+            font-size: 38px;
+            font-weight: 700;
+
+            margin-bottom: 14px;
+        }
+
+        .page-header p {
+            color: #888;
+
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* ==================================================
+           MOVIE COUNT
+        ================================================== */
+
+        .movie-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 20px;
+        }
+
+        .movie-header h2 {
+            font-size: 20px;
+        }
+
+        .movie-count {
+            color: #777;
+            font-size: 13px;
+        }
+
+        /* ==================================================
+           MOVIE GRID
+        ================================================== */
+
+        .movie-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 24px;
+        }
+
+        /* ==================================================
+           MOVIE CARD
+        ================================================== */
+
+        .movie-card {
+            position: relative;
+
+            overflow: hidden;
+
+            background: var(--card);
+
+            border: 1px solid #1d1d1d;
+            border-radius: 8px;
+
+            transition:
+                transform 0.25s,
+                border-color 0.25s;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+            border-color: #444;
+        }
+
+        .movie-poster {
+            width: 100%;
+            aspect-ratio: 2 / 3;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #151515,
+                    #080808
+                );
+
+            color: #555;
+
+            font-size: 45px;
+        }
+
+        .movie-poster img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .movie-info {
+            padding: 18px;
+        }
+
+        .movie-title {
+            margin-bottom: 8px;
+
+            color: #fff;
+
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .movie-id {
+            margin-bottom: 14px;
+
+            color: #666;
+
+            font-size: 12px;
+        }
+
+        .movie-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .favorite-button {
+            border: none;
+            background: transparent;
+
+            color: var(--red);
+
+            font-size: 13px;
+
+            cursor: pointer;
+        }
+
+        .favorite-button:hover {
+            opacity: 0.75;
+        }
+
+        .movie-rating {
+            color: #aaa;
+            font-size: 12px;
+        }
+
+        /* ==================================================
+           EMPTY STATE
+        ================================================== */
+
+        .empty-state {
+            display: none;
+
+            padding: 100px 20px;
+
+            text-align: center;
+
+            border: 1px solid #1d1d1d;
+            border-radius: 8px;
+
+            background: #0d0d0d;
+        }
+
+        .empty-icon {
+            margin-bottom: 20px;
+
+            font-size: 45px;
+        }
+
+        .empty-state h2 {
+            margin-bottom: 10px;
+
+            font-size: 20px;
+        }
+
+        .empty-state p {
+            margin-bottom: 25px;
+
+            color: #777;
+
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .movie-list-button {
+            display: inline-block;
+
+            padding: 11px 22px;
+
+            background: var(--red);
+
+            border-radius: 5px;
+
+            color: #fff;
+
+            font-size: 13px;
+
+            transition: 0.25s;
+        }
+
+        .movie-list-button:hover {
+            opacity: 0.85;
+        }
+
+        /* ==================================================
+           FOOTER
+        ================================================== */
+
+        .footer {
+            padding: 30px;
+
+            border-top: 1px solid #181818;
+
+            color: #555;
+
+            text-align: center;
+
+            font-size: 12px;
+        }
+
+        /* ==================================================
+           RESPONSIVE
+        ================================================== */
+
+        @media (max-width: 900px) {
+
+            .header {
+                padding: 0 25px;
+            }
+
+            .nav {
+                gap: 18px;
+                margin-left: 30px;
+            }
+
+            .movie-grid {
+                grid-template-columns:
+                    repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 650px) {
+
+            .header {
+                padding: 0 20px;
+            }
+
+            .nav {
+                display: none;
+            }
+
+            .main {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .movie-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+
+<!-- ==================================================
+     HEADER
+================================================== -->
+
+<header class="header">
+
+    <!-- 로고 -->
+    <a href="/" class="logo">
+
+        <img
+            src="/images/logo.png"
+            alt="movieLife"
+        >
+
+    </a>
+
+
+    <!-- 네비게이션 -->
+    <nav class="nav">
+
+        <a href="/">
+            홈
+        </a>
+
+        <a href="/movies" class="active">
+            영화
+        </a>
+
+        <a href="/popular">
+            인기영화
+        </a>
+
+        <a href="/movie-recommend">
+            영화추천
+        </a>
+
+        <a href="/ott">
+            OTT
+        </a>
+
+        <a href="/mypage">
+            마이페이지
+        </a>
+
+    </nav>
+
+
+    <!-- 로그인 / 회원가입 -->
+    <div class="header-right">
+
+        <a
+            href="/login"
+            class="login-button"
+        >
+            로그인
+        </a>
+
+        <a
+            href="/signup"
+            class="signup-button"
+        >
+            회원가입
+        </a>
+
+    </div>
+
+</header>
+
+
+<!-- ==================================================
+     MAIN
+================================================== -->
+
+<main class="main">
+
+
+    <!-- 페이지 제목 -->
+    <section class="page-header">
+
+        <div class="page-label">
+            MY FAVORITE MOVIES
+        </div>
+
+        <h1>
+            찜한 영화
+        </h1>
+
+        <p>
+            보고 싶은 영화를 한곳에 모아보세요.<br>
+            마음에 드는 영화는 언제든 다시 확인할 수 있습니다.
+        </p>
+
+    </section>
+
+
+    <!-- ==================================================
+         MOVIE LIST
+    ================================================== -->
+
+    <section>
+
+        <div class="movie-header">
+
+            <h2>
+                내가 찜한 영화
+            </h2>
+
+            <div
+                class="movie-count"
+                id="movieCount"
+            >
+                총 <span th:text="${favoriteMovies.size()}">0</span>편
+            </div>
+
+        </div>
+
+
+        <!-- 영화 카드 -->
+        <div
+            class="movie-grid"
+            id="movieGrid"
+        >
+
+
+            <article
+                class="movie-card"
+                th:each="movie : ${favoriteMovies}"
+                th:id="'favorite-card-' + ${movie.id}"
+            >
+
+                <a
+                    class="movie-poster"
+                    th:href="@{/movies/{id}(id=${movie.id})}"
+                >
+                    <img
+                        th:if="${movie.posterPath != null}"
+                        th:src="${movie.posterUrl}"
+                        th:alt="${movie.title}"
+                    >
+
+                    <span th:if="${movie.posterPath == null}">
+                        🎬
+                    </span>
+                </a>
+
+                <div class="movie-info">
+
+                    <a
+                        class="movie-title"
+                        th:href="@{/movies/{id}(id=${movie.id})}"
+                        th:text="${movie.title}"
+                    >영화 제목</a>
+
+                    <div
+                        class="movie-id"
+                        th:text="'Movie ID ' + ${movie.id}"
+                    >
+                        Movie ID
+                    </div>
+
+                    <div class="movie-bottom">
+
+                        <div
+                            class="movie-rating"
+                            th:text="'★ ' + ${#numbers.formatDecimal(movie.voteAverage, 1, 1)}"
+                        >
+                            ★ 0.0
+                        </div>
+
+                        <button
+                            type="button"
+                            class="favorite-button"
+                            th:onclick="'removeFavorite(' + ${movie.id} + ')'"
+                        >
+                            ♥ 찜 취소
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+        </div>
+
+
+        <!-- 찜한 영화가 없을 때 -->
+        <div
+            class="empty-state"
+            id="emptyState"
+            th:style="${favoriteMovies.isEmpty()} ? 'display:block' : 'display:none'"
+        >
+
+            <div class="empty-icon">
+                🎬
+            </div>
+
+            <h2>
+                찜한 영화가 없습니다.
+            </h2>
+
+            <p>
+                마음에 드는 영화를 찜하고<br>
+                나중에 다시 확인해보세요.
+            </p>
+
+            <a
+                href="/movies"
+                class="movie-list-button"
+            >
+                영화 보러가기
+            </a>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- ==================================================
+     FOOTER
+================================================== -->
+
+<footer class="footer">
+
+    © 2026 movieLife. All Rights Reserved.
+
+</footer>
+
+<script>
+    async function removeFavorite(movieId) {
+        if (!confirm("이 영화를 찜 목록에서 삭제하시겠습니까?")) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/favorites/${movieId}`, {
+                method: "DELETE"
+            });
+
+            if (response.status === 401) {
+                alert("로그인이 필요합니다.");
+                location.href = "/login?required=true";
+                return;
+            }
+
+            if (!response.ok) {
+                alert(await response.text());
+                return;
+            }
+
+            const card = document.getElementById(
+                `favorite-card-${movieId}`
+            );
+
+            if (card) {
+                card.remove();
+            }
+
+            const remainingCards =
+                document.querySelectorAll(".movie-card").length;
+
+            document.querySelector("#movieCount span").textContent =
+                remainingCards;
+
+            if (remainingCards === 0) {
+                document.getElementById("emptyState").style.display =
+                    "block";
+            }
+
+        } catch (error) {
+            alert("찜 취소 중 오류가 발생했습니다.");
+        }
+    }
+</script>
+
+
+<script src="/js/auth-header.js" defer></script>
+</body>
+</html>

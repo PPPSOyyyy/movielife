@@ -1,5 +1,7 @@
 package com.yse.dev.Controller;
 
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -174,8 +176,12 @@ public class MemberController {
                         );
 
 
+        // 비밀번호는 브라우저로 보내지 않고 필요한 정보만 전달
         return ResponseEntity.ok(
-                member
+                Map.of(
+                        "userId", member.getUserId(),
+                        "nickname", member.getNickname()
+                )
         );
     }
 

@@ -389,6 +389,78 @@
         }
 
 
+        .action-buttons {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+            margin-top: 35px;
+
+        }
+
+
+        .favorite-button,
+        .review-button {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            min-width: 130px;
+
+            padding: 12px 18px;
+
+            border-radius: 5px;
+
+            font-family: inherit;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+        }
+
+
+        .favorite-button {
+
+            border: 1px solid var(--red);
+
+            background: transparent;
+
+            color: var(--red);
+
+        }
+
+
+        .favorite-button.active {
+
+            background: var(--red);
+
+            color: white;
+
+        }
+
+
+        .review-button {
+
+            border: 1px solid var(--red);
+
+            background: var(--red);
+
+            color: white;
+
+            text-decoration: none;
+
+        }
+
+
         @media (max-width: 800px) {
 
             .nav {
@@ -694,6 +766,28 @@
 
 
 
+            <div class="action-buttons">
+
+                <button
+                    type="button"
+                    id="favoriteButton"
+                    class="favorite-button"
+                    th:attr="data-movie-id=${movie.id}"
+                    onclick="toggleFavorite()"
+                >
+                    ♡ 찜하기
+                </button>
+
+                <a
+                    class="review-button"
+                    th:href="@{/review(movieId=${movie.id})}"
+                >
+                    리뷰 작성
+                </a>
+
+            </div>
+
+
             <a
                 href="/movies"
                 class="back-button"
@@ -711,6 +805,104 @@
 </section>
 
 
+<script>
+
+    const favoriteButton =
+        document.getElementById("favoriteButton");
+
+    const movieId =
+        favoriteButton.dataset.movieId;
+
+    let favorite = false;
+
+
+    function updateFavoriteButton() {
+
+        favoriteButton.classList.toggle(
+            "active",
+            favorite
+        );
+
+        favoriteButton.textContent =
+            favorite
+                ? "♥ 찜 취소"
+                : "♡ 찜하기";
+    }
+
+
+    async function checkFavorite() {
+
+        try {
+
+            const response = await fetch(
+                `/api/favorites/check?movieId=${movieId}`
+            );
+
+            if (!response.ok) {
+                return;
+            }
+
+            favorite = await response.json();
+            updateFavoriteButton();
+
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+
+    async function toggleFavorite() {
+
+        try {
+
+            const response = await fetch(
+                favorite
+                    ? `/api/favorites/${movieId}`
+                    : `/api/favorites?movieId=${movieId}`,
+                {
+                    method: favorite
+                        ? "DELETE"
+                        : "POST"
+                }
+            );
+
+            if (response.status === 401) {
+
+                alert("로그인이 필요합니다.");
+                window.location.href = "/login";
+                return;
+            }
+
+            if (!response.ok) {
+
+                const message = await response.text();
+                alert(message);
+                return;
+            }
+
+            favorite = !favorite;
+            updateFavoriteButton();
+
+            alert(
+                favorite
+                    ? "찜한 영화에 추가했습니다."
+                    : "찜을 취소했습니다."
+            );
+
+        } catch (error) {
+
+            console.error(error);
+            alert("찜 처리 중 오류가 발생했습니다.");
+        }
+    }
+
+
+    checkFavorite();
+
+</script>
+
+
+<script src="/js/auth-header.js" defer></script>
 </body>
 
 </html>

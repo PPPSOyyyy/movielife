@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>프로필 수정 | movieLife</title>
+
+    <style>
+        :root {
+            --black: #000;
+            --red: #D92234;
+            --white: #fff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--black);
+            color: var(--white);
+            font-family: Pretendard, "Noto Sans KR", Arial, sans-serif;
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .header {
+            height: 76px;
+            display: flex;
+            align-items: center;
+            padding: 0 60px;
+
+            background: #000;
+            border-bottom: 1px solid #222;
+        }
+
+        .logo img {
+            width: 125px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 35px;
+            margin-left: 70px;
+        }
+
+        .nav a {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .nav a:hover {
+            color: #fff;
+        }
+
+        .header-right {
+            margin-left: auto;
+        }
+
+        .logout-button {
+            padding: 9px 18px;
+
+            border: 1px solid #444;
+            border-radius: 5px;
+
+            background: transparent;
+            color: #fff;
+
+            cursor: pointer;
+        }
+
+        .logout-button:hover {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .main {
+            width: 500px;
+            margin: 0 auto;
+
+            padding: 130px 0 100px;
+        }
+
+        .page-label {
+            margin-bottom: 12px;
+
+            color: var(--red);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            margin-bottom: 12px;
+            font-size: 38px;
+        }
+
+        .description {
+            margin-bottom: 45px;
+
+            color: #777;
+            font-size: 14px;
+        }
+
+        .profile-form {
+            padding: 35px;
+
+            background: #0d0d0d;
+            border: 1px solid #222;
+            border-radius: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+
+            margin-bottom: 10px;
+
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+
+            padding: 13px 14px;
+
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 5px;
+
+            color: #fff;
+            font-size: 14px;
+
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--red);
+        }
+
+        .help {
+            margin-top: 8px;
+
+            color: #666;
+            font-size: 12px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+
+            margin-top: 35px;
+        }
+
+        .button {
+            flex: 1;
+
+            padding: 13px;
+
+            border-radius: 5px;
+
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .cancel-button {
+            border: 1px solid #444;
+            background: transparent;
+            color: #fff;
+            text-align: center;
+        }
+
+        .save-button {
+            border: none;
+            background: var(--red);
+            color: #fff;
+        }
+
+        .save-button:hover {
+            opacity: 0.85;
+        }
+
+        .footer {
+            padding: 30px;
+
+            border-top: 1px solid #181818;
+
+            color: #555;
+            text-align: center;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+
+<body>
+
+<header class="header">
+
+    <a href="/" class="logo">
+        <img
+            src="images/logo.png"
+            alt="movieLife"
+        >
+    </a>
+
+    <nav class="nav">
+
+        <a href="/">
+            홈
+        </a>
+
+        <a href="/movie-list">
+            영화
+        </a>
+
+        <a href="/popular">
+            인기영화
+        </a>
+
+        <a href="/movie-recommend">
+            영화추천
+        </a>
+
+        <a href="/ott">
+            OTT
+        </a>
+
+        <a href="/mypage">
+            마이페이지
+        </a>
+
+    </nav>
+
+    <div class="header-right">
+
+        <button
+            type="button"
+            class="logout-button"
+            onclick="logout()"
+        >
+            로그아웃
+        </button>
+
+    </div>
+
+</header>
+
+
+<main class="main">
+
+    <div class="page-label">
+        MY PROFILE
+    </div>
+
+    <h1>
+        프로필 수정
+    </h1>
+
+    <p class="description">
+        닉네임과 비밀번호를 수정할 수 있습니다.
+    </p>
+
+
+    <form
+        id="profileForm"
+        class="profile-form"
+    >
+
+        <div class="form-group">
+
+            <label for="nickname">
+                닉네임
+            </label>
+
+            <input
+                type="text"
+                id="nickname"
+                name="nickname"
+                placeholder="새 닉네임을 입력해주세요."
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="password">
+                새 비밀번호
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="변경하지 않으려면 비워두세요."
+            >
+
+            <p class="help">
+                비밀번호를 변경하지 않으려면 입력하지 않아도 됩니다.
+            </p>
+
+        </div>
+
+
+        <div class="buttons">
+
+            <a
+                href="/mypage"
+                class="button cancel-button"
+            >
+                취소
+            </a>
+
+            <button
+                type="submit"
+                class="button save-button"
+            >
+                수정 완료
+            </button>
+
+        </div>
+
+    </form>
+
+</main>
+
+
+<footer class="footer">
+
+    © 2026 movieLife. All Rights Reserved.
+
+</footer>
+
+
+<script>
+
+document
+    .getElementById("profileForm")
+    .addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        const nickname =
+            document
+                .getElementById("nickname")
+                .value
+                .trim();
+
+        const password =
+            document
+                .getElementById("password")
+                .value;
+
+        if (nickname === "") {
+            alert("닉네임을 입력해주세요.");
+            return;
+        }
+
+        try {
+
+            const response = await fetch(
+                "/api/members/profile",
+                {
+                    method: "PUT",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        nickname: nickname,
+                        password: password
+                    })
+                }
+            );
+
+            const message = await response.text();
+
+            if (!response.ok) {
+                alert(message);
+                return;
+            }
+
+            alert(message);
+
+            window.location.href = "/mypage";
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert("프로필 수정 중 오류가 발생했습니다.");
+
+        }
+
+    });
+
+
+async function logout() {
+
+    const response = await fetch(
+        "/api/members/logout",
+        {
+            method: "POST"
+        }
+    );
+
+    if (response.ok) {
+
+        alert("로그아웃되었습니다.");
+
+        window.location.href = "/";
+
+    } else {
+
+        alert("로그아웃에 실패했습니다.");
+
+    }
+}
+
+</script>
+
+<script src="/js/auth-header.js" defer></script>
+</body>
+</html>
