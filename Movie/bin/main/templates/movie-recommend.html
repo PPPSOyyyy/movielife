@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영화 추천 | movieLife</title>
+
+    <style>
+        /* ==================================================
+            기본 설정 (팀원 원본 CSS 100% 유지)
+        ================================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --black: #000000; --red: #D92234; --white: #ffffff; --gray-100: #f5f5f5; --gray-300: #cccccc; --gray-500: #777777; --gray-700: #333333; }
+        html { scroll-behavior: smooth; }
+        body { min-height: 100vh; background: #000000; color: #ffffff; font-family: "Pretendard", "Noto Sans KR", Arial, sans-serif; }
+        a { color: inherit; text-decoration: none; }
+        button, input, select { font-family: inherit; }
+        button { cursor: pointer; }
+
+        /* HEADER */
+        .header { position: fixed; top: 0; left: 0; z-index: 1000; width: 100%; height: 76px; display: flex; align-items: center; padding: 0 6%; background: rgba(0, 0, 0, 0.94); border-bottom: 1px solid rgba(255, 255, 255, 0.07); backdrop-filter: blur(10px); }
+        .logo { display: flex; align-items: center; width: 145px; flex-shrink: 0; }
+        .logo img { display: block; width: 145px; height: auto; }
+        .nav { display: flex; align-items: center; gap: 30px; margin-left: 45px; }
+        .nav a { position: relative; color: #bdbdbd; font-size: 14px; font-weight: 500; transition: 0.25s; }
+        .nav a:hover { color: #ffffff; }
+        .nav a.active { color: #ffffff; font-weight: 700; }
+        .nav a.active::after { content: ""; position: absolute; left: 0; bottom: -9px; width: 100%; height: 2px; background: var(--red); }
+        .header-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+        .login-button { padding: 9px 18px; border: 1px solid #444; border-radius: 5px; background: transparent; color: white; font-size: 12px; }
+        .signup-button { padding: 9px 18px; border: 1px solid var(--red); border-radius: 5px; background: var(--red); color: white; font-size: 12px; }
+
+        /* MAIN */
+        .main { max-width: 1200px; margin: 0 auto; padding: 130px 30px 100px; }
+        .page-header { margin-bottom: 40px; }
+        .page-label { margin-bottom: 10px; color: var(--red); font-size: 11px; font-weight: 700; letter-spacing: 2px; }
+        .page-header h1 { margin-bottom: 8px; font-size: 38px; letter-spacing: -2px; }
+        .page-header p { color: #666; font-size: 13px; }
+
+        /* 필터 버튼 */
+        .filter-area { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; padding-bottom: 18px; border-bottom: 1px solid #222; }
+        .filter-buttons { display: flex; gap: 8px; }
+        .filter-button { padding: 7px 13px; border: 1px solid #333; border-radius: 4px; background: transparent; color: #777; font-size: 11px; transition: 0.2s; }
+        .filter-button:hover, .filter-button.active { border-color: var(--red); background: rgba(217, 34, 52, 0.08); color: var(--red); }
+
+        /* 영화 목록 그리드 */
+        .movie-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px 18px; }
+        .movie-card { overflow: hidden; border: 1px solid #222; border-radius: 6px; background: #0d0d0d; transition: 0.3s; }
+        .movie-card:hover { transform: translateY(-5px); border-color: #444; }
+
+        /* 포스터 이미지 영역 */
+        .poster { position: relative; width: 100%; aspect-ratio: 2 / 3; overflow: hidden; background: #1a1a1a; }
+        .poster img { width: 100%; height: 100%; object-fit: cover; transition: 0.4s; }
+        .movie-card:hover .poster img { transform: scale(1.04); }
+
+        /* 찜 버튼 */
+        .favorite { position: absolute; top: 12px; right: 12px; z-index: 2; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 50%; background: rgba(0, 0, 0, 0.6); color: white; font-size: 16px; }
+        .favorite:hover { border-color: var(--red); color: var(--red); }
+
+        /* 영화 정보 */
+        .movie-info { padding: 17px; }
+        .movie-info h2 { margin-bottom: 6px; font-size: 16px; letter-spacing: -0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .movie-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #666; font-size: 10px; }
+        .rating { color: #e9bd4e; }
+        .movie-description { margin-bottom: 12px; color: #777; font-size: 10px; line-height: 1.7; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        /* 상세 정보 표 */
+        .movie-detail-info { display: grid; grid-template-columns: 45px 1fr; row-gap: 5px; padding-top: 12px; border-top: 1px solid #222; }
+        .detail-label { color: #555; font-size: 9px; }
+        .detail-value { color: #888; font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* FOOTER */
+        .footer { padding: 30px 6%; border-top: 1px solid #181818; text-align: center; color: #444; font-size: 10px; }
+
+        @media (max-width: 1000px) { .movie-list { grid-template-columns: repeat(3, 1fr); } .nav { gap: 18px; margin-left: 25px; } }
+        @media (max-width: 700px) { .header { height: 68px; padding: 0 20px; } .nav, .login-button, .signup-button { display: none; } .main { padding: 100px 20px 70px; } .movie-list { grid-template-columns: repeat(2, 1fr); gap: 20px 10px; } }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <a th:href="@{/}" class="logo">
+            <img src="/images/logo.png" alt="movieLife">
+        </a>
+        <nav class="nav">
+            <a th:href="@{/}">홈</a>
+            <!-- 수정된 링크 경로: /recommend -> /movie-recommend -->
+            <a th:href="@{/movie-recommend}" class="active">영화추천</a>
+            <a th:href="@{/mypage}">마이페이지</a>
+        </nav>
+        <div class="header-right">
+            <a th:href="@{/member/login}" class="login-button">로그인</a>
+            <a th:href="@{/member/signup}" class="signup-button">회원가입</a>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- 페이지 제목 -->
+        <section class="page-header">
+            <div class="page-label">MOVIE RECOMMEND</div>
+            <h1>실시간 영화 추천</h1>
+            <p>지금 이 순간, 전 세계가 주목하는 화제작과 내 취향에 딱 맞는 인생 영화를 발견해 보세요.</p>
+        </section>
+
+		<!-- 장르 필터 버튼 (동적 active 적용) -->
+		        <section class="filter-area">
+		            <div class="filter-buttons">
+						<!-- 💡 가장 왼쪽에 추가된 AI 맞춤 추천 탭 (이름: ✨ 추천) -->
+		                <a th:href="@{/movie-recommend/ai}" 
+		                   class="filter-button" 
+		                   th:classappend="${currentGenre == -1} ? 'active'">✨ 추천</a>
+						   
+		                <a th:href="@{/movie-recommend}" 
+		                   class="filter-button" 
+		                   th:classappend="${currentGenre == null || currentGenre == 0} ? 'active'">🔥 트렌드</a>
+		                
+		                <a th:href="@{/movie-recommend/genre(id=28)}" 
+		                   class="filter-button" 
+		                   th:classappend="${currentGenre == 28} ? 'active'">💥 액션</a>
+		                
+		                <a th:href="@{/movie-recommend/genre(id=35)}" 
+		                   class="filter-button" 
+		                   th:classappend="${currentGenre == 35} ? 'active'">😂 코미디</a>
+		                
+		                <a th:href="@{/movie-recommend/genre(id=18)}" 
+		                   class="filter-button" 
+		                   th:classappend="${currentGenre == 18} ? 'active'">😭 드라마</a>
+		                
+		                <a th:href="@{/movie-recommend/genre(id=27)}" 
+		                   class="filter-button" 
+		                   th:classappend="${currentGenre == 27} ? 'active'">👻 공포</a>
+		                
+		                <a th:href="@{/movie-recommend/genre(id=878)}" 
+		                   class="filter-button" 
+		                   th:classappend="${currentGenre == 878} ? 'active'">👽 SF</a>
+		            </div>
+		        </section>
+
+		<!-- 영화 목록 그리드 -->
+		<section class="movie-list">
+		    
+		    <!-- 💡 a 태그에 th:href와 th:each를 둘 다 넣어주어야 합니다! -->
+		    <a th:href="@{/movie-recommend/detail(id=${movie.id})}" class="movie-card-link" th:each="movie : ${movieList}">
+		        <article class="movie-card">
+		            <div class="poster">
+		                <button type="button" class="favorite">♡</button>
+		                <img th:src="${movie.posterPath}" alt="영화 포스터">
+		            </div>
+
+		            <div class="movie-info">
+		                <h2 th:text="${movie.title}">영화 제목</h2>
+
+		                <div class="movie-meta">
+		                    <span class="rating">★ <span th:text="${movie.voteAverage}">0.0</span></span>
+		                    <span th:text="${movie.releaseDate}">2026</span>
+		                </div>
+
+		                <p class="movie-description" th:text="${movie.overview}">
+		                    영화 줄거리 정보가 들어오는 공간입니다.
+		                </p>
+
+		                <div class="movie-detail-info">
+		                    <span class="detail-label">ID</span>
+		                    <span class="detail-value" th:text="${movie.id}">000</span>
+
+		                    <span class="detail-label">개봉일</span>
+		                    <span class="detail-value" th:text="${movie.releaseDate}">2026.00.00</span>
+		                </div>
+		            </div>
+		        </article>
+		    </a>
+
+		</section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        © 2026 movieLife. All Rights Reserved.
+    </footer>
+
+</body>
+</html>

@@ -3,9 +3,11 @@ package com.yse.dev.Service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yse.dev.DTO.ProfileDto;
 import com.yse.dev.DTO.LoginDto;
 import com.yse.dev.DTO.MemberDto;
+import com.yse.dev.DTO.ProfileDto;
+import com.yse.dev.Entity.Member;
+import com.yse.dev.Repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,26 +15,22 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class MemberService {
-
-    // private final MemberRepository memberRepository;
+	
+    private final MemberRepository memberRepository;
     // private final PasswordEncoder passwordEncoder; 
 
     // 회원가입 로직
 
     @Transactional
     public void signup(MemberDto memberDto) {
-        // 1. 아이디 중복 검증 (한 번 더 체크)
+        // 아이디 중복 검증
         if (isUserIdDuplicate(memberDto.getUserId())) {
             throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
         }
         
-        // 2. 비밀번호 암호화 (BCrypt)
-        // String encodedPassword = passwordEncoder.encode(memberDto.getPassword());
-        // memberDto.setPassword(encodedPassword);
-
-        // 3. DB에 저장 (Entity 변환 후 Repository 호출)
-        // MemberEntity memberEntity = MemberEntity.toEntity(memberDto);
-        // memberRepository.save(memberEntity);
+        // DTO를 Member 엔티티로 변환 후 DB에 저장
+        Member member = Member.toEntity(memberDto);
+        memberRepository.save(member);
     }
 
     // 로그인 로직
@@ -40,18 +38,18 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public MemberDto login(LoginDto loginDto) {
-        // 1. DB에서 아이디로 회원 조회
-        // MemberEntity memberEntity = memberRepository.findByUserId(loginDto.getUserId())
-        //        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이디입니다."));
+        Member member = memberRepository.findByUserId(loginDto.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이디입니다."));
         
-        // 2. 비밀번호 일치 여부 확인
-        // if (!passwordEncoder.matches(loginDto.getPassword(), memberEntity.getPassword())) {
-        //     throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        // }
+        if (!loginDto.getPassword().equals(member.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
 
-        // 3. 성공 시 DTO로 변환하여 컨트롤러로 반환
-        // return MemberDto.toDto(memberEntity);
-        return new MemberDto(); // 임시 반환값
+        MemberDto dto = new MemberDto();
+        dto.setUserId(member.getUserId());
+        dto.setNickname(member.getNickname());
+        
+        return dto;
     }
 
     // 프로필 수정 로직
