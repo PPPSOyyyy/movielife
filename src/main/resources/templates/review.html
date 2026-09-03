@@ -553,6 +553,26 @@
         }
 
 
+        .review-guide {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 8px;
+            font-size: 11px;
+        }
+
+        .review-error {
+            min-height: 16px;
+            color: #ff4d5a;
+        }
+
+        .review-count-text {
+            margin-left: auto;
+            color: #666;
+            white-space: nowrap;
+        }
+
+
 
         /* ==================================================
            DIVIDER
@@ -887,14 +907,25 @@
         </div>
 
 
-        <h1>
+        <h1
+            th:text="${editMode ? '리뷰 수정' : '리뷰 등록'}"
+        >
             리뷰 등록
         </h1>
 
 
-        <p>
+        <p
+            th:if="${!editMode}"
+        >
             영화를 보고 느낀 점을 자유롭게 남겨보세요.<br>
             여러분의 리뷰가 다른 사람의 영화 선택에 도움이 됩니다.
+        </p>
+
+        <p
+            th:if="${editMode}"
+        >
+            기존에 작성한 별점과 리뷰 내용을 수정할 수 있습니다.<br>
+            수정한 내용은 저장 후 나의 리뷰에 바로 반영됩니다.
         </p>
 
 
@@ -951,6 +982,12 @@
                     th:value="${movieId}"
                 >
 
+                <input
+                    type="hidden"
+                    id="reviewId"
+                    th:value="${editMode ? review.id : ''}"
+                >
+
 
                 <p class="form-help">
                     선택한 영화가 자동으로 입력됩니다.
@@ -989,25 +1026,37 @@
                     required
                 >
 
-                    <option value="1">
+                    <option
+                        value="1"
+                        th:selected="${editMode && review.rating == 1}"
+                    >
                         ⭐ 1점
                     </option>
 
-                    <option value="2">
+                    <option
+                        value="2"
+                        th:selected="${editMode && review.rating == 2}"
+                    >
                         ⭐⭐ 2점
                     </option>
 
-                    <option value="3">
+                    <option
+                        value="3"
+                        th:selected="${editMode && review.rating == 3}"
+                    >
                         ⭐⭐⭐ 3점
                     </option>
 
-                    <option value="4">
+                    <option
+                        value="4"
+                        th:selected="${editMode && review.rating == 4}"
+                    >
                         ⭐⭐⭐⭐ 4점
                     </option>
 
                     <option
                         value="5"
-                        selected
+                        th:selected="${!editMode || review.rating == 5}"
                     >
                         ⭐⭐⭐⭐⭐ 5점
                     </option>
@@ -1051,9 +1100,16 @@
                     name="content"
                     class="review-textarea"
                     rows="7"
+                    maxlength="1000"
                     placeholder="영화를 보고 느낀 점을 자유롭게 작성해주세요."
                     required
+                    th:text="${editMode ? review.content : ''}"
                 ></textarea>
+
+                <div class="review-guide">
+                    <span id="reviewError" class="review-error"></span>
+                    <span id="reviewCharCount" class="review-count-text">0 / 1000</span>
+                </div>
 
 
             </div>
@@ -1067,13 +1123,14 @@
             <button
                 type="submit"
                 class="submit-button"
+                th:text="${editMode ? '수정 완료' : '리뷰 등록'}"
             >
                 리뷰 등록
             </button>
 
 
             <a
-                href="/mypage"
+                th:href="${editMode ? '/my-reviews' : '/mypage'}"
                 class="cancel-button"
             >
                 취소
@@ -1101,37 +1158,227 @@
 </footer>
 
 <script>
-document.querySelector("form").addEventListener("submit", async function(e) {
-    e.preventDefault();
 
-    const form = this;
+const reviewForm = document.querySelector("form");
+const reviewContent = document.getElementById("content");
+const reviewError = document.getElementById("reviewError");
+const reviewCharCount = document.getElementById("reviewCharCount");
+const ratingSelect = document.getElementById("rating");
+const reviewIdInput = document.getElementById("reviewId");
 
-    const response = await fetch("/api/reviews", {
-        method: "POST",
-        body: new FormData(form)
-    });
+const reviewId = reviewIdInput.value;
+const editMode = reviewId !== "";
 
-    if (response.ok) {
-        alert("리뷰를 작성했습니다.");
-        window.location.href = "/mypage";
+
+/* ==================================================
+   글자 수 표시
+================================================== */
+
+function updateReviewCount() {
+
+    const length =
+        reviewContent.value.length;
+
+    reviewCharCount.textContent =
+        `${length} / 1000`;
+
+    if (length > 1000) {
+
+        reviewError.textContent =
+            "리뷰는 1000자 이하로 작성해주세요.";
+
     } else {
-        const message = await response.text();
-        alert(message);
-    }
-});
 
-async function logout() {
-    const response = await fetch("/api/members/logout", {
-        method: "POST"
-    });
-
-    if (response.ok) {
-        alert("로그아웃되었습니다.");
-        window.location.href = "/";
-    } else {
-        alert("로그아웃 처리 중 오류가 발생했습니다.");
+        reviewError.textContent =
+            "";
     }
 }
+
+
+reviewContent.addEventListener(
+    "input",
+    updateReviewCount
+);
+
+
+/* ==================================================
+   리뷰 등록 / 수정
+================================================== */
+
+reviewForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        const content =
+            reviewContent.value;
+
+        const rating =
+            Number(ratingSelect.value);
+
+        reviewError.textContent =
+            "";
+
+
+        if (
+            !Number.isInteger(rating) ||
+            rating < 1 ||
+            rating > 5
+        ) {
+
+            reviewError.textContent =
+                "별점은 1점부터 5점까지 선택해주세요.";
+
+            return;
+        }
+
+
+        if (content.trim() === "") {
+
+            reviewError.textContent =
+                "리뷰 내용을 입력해주세요.";
+
+            reviewContent.focus();
+
+            return;
+        }
+
+
+        if (content.trim().length > 1000) {
+
+            reviewError.textContent =
+                "리뷰는 1000자 이하로 작성해주세요.";
+
+            reviewContent.focus();
+
+            return;
+        }
+
+
+        const formData =
+            new FormData();
+
+        formData.append(
+            "rating",
+            rating
+        );
+
+        formData.append(
+            "content",
+            content.trim()
+        );
+
+
+        if (!editMode) {
+
+            formData.append(
+                "movieId",
+                document.getElementById("movieId").value
+            );
+        }
+
+
+        try {
+
+            const requestUrl =
+                editMode
+                    ? `/api/reviews/${reviewId}`
+                    : "/api/reviews";
+
+            const requestMethod =
+                editMode
+                    ? "PUT"
+                    : "POST";
+
+
+            const response =
+                await fetch(
+                    requestUrl,
+                    {
+                        method: requestMethod,
+                        body: formData
+                    }
+                );
+
+
+            if (response.status === 401) {
+
+                const returnUrl =
+                    window.location.pathname
+                    + window.location.search;
+
+                if (
+                    typeof openLoginRequiredModal
+                    === "function"
+                ) {
+
+                    openLoginRequiredModal(
+                        returnUrl
+                    );
+
+                } else {
+
+                    window.location.href =
+                        "/login?returnUrl="
+                        + encodeURIComponent(
+                            returnUrl
+                        );
+                }
+
+                return;
+            }
+
+
+            if (!response.ok) {
+
+                const message =
+                    await response.text();
+
+                reviewError.textContent =
+                    message;
+
+                return;
+            }
+
+
+            if (editMode) {
+
+                alert(
+                    "리뷰가 수정되었습니다."
+                );
+
+            } else {
+
+                alert(
+                    "리뷰를 작성했습니다."
+                );
+            }
+
+
+            window.location.href =
+                "/my-reviews";
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            reviewError.textContent =
+                editMode
+                    ? "리뷰 수정 중 오류가 발생했습니다. 다시 시도해주세요."
+                    : "리뷰 등록 중 오류가 발생했습니다. 다시 시도해주세요.";
+        }
+    }
+);
+
+
+/* ==================================================
+   최초 글자 수 표시
+================================================== */
+
+updateReviewCount();
+
 </script>
 
 <script src="/js/auth-header.js" defer></script>

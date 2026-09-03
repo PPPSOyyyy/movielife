@@ -500,6 +500,41 @@
 
         }
 
+		.movie-genres {
+
+		    display: flex;
+
+		    flex-wrap: wrap;
+
+		    gap: 5px;
+
+		    margin-top: 8px;
+
+		}
+
+
+		.movie-genre {
+
+		    padding: 4px 7px;
+
+		    border:
+
+		        1px solid
+		        rgba(217,34,52,0.28);
+
+		    border-radius: 4px;
+
+		    background:
+
+		        rgba(217,34,52,0.08);
+
+		    color: #cfcfcf;
+
+		    font-size: 10px;
+
+		    line-height: 1;
+
+		}
 
         .movie-overview {
 
@@ -1049,11 +1084,11 @@
             <div class="poster-box">
 
 
-                <img
-                    th:if="${movie.posterPath != null}"
-                    th:src="${movie.posterUrl}"
-                    th:alt="${movie.title}"
-                >
+				<img
+				    th:src="${movie.posterUrl}"
+				    th:alt="${movie.title}"
+				    onerror="this.onerror=null; this.src='/poster/no-poster.png';"
+				>
 
 
                 <div
@@ -1092,31 +1127,58 @@
                 </h2>
 
 
-                <div
-                    class="movie-date"
-                    th:text="
-                        ${movie.releaseDate != null
-                        && !movie.releaseDate.isEmpty()}
-                        ? '개봉일 : '
-                          + ${movie.releaseDate}
-                        : '개봉일 정보 없음'
-                    "
-                >
-                    개봉일
-                </div>
+				<!-- 개봉일 -->
+
+				<div
+				    class="movie-date"
+				    th:text="
+				        ${movie.releaseDate != null
+				        && !movie.releaseDate.isEmpty()}
+				        ? '개봉일 : '
+				          + ${movie.releaseDate}
+				        : '개봉일 정보 없음'
+				    "
+				>
+				    개봉일
+				</div>
 
 
-                <p
-                    class="movie-overview"
-                    th:text="
-                        ${movie.overview != null
-                        && !movie.overview.isEmpty()}
-                        ? ${movie.overview}
-                        : '줄거리 정보가 없습니다.'
-                    "
-                >
-                    줄거리
-                </p>
+
+				<!-- 장르 -->
+
+				<div
+				    class="movie-genres"
+				    th:if="${movie.genreNames != null
+				        && !movie.genreNames.isEmpty()}"
+				>
+
+
+				    <span
+				        class="movie-genre"
+				        th:each="genre : ${movie.genreNames}"
+				        th:text="${genre}"
+				    >
+				        장르
+				    </span>
+
+
+				</div>
+
+
+
+				<!-- 줄거리 -->
+
+				<p
+				    class="movie-overview"
+				    th:text="
+				        ${movie.overview != null
+				        && !movie.overview.isEmpty()}
+				        ? ${movie.overview}
+				        : '줄거리 정보가 없습니다.'
+				    "
+				>
+				    줄거리
+				</p>
 
 
             </div>

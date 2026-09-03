@@ -26,13 +26,10 @@
         :root {
             --red: #D92234;
             --white: #ffffff;
-            --gray: #888888;
-            --card: #101010;
         }
 
 
         body {
-
             min-height: 100vh;
 
             background: #000;
@@ -44,7 +41,6 @@
                 "Noto Sans KR",
                 Arial,
                 sans-serif;
-
         }
 
 
@@ -54,8 +50,17 @@
         }
 
 
-        .header {
+        button {
+            font-family: inherit;
+        }
 
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
             width: 100%;
             height: 76px;
 
@@ -69,7 +74,6 @@
 
             border-bottom:
                 1px solid #191919;
-
         }
 
 
@@ -79,27 +83,25 @@
 
 
         .logo img {
+            display: block;
+
             width: 145px;
         }
 
 
         .nav {
-
             display: flex;
 
             gap: 30px;
 
             margin-left: 45px;
-
         }
 
 
         .nav a {
-
             color: #bbb;
 
             font-size: 14px;
-
         }
 
 
@@ -108,19 +110,59 @@
         }
 
 
-        .detail-hero {
+        .header-right {
+            display: flex;
+            align-items: center;
 
+            gap: 10px;
+
+            margin-left: auto;
+        }
+
+
+        .login-button,
+        .signup-button {
+            padding: 9px 18px;
+
+            border-radius: 5px;
+
+            font-size: 12px;
+        }
+
+
+        .login-button {
+            border: 1px solid #444;
+
+            background: transparent;
+
+            color: white;
+        }
+
+
+        .signup-button {
+            border: 1px solid var(--red);
+
+            background: var(--red);
+
+            color: white;
+        }
+
+
+
+        /* =========================
+           HERO
+        ========================= */
+
+        .detail-hero {
             position: relative;
 
             min-height: 650px;
 
             overflow: hidden;
-
         }
 
 
         .backdrop {
-
             position: absolute;
 
             inset: 0;
@@ -129,12 +171,10 @@
             background-position: center;
 
             opacity: 0.26;
-
         }
 
 
         .backdrop::after {
-
             content: "";
 
             position: absolute;
@@ -148,12 +188,10 @@
                     rgba(0,0,0,0.75),
                     #000 100%
                 );
-
         }
 
 
         .detail-container {
-
             position: relative;
 
             z-index: 2;
@@ -172,45 +210,47 @@
 
             padding:
                 80px 30px;
-
         }
 
 
-        .poster {
 
-            width: 100%;
+        /* =========================
+           POSTER
+        ========================= */
+
+        .poster-wrapper {
+            width: 300px;
+
+            aspect-ratio: 2 / 3;
+
+            overflow: hidden;
 
             border-radius: 8px;
+
+            background: #151515;
 
             box-shadow:
                 0 25px 70px
                 rgba(0,0,0,0.8);
-
         }
 
 
-        .no-poster {
-
+        .poster {
             width: 100%;
+            height: 100%;
 
-            aspect-ratio: 2 / 3;
+            display: block;
 
-            display: flex;
-
-            align-items: center;
-            justify-content: center;
-
-            border-radius: 8px;
-
-            background: #191919;
-
-            color: #555;
-
+            object-fit: cover;
         }
 
+
+
+        /* =========================
+           MOVIE INFO
+        ========================= */
 
         .label {
-
             margin-bottom: 12px;
 
             color: var(--red);
@@ -219,49 +259,39 @@
             font-weight: 700;
 
             letter-spacing: 2px;
-
         }
 
 
         .movie-title {
-
             font-size: 45px;
 
             letter-spacing: -2px;
 
             margin-bottom: 8px;
-
         }
 
 
         .original-title {
-
             color: #666;
 
             font-size: 13px;
 
             margin-bottom: 25px;
-
         }
 
 
         .meta {
-
             display: flex;
-
             flex-wrap: wrap;
 
             gap: 10px;
 
             margin-bottom: 25px;
-
         }
 
 
         .meta-item {
-
-            padding:
-                7px 10px;
+            padding: 7px 10px;
 
             border:
                 1px solid #333;
@@ -271,28 +301,22 @@
             color: #bbb;
 
             font-size: 11px;
-
         }
 
 
         .rating {
-
             color: #ffd54a;
-
         }
 
 
         .overview-title {
-
             margin-bottom: 10px;
 
             font-size: 18px;
-
         }
 
 
         .overview {
-
             max-width: 750px;
 
             color: #aaa;
@@ -300,41 +324,37 @@
             font-size: 14px;
 
             line-height: 1.9;
-
         }
 
 
+
+        /* =========================
+           INFO
+        ========================= */
+
         .info-section {
-
             margin-top: 35px;
-
         }
 
 
         .info-section h3 {
-
             margin-bottom: 13px;
 
             font-size: 17px;
-
         }
 
 
         .tag-list {
-
             display: flex;
 
             flex-wrap: wrap;
 
             gap: 8px;
-
         }
 
 
         .tag {
-
-            padding:
-                7px 11px;
+            padding: 7px 11px;
 
             border-radius: 4px;
 
@@ -346,21 +366,113 @@
             color: #bbb;
 
             font-size: 11px;
-
         }
 
 
         .ott-empty {
-
             color: #666;
 
             font-size: 12px;
-
         }
 
 
-        .back-button {
 
+        /* =========================
+           BUTTON
+        ========================= */
+
+        .action-buttons {
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+            margin-top: 35px;
+        }
+
+
+        .favorite-button,
+        .review-button {
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            min-width: 130px;
+
+            padding: 12px 18px;
+
+            border-radius: 5px;
+
+            font-size: 12px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+
+        .favorite-button {
+            border:
+                1px solid #D92234;
+
+            background:
+                transparent;
+
+            color:
+                #D92234;
+        }
+
+
+        .favorite-button:hover {
+            background:
+                rgba(217,34,52,0.08);
+        }
+
+
+        .favorite-button.active {
+            border-color:
+                #333333;
+
+            background:
+                #171717;
+
+            color:
+                #D92234;
+        }
+
+
+        .favorite-button.active:hover {
+            border-color:
+                #555555;
+
+            background:
+                #222222;
+        }
+
+
+        .review-button {
+            border:
+                1px solid var(--red);
+
+            background:
+                var(--red);
+
+            color:
+                white;
+        }
+
+
+        .review-button:hover {
+            background:
+                #ed3043;
+        }
+
+
+
+        .back-button {
             display: inline-block;
 
             margin-top: 35px;
@@ -371,122 +483,344 @@
             border:
                 1px solid #444;
 
-            border-radius: 5px;
+            border-radius:
+                5px;
 
-            color: #bbb;
+            color:
+                #bbb;
 
-            font-size: 12px;
-
+            font-size:
+                12px;
         }
 
 
-        .back-button:hover {
 
-            color: white;
+        /* =========================
+           USER REVIEW AREA
+        ========================= */
 
-            border-color: var(--red);
+        .review-section {
+            width: 100%;
 
+            max-width: 1140px;
+
+            margin:
+                10px auto 100px;
+
+            padding:
+                0 30px;
         }
 
 
-        .action-buttons {
+        .review-section-header {
+            display: flex;
+
+            align-items: flex-end;
+            justify-content: space-between;
+
+            gap: 30px;
+
+            padding-top: 45px;
+
+            border-top:
+                1px solid #222;
+        }
+
+
+        .review-section-title-small {
+            color: var(--red);
+
+            font-size: 10px;
+            font-weight: 700;
+
+            letter-spacing: 2px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .review-section h2 {
+            font-size: 25px;
+
+            letter-spacing: -1px;
+        }
+
+
+
+        /* 평균 평점 */
+
+        .user-rating-summary {
+            margin-top: 25px;
 
             display: flex;
 
-            flex-wrap: wrap;
-
-            gap: 10px;
-
-            margin-top: 35px;
-
-        }
-
-
-        .favorite-button,
-        .review-button {
-
-            display: inline-flex;
-
             align-items: center;
 
-            justify-content: center;
+            gap: 20px;
 
-            min-width: 130px;
+            padding:
+                25px 28px;
 
-            padding: 12px 18px;
+            border:
+                1px solid #272727;
 
-            border-radius: 5px;
+            border-radius:
+                8px;
 
-            font-family: inherit;
-
-            font-size: 12px;
-
-            font-weight: 700;
-
-            cursor: pointer;
-
+            background:
+                #101010;
         }
 
 
-        .favorite-button {
+        .user-rating-star {
+            color:
+                #ffd54a;
 
-            border: 1px solid var(--red);
-
-            background: transparent;
-
-            color: var(--red);
-
+            font-size:
+                30px;
         }
 
 
-        .favorite-button.active {
+        .user-rating-score {
+            font-size:
+                30px;
 
-            background: var(--red);
-
-            color: white;
-
+            font-weight:
+                700;
         }
 
 
-        .review-button {
+        .user-rating-max {
+            color:
+                #666;
 
-            border: 1px solid var(--red);
-
-            background: var(--red);
-
-            color: white;
-
-            text-decoration: none;
-
+            font-size:
+                14px;
         }
 
+
+        .user-rating-count {
+            margin-left:
+                auto;
+
+            color:
+                #777;
+
+            font-size:
+                12px;
+        }
+
+
+
+        /* 리뷰 목록 */
+
+        .review-list {
+            margin-top:
+                20px;
+
+            display: flex;
+
+            flex-direction:
+                column;
+
+            gap:
+                12px;
+        }
+
+
+        .user-review-card {
+            padding:
+                22px 24px;
+
+            border:
+                1px solid #252525;
+
+            border-radius:
+                7px;
+
+            background:
+                #101010;
+        }
+
+
+        .user-review-top {
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                12px;
+
+            margin-bottom:
+                13px;
+        }
+
+
+        .review-nickname {
+            color:
+                #fff;
+
+            font-size:
+                13px;
+
+            font-weight:
+                700;
+        }
+
+
+        .review-stars {
+            color:
+                #ffd54a;
+
+            font-size:
+                13px;
+
+            letter-spacing:
+                1px;
+        }
+
+
+        .review-score {
+            color:
+                #777;
+
+            font-size:
+                11px;
+        }
+
+
+        .review-date {
+            margin-left:
+                auto;
+
+            color:
+                #555;
+
+            font-size:
+                10px;
+        }
+
+
+        .review-content {
+            color:
+                #bbb;
+
+            font-size:
+                13px;
+
+            line-height:
+                1.8;
+
+            white-space:
+                pre-wrap;
+
+            word-break:
+                break-word;
+        }
+
+
+        .review-updated {
+            margin-top:
+                10px;
+
+            color:
+                #555;
+
+            font-size:
+                10px;
+        }
+
+
+        .review-empty {
+            padding:
+                55px 20px;
+
+            border:
+                1px solid #252525;
+
+            border-radius:
+                7px;
+
+            background:
+                #101010;
+
+            text-align:
+                center;
+
+            color:
+                #666;
+
+            font-size:
+                12px;
+        }
+
+
+
+        /* =========================
+           MOBILE
+        ========================= */
 
         @media (max-width: 800px) {
 
             .nav {
-                display: none;
+                display:
+                    none;
             }
 
 
             .detail-container {
-
                 grid-template-columns:
                     1fr;
-
             }
 
 
-            .poster {
+            .poster-wrapper {
+                width:
+                    100%;
 
-                max-width: 280px;
-
+                max-width:
+                    280px;
             }
 
 
             .movie-title {
+                font-size:
+                    34px;
+            }
 
-                font-size: 34px;
 
+            .user-rating-summary {
+                align-items:
+                    flex-start;
+
+                flex-wrap:
+                    wrap;
+            }
+
+
+            .user-rating-count {
+                width:
+                    100%;
+
+                margin-left:
+                    0;
+            }
+
+
+            .user-review-top {
+                flex-wrap:
+                    wrap;
+            }
+
+
+            .review-date {
+                width:
+                    100%;
+
+                margin-left:
+                    0;
             }
 
         }
@@ -526,15 +860,15 @@
             영화
         </a>
 
-        <a href="/movies">
+        <a href="/popular">
             인기영화
         </a>
 
-        <a href="#">
+        <a href="/movie-recommend">
             영화추천
         </a>
 
-        <a href="#">
+        <a href="/ott">
             OTT
         </a>
 
@@ -543,6 +877,25 @@
         </a>
 
     </nav>
+
+
+    <div class="header-right">
+
+        <a
+            href="/login"
+            class="login-button"
+        >
+            로그인
+        </a>
+
+        <a
+            href="/signup"
+            class="signup-button"
+        >
+            회원가입
+        </a>
+
+    </div>
 
 
 </header>
@@ -566,23 +919,15 @@
     <div class="detail-container">
 
 
-        <div>
+        <div class="poster-wrapper">
 
 
             <img
                 class="poster"
-                th:if="${movie.posterPath != null}"
                 th:src="${movie.posterUrl}"
                 th:alt="${movie.title}"
+                onerror="this.onerror=null; this.src='/poster/no-poster.png';"
             >
-
-
-            <div
-                class="no-poster"
-                th:if="${movie.posterPath == null}"
-            >
-                포스터 없음
-            </div>
 
 
         </div>
@@ -619,8 +964,12 @@
 
                 <div
                     class="meta-item"
-                    th:text="'개봉일 '
-                        + ${movie.releaseDate}"
+                    th:text="
+                        ${movie.releaseDate != null
+                        && !movie.releaseDate.isEmpty()}
+                        ? '개봉일 ' + ${movie.releaseDate}
+                        : '개봉일 정보 없음'
+                    "
                 >
                     개봉일
                 </div>
@@ -629,15 +978,57 @@
                 <div
                     class="meta-item"
                     th:if="${movie.runtime != null}"
-                    th:text="${movie.runtime}
-                        + '분'"
+                    th:text="${movie.runtime} + '분'"
                 >
                     상영시간
                 </div>
 
 
                 <div
+                    class="meta-item"
+                    th:if="${movie.runtime == null}"
+                >
+                    상영시간 정보 없음
+                </div>
+
+
+                <div
+                    class="meta-item"
+                    th:if="${movie.productionCountries != null
+                        && !movie.productionCountries.isEmpty()}"
+                    th:text="'제작국가 '
+                        + ${#strings.listJoin(
+                            movie.productionCountries,
+                            ', '
+                        )}"
+                >
+                    제작국가
+                </div>
+
+
+                <div
+                    class="meta-item"
+                    th:if="${movie.productionCountries == null
+                        || movie.productionCountries.isEmpty()}"
+                >
+                    제작국가 정보 없음
+                </div>
+
+
+                <div
+                    class="meta-item"
+                    th:text="'관람등급 '
+                        + ${movie.certification != null
+                            ? movie.certification
+                            : '정보 없음'}"
+                >
+                    관람등급
+                </div>
+
+
+                <div
                     class="meta-item rating"
+                    th:if="${movie.voteAverage != null}"
                     th:text="'★ '
                         + ${#numbers.formatDecimal(
                             movie.voteAverage,
@@ -674,14 +1065,16 @@
 
             <div class="info-section">
 
-
                 <h3>
                     장르
                 </h3>
 
 
-                <div class="tag-list">
-
+                <div
+                    class="tag-list"
+                    th:if="${movie.genres != null
+                        && !movie.genres.isEmpty()}"
+                >
 
                     <span
                         class="tag"
@@ -691,9 +1084,7 @@
                         장르
                     </span>
 
-
                 </div>
-
 
             </div>
 
@@ -701,14 +1092,40 @@
 
             <div class="info-section">
 
+                <h3>
+                    감독
+                </h3>
+
+
+                <div class="tag-list">
+
+                    <span
+                        class="tag"
+                        th:if="${movie.director != null
+                            && !movie.director.isEmpty()}"
+                        th:text="${movie.director}"
+                    >
+                        감독
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="info-section">
 
                 <h3>
                     주요 출연진
                 </h3>
 
 
-                <div class="tag-list">
-
+                <div
+                    class="tag-list"
+                    th:if="${movie.cast != null
+                        && !movie.cast.isEmpty()}"
+                >
 
                     <span
                         class="tag"
@@ -718,16 +1135,13 @@
                         배우
                     </span>
 
-
                 </div>
-
 
             </div>
 
 
 
             <div class="info-section">
-
 
                 <h3>
                     한국 OTT
@@ -740,7 +1154,6 @@
                         && !movie.ottProviders.isEmpty()}"
                 >
 
-
                     <span
                         class="tag"
                         th:each="ott : ${movie.ottProviders}"
@@ -748,7 +1161,6 @@
                     >
                         OTT
                     </span>
-
 
                 </div>
 
@@ -761,12 +1173,12 @@
                     현재 한국 OTT 제공 정보가 없습니다.
                 </div>
 
-
             </div>
 
 
 
             <div class="action-buttons">
+
 
                 <button
                     type="button"
@@ -778,12 +1190,15 @@
                     ♡ 찜하기
                 </button>
 
-                <a
+
+                <button
+                    type="button"
                     class="review-button"
-                    th:href="@{/review(movieId=${movie.id})}"
+                    onclick="goToReview()"
                 >
                     리뷰 작성
-                </a>
+                </button>
+
 
             </div>
 
@@ -805,104 +1220,742 @@
 </section>
 
 
+
+<!-- =========================
+     MovieLife 사용자 리뷰
+========================= -->
+
+<section class="review-section">
+
+
+    <div class="review-section-header">
+
+
+        <div>
+
+            <div class="review-section-title-small">
+                MOVIELIFE REVIEW
+            </div>
+
+
+            <h2>
+                사용자 리뷰
+            </h2>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- 평균 별점 -->
+
+    <div class="user-rating-summary">
+
+
+        <div class="user-rating-star">
+            ★
+        </div>
+
+
+        <div>
+
+            <span
+                id="averageRating"
+                class="user-rating-score"
+            >
+                0.0
+            </span>
+
+            <span class="user-rating-max">
+                / 5.0
+            </span>
+
+        </div>
+
+
+        <div
+            id="reviewCount"
+            class="user-rating-count"
+        >
+            아직 평가가 없습니다.
+        </div>
+
+
+    </div>
+
+
+
+    <!-- 리뷰 목록 -->
+
+    <div
+        id="reviewList"
+        class="review-list"
+    >
+
+
+        <div class="review-empty">
+            리뷰를 불러오는 중입니다.
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
 <script>
 
+
     const favoriteButton =
-        document.getElementById("favoriteButton");
+        document.getElementById(
+            "favoriteButton"
+        );
+
 
     const movieId =
         favoriteButton.dataset.movieId;
 
-    let favorite = false;
 
+    let favorite =
+        false;
+
+
+
+    /* =========================
+       찜 버튼 상태
+    ========================= */
 
     function updateFavoriteButton() {
 
-        favoriteButton.classList.toggle(
-            "active",
-            favorite
-        );
+
+        favoriteButton
+            .classList
+            .toggle(
+                "active",
+                favorite
+            );
+
 
         favoriteButton.textContent =
+
             favorite
+
                 ? "♥ 찜 취소"
+
                 : "♡ 찜하기";
+
     }
 
+
+
+    /* =========================
+       찜 상태 조회
+    ========================= */
 
     async function checkFavorite() {
 
+
         try {
 
-            const response = await fetch(
-                `/api/favorites/check?movieId=${movieId}`
-            );
+
+            const response =
+                await fetch(
+
+                    `/api/favorites/check?movieId=${movieId}`
+
+                );
+
 
             if (!response.ok) {
+
                 return;
+
             }
 
-            favorite = await response.json();
+
+            favorite =
+                await response.json();
+
+
             updateFavoriteButton();
 
+
         } catch (error) {
-            console.error(error);
+
+
+            console.error(
+                error
+            );
+
         }
+
     }
 
+
+
+    /* =========================
+       찜 추가 / 취소
+    ========================= */
 
     async function toggleFavorite() {
 
+
         try {
 
-            const response = await fetch(
-                favorite
-                    ? `/api/favorites/${movieId}`
-                    : `/api/favorites?movieId=${movieId}`,
-                {
-                    method: favorite
-                        ? "DELETE"
-                        : "POST"
-                }
-            );
 
-            if (response.status === 401) {
+            const response =
+                await fetch(
 
-                alert("로그인이 필요합니다.");
-                window.location.href = "/login";
+                    favorite
+
+                        ? `/api/favorites/${movieId}`
+
+                        : `/api/favorites?movieId=${movieId}`,
+
+                    {
+
+                        method:
+
+                            favorite
+
+                                ? "DELETE"
+
+                                : "POST"
+
+                    }
+
+                );
+
+
+            if (
+                response.status === 401
+            ) {
+
+
+                showLoginRequired(
+
+                    window.location.pathname
+
+                    + window.location.search
+
+                );
+
+
                 return;
+
             }
+
 
             if (!response.ok) {
 
-                const message = await response.text();
-                alert(message);
+
+                const message =
+                    await response.text();
+
+
+                alert(
+                    message
+                );
+
+
                 return;
+
             }
 
-            favorite = !favorite;
+
+            favorite =
+                !favorite;
+
+
             updateFavoriteButton();
 
-            alert(
-                favorite
-                    ? "찜한 영화에 추가했습니다."
-                    : "찜을 취소했습니다."
-            );
 
         } catch (error) {
 
-            console.error(error);
-            alert("찜 처리 중 오류가 발생했습니다.");
+
+            console.error(
+                error
+            );
+
         }
+
     }
 
 
+
+    /* =========================
+       리뷰 작성
+    ========================= */
+
+    async function goToReview() {
+
+
+        try {
+
+
+            const response =
+                await fetch(
+                    "/api/members/me"
+                );
+
+
+            if (!response.ok) {
+
+
+                showLoginRequired(
+
+                    "/review?movieId="
+                    + movieId
+
+                );
+
+
+                return;
+
+            }
+
+
+            window.location.href =
+
+                "/review?movieId="
+
+                + encodeURIComponent(
+                    movieId
+                );
+
+
+        } catch (error) {
+
+
+            console.error(
+                error
+            );
+
+        }
+
+    }
+
+
+
+    /* =========================
+       로그인 필요 모달
+    ========================= */
+
+    function showLoginRequired(
+            returnUrl) {
+
+
+        if (
+            typeof openLoginRequiredModal
+            === "function"
+        ) {
+
+
+            openLoginRequiredModal(
+                returnUrl
+            );
+
+
+            return;
+
+        }
+
+
+        window.location.href =
+
+            "/login?returnUrl="
+
+            + encodeURIComponent(
+                returnUrl
+            );
+
+    }
+
+
+
+    /* =========================
+       사용자 리뷰 불러오기
+    ========================= */
+
+    async function loadMovieReviews() {
+
+
+        const reviewList =
+            document.getElementById(
+                "reviewList"
+            );
+
+
+        try {
+
+
+            const response =
+                await fetch(
+
+                    `/api/reviews?movieId=${movieId}`
+
+                );
+
+
+            if (!response.ok) {
+
+
+                throw new Error(
+                    "리뷰를 불러오지 못했습니다."
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+
+            /* 평균 평점 */
+
+            const average =
+                Number(
+                    data.averageRating
+                    || 0
+                );
+
+
+            document
+                .getElementById(
+                    "averageRating"
+                )
+                .textContent =
+
+                average.toFixed(1);
+
+
+
+            /* 참여 수 */
+
+            const count =
+                Number(
+                    data.reviewCount
+                    || 0
+                );
+
+
+            document
+                .getElementById(
+                    "reviewCount"
+                )
+                .textContent =
+
+                count > 0
+
+                    ? `총 ${count}명 참여`
+
+                    : "아직 평가가 없습니다.";
+
+
+
+            const reviews =
+                data.reviews || [];
+
+
+
+            /* 리뷰 없음 */
+
+            if (
+                reviews.length === 0
+            ) {
+
+
+                reviewList.innerHTML = `
+
+                    <div class="review-empty">
+
+                        아직 작성된 리뷰가 없습니다.<br><br>
+
+                        첫 번째 리뷰를 작성해보세요.
+
+                    </div>
+
+                `;
+
+
+                return;
+
+            }
+
+
+
+            reviewList.innerHTML =
+                "";
+
+
+
+            reviews.forEach(
+                review => {
+
+
+                    const card =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    card.className =
+                        "user-review-card";
+
+
+
+                    /* 별 */
+
+                    const starCount =
+                        Number(
+                            review.rating
+                            || 0
+                        );
+
+
+                    const stars =
+                        "★".repeat(
+                            starCount
+                        )
+                        +
+                        "☆".repeat(
+                            5
+                            - starCount
+                        );
+
+
+
+                    /* 작성일 */
+
+                    const createdDate =
+                        formatReviewDate(
+                            review.createdAt
+                        );
+
+
+
+                    /* 수정 여부 */
+
+                    let updatedHtml =
+                        "";
+
+
+                    if (
+                        review.updatedAt
+                    ) {
+
+
+                        updatedHtml = `
+
+                            <div class="review-updated">
+
+                                수정됨 ·
+                                ${formatReviewDate(
+                                    review.updatedAt
+                                )}
+
+                            </div>
+
+                        `;
+
+                    }
+
+
+
+                    card.innerHTML = `
+
+                        <div class="user-review-top">
+
+
+                            <span class="review-nickname">
+
+                                ${escapeHtml(
+                                    review.nickname
+                                    || "사용자"
+                                )}
+
+                            </span>
+
+
+                            <span class="review-stars">
+
+                                ${stars}
+
+                            </span>
+
+
+                            <span class="review-score">
+
+                                ${starCount}.0
+
+                            </span>
+
+
+                            <span class="review-date">
+
+                                ${createdDate}
+
+                            </span>
+
+
+                        </div>
+
+
+                        <div class="review-content">
+
+                            ${escapeHtml(
+                                review.content
+                                || ""
+                            )}
+
+                        </div>
+
+
+                        ${updatedHtml}
+
+                    `;
+
+
+                    reviewList.appendChild(
+                        card
+                    );
+
+                }
+            );
+
+
+        } catch (error) {
+
+
+            console.error(
+                error
+            );
+
+
+            reviewList.innerHTML = `
+
+                <div class="review-empty">
+
+                    리뷰 정보를 불러오지 못했습니다.
+
+                </div>
+
+            `;
+
+        }
+
+    }
+
+
+
+    /* =========================
+       날짜 표시
+    ========================= */
+
+    function formatReviewDate(
+            dateValue) {
+
+
+        if (!dateValue) {
+
+            return "";
+
+        }
+
+
+        const date =
+            new Date(
+                dateValue
+            );
+
+
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
+
+            return "";
+
+        }
+
+
+        const year =
+            date.getFullYear();
+
+
+        const month =
+            String(
+                date.getMonth() + 1
+            ).padStart(
+                2,
+                "0"
+            );
+
+
+        const day =
+            String(
+                date.getDate()
+            ).padStart(
+                2,
+                "0"
+            );
+
+
+        return `${year}.${month}.${day}`;
+
+    }
+
+
+
+    /* =========================
+       HTML 문자 처리
+    ========================= */
+
+    function escapeHtml(
+            value) {
+
+
+        const div =
+            document.createElement(
+                "div"
+            );
+
+
+        div.textContent =
+            value;
+
+
+        return div.innerHTML;
+
+    }
+
+
+
+    /* =========================
+       최초 실행
+    ========================= */
+
     checkFavorite();
+
+    loadMovieReviews();
+
 
 </script>
 
 
-<script src="/js/auth-header.js" defer></script>
+
+<script
+    src="/js/auth-header.js"
+    defer
+></script>
+
+
 </body>
 
 </html>

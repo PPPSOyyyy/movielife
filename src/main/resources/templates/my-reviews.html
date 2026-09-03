@@ -297,6 +297,37 @@
             font-size: 12px;
         }
 
+
+        .review-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .review-toolbar .review-count {
+            margin-bottom: 0;
+        }
+
+        .review-sort {
+            min-width: 150px;
+            height: 36px;
+            padding: 0 10px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            outline: none;
+            background: #0d0d0d;
+            color: #bbb;
+            font-family: inherit;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .review-sort:focus {
+            border-color: var(--red);
+        }
+
         .review-list {
             display: flex;
 
@@ -797,12 +828,25 @@
     <div class="review-container">
 
 
-        <div
-            class="review-count"
-            id="reviewCount"
-        >
+        <div class="review-toolbar">
 
-            리뷰를 불러오는 중...
+            <div
+                class="review-count"
+                id="reviewCount"
+            >
+                리뷰를 불러오는 중...
+            </div>
+
+            <select
+                id="reviewSort"
+                class="review-sort"
+                aria-label="리뷰 정렬"
+            >
+                <option value="latest">최신순</option>
+                <option value="oldest">오래된순</option>
+                <option value="ratingHigh">평점 높은순</option>
+                <option value="ratingLow">평점 낮은순</option>
+            </select>
 
         </div>
 
@@ -893,597 +937,238 @@
 
 <script>
 
+let myReviews = [];
 
-    // 내 리뷰 가져오기
+const reviewList = document.getElementById("reviewList");
+const reviewCount = document.getElementById("reviewCount");
+const reviewSort = document.getElementById("reviewSort");
 
-    async function loadMyReviews() {
+async function loadMyReviews() {
+    try {
+        const response = await fetch("/api/reviews/my");
 
-
-        const reviewList =
-            document.getElementById("reviewList");
-
-        const reviewCount =
-            document.getElementById("reviewCount");
-
-
-        try {
-
-
-            const response =
-                await fetch("/api/reviews/my");
-
-
-            // 로그인하지 않은 경우
-
-            if (response.status === 401) {
-
-                reviewList.innerHTML = `
-
-                    <div class="empty-state">
-
-                        <div class="empty-icon">
-                            🔒
-                        </div>
-
-                        <h2>
-                            로그인이 필요합니다.
-                        </h2>
-
-                        <p>
-                            나의 리뷰를 확인하려면
-                            로그인해주세요.
-                        </p>
-
-                        <a
-                            href="/login"
-                            class="review-write-button"
-                        >
-                            로그인하기
-                        </a>
-
-                    </div>
-
-                `;
-
-                reviewCount.textContent = "";
-
-                return;
-            }
-
-
-            // 서버 오류
-
-            if (!response.ok) {
-
-                throw new Error(
-                    "리뷰를 불러오지 못했습니다."
-                );
-
-            }
-
-
-            // JSON 데이터 가져오기
-
-            const reviews =
-                await response.json();
-
-
-            // 리뷰 개수
-
-            reviewCount.textContent =
-                `총 ${reviews.length}개의 리뷰`;
-
-
-            // 리뷰가 없는 경우
-
-            if (reviews.length === 0) {
-
-                reviewList.innerHTML = `
-
-                    <div class="empty-state">
-
-                        <div class="empty-icon">
-                            ✏️
-                        </div>
-
-                        <h2>
-                            작성한 리뷰가 없습니다.
-                        </h2>
-
-                        <p>
-                            영화를 보고 나만의 이야기를
-                            남겨보세요.
-                        </p>
-
-                        <a
-                            href="/review"
-                            class="review-write-button"
-                        >
-                            리뷰 작성하기
-                        </a>
-
-                    </div>
-
-                `;
-
-                return;
-            }
-
-
-
-            // 리뷰 출력
-
-            reviewList.innerHTML =
-                reviews.map(review => {
-
-
-                    // 별점
-
-                    const rating =
-                        Number(review.rating) || 0;
-
-
-                    const stars =
-                        "★".repeat(rating) +
-                        "☆".repeat(5 - rating);
-
-
-
-                    // 날짜
-
-                    const date =
-                        review.createdAt
-                            ? new Date(
-                                review.createdAt
-                              ).toLocaleDateString(
-                                "ko-KR"
-                              )
-                            : "";
-
-
-
-                    return `
-
-                        <article
-                            class="review-card"
-                        >
-
-
-                            <div
-                                class="review-top"
-                            >
-
-
-                                <div
-                                    class="movie-info"
-                                >
-
-
-                                    <div
-                                        class="movie-icon"
-                                    >
-                                        🎬
-                                    </div>
-
-
-                                    <div>
-
-                                        <div
-                                            class="movie-title"
-                                        >
-                                            ${escapeHtml(
-                                                review.movieTitle
-                                                || "영화"
-                                            )}
-                                        </div>
-
-                                    </div>
-
-
-                                </div>
-
-
-
-                                <div
-                                    class="rating"
-                                >
-                                    ${stars}
-                                </div>
-
-
-                            </div>
-
-
-
-                            <div
-                                class="review-content"
-                            >
-                                ${escapeHtml(
-                                    review.content
-                                )}
-                            </div>
-
-
-
-                            <div
-                                class="review-bottom"
-                            >
-
-
-                                <div
-                                    class="review-date"
-                                >
-
-                                    작성일 ${date}
-
-                                </div>
-
-
-
-                                <div
-                                    class="review-actions"
-                                >
-
-
-                                    <button
-                                        type="button"
-                                        class="review-action"
-                                        onclick="editReview(${review.id})"
-                                    >
-                                        수정
-                                    </button>
-
-
-                                    <button
-                                        type="button"
-                                        class="review-action delete"
-                                        onclick="deleteReview(${review.id})"
-                                    >
-                                        삭제
-                                    </button>
-
-
-                                </div>
-
-
-                            </div>
-
-
-                        </article>
-
-                    `;
-
-                }).join("");
-
-
-        } catch (error) {
-
-
-            console.error(error);
-
-
+        if (response.status === 401) {
             reviewCount.textContent = "";
-
+            reviewSort.style.display = "none";
 
             reviewList.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🔒</div>
+                    <h2>로그인이 필요합니다.</h2>
+                    <p>나의 리뷰를 확인하려면 로그인해주세요.</p>
+                    <a
+                        href="/login?returnUrl=%2Fmy-reviews"
+                        class="review-write-button"
+                    >
+                        로그인하기
+                    </a>
+                </div>
+            `;
+            return;
+        }
 
-                <div class="message">
+        if (!response.ok) {
+            throw new Error("리뷰를 불러오지 못했습니다.");
+        }
 
-                    리뷰를 불러오는 중
-                    오류가 발생했습니다.
+        myReviews = await response.json();
+        reviewSort.style.display = "block";
+        reviewCount.textContent = `총 ${myReviews.length}개의 리뷰`;
+        renderReviews();
 
+    } catch (error) {
+        console.error(error);
+        reviewCount.textContent = "";
+        reviewList.innerHTML = `
+            <div class="message">
+                리뷰를 불러오는 중 오류가 발생했습니다.
+            </div>
+        `;
+    }
+}
+
+function renderReviews() {
+    if (myReviews.length === 0) {
+        reviewList.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">✏️</div>
+                <h2>작성한 리뷰가 없습니다.</h2>
+                <p>영화를 보고 나만의 이야기를 남겨보세요.</p>
+                <a href="/movies" class="review-write-button">
+                    영화 보러가기
+                </a>
+            </div>
+        `;
+        return;
+    }
+
+    const reviews = [...myReviews];
+
+    switch (reviewSort.value) {
+        case "oldest":
+            reviews.sort((a, b) =>
+                new Date(a.createdAt) - new Date(b.createdAt)
+            );
+            break;
+
+        case "ratingHigh":
+            reviews.sort((a, b) =>
+                Number(b.rating) - Number(a.rating)
+            );
+            break;
+
+        case "ratingLow":
+            reviews.sort((a, b) =>
+                Number(a.rating) - Number(b.rating)
+            );
+            break;
+
+        case "latest":
+        default:
+            reviews.sort((a, b) =>
+                new Date(b.createdAt) - new Date(a.createdAt)
+            );
+            break;
+    }
+
+    reviewList.innerHTML = reviews.map(review => {
+        const rating = Number(review.rating) || 0;
+        const stars =
+            "★".repeat(rating) +
+            "☆".repeat(Math.max(0, 5 - rating));
+
+        const createdDate = formatDate(review.createdAt);
+        const updatedDate = review.updatedAt
+            ? formatDate(review.updatedAt)
+            : null;
+
+        return `
+            <article class="review-card">
+
+                <div class="review-top">
+                    <div class="movie-info">
+                        <div class="movie-icon">🎬</div>
+                        <div>
+                            <div class="movie-title">
+                                ${escapeHtml(review.movieTitle || "영화")}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rating">
+                        ${stars}
+                    </div>
                 </div>
 
-            `;
+                <div class="review-content">
+                    ${escapeHtml(review.content)}
+                </div>
 
-        }
+                <div class="review-bottom">
+                    <div class="review-date">
+                        ${
+                            updatedDate
+                                ? `작성일 ${createdDate} · 수정일 ${updatedDate}`
+                                : `작성일 ${createdDate}`
+                        }
+                    </div>
 
-    }
-	async function editReview(reviewId) {
+                    <div class="review-actions">
+                        <button
+                            type="button"
+                            class="review-action"
+                            onclick="editReview(${review.id})"
+                        >
+                            수정
+                        </button>
 
-	    // 현재 리뷰 찾기
-	    const response = await fetch("/api/reviews/my");
+                        <button
+                            type="button"
+                            class="review-action delete"
+                            onclick="deleteReview(${review.id})"
+                        >
+                            삭제
+                        </button>
+                    </div>
+                </div>
 
-	    if (!response.ok) {
-	        alert("리뷰 정보를 불러오지 못했습니다.");
-	        return;
-	    }
+            </article>
+        `;
+    }).join("");
+}
 
-	    const reviews = await response.json();
+function editReview(reviewId) {
+    const review = myReviews.find(
+        review => review.id === reviewId
+    );
 
-	    const review = reviews.find(
-	        review => review.id === reviewId
-	    );
-
-	    if (!review) {
-	        alert("리뷰를 찾을 수 없습니다.");
-	        return;
-	    }
-
-	    // 수정할 별점
-	    const ratingInput = prompt(
-	        "별점을 입력해주세요. (1~5)",
-	        review.rating
-	    );
-
-	    if (ratingInput === null) {
-	        return;
-	    }
-
-	    const rating = Number(ratingInput);
-
-	    if (
-	        !Number.isInteger(rating) ||
-	        rating < 1 ||
-	        rating > 5
-	    ) {
-	        alert("별점은 1점부터 5점까지 입력해주세요.");
-	        return;
-	    }
-
-	    // 수정할 리뷰 내용
-	    const content = prompt(
-	        "리뷰 내용을 입력해주세요.",
-	        review.content
-	    );
-
-	    if (content === null) {
-	        return;
-	    }
-
-	    if (content.trim() === "") {
-	        alert("리뷰 내용을 입력해주세요.");
-	        return;
-	    }
-
-	    // 수정 요청
-	    const formData = new FormData();
-
-	    formData.append("rating", rating);
-	    formData.append("content", content);
-
-	    try {
-
-	        const updateResponse = await fetch(
-	            `/api/reviews/${reviewId}`,
-	            {
-	                method: "PUT",
-	                body: formData
-	            }
-	        );
-
-	        const message =
-	            await updateResponse.text();
-
-	        if (!updateResponse.ok) {
-	            alert(message);
-	            return;
-	        }
-
-	        alert("리뷰가 수정되었습니다.");
-
-	        // 수정된 리뷰 다시 불러오기
-	        loadMyReviews();
-
-	    } catch (error) {
-
-	        console.error(error);
-
-	        alert("리뷰 수정 중 오류가 발생했습니다.");
-	    }
-	}
-	async function deleteReview(reviewId) {
-
-	    const confirmed = confirm(
-	        "정말 이 리뷰를 삭제하시겠습니까?"
-	    );
-
-	    if (!confirmed) {
-	        return;
-	    }
-
-	    try {
-
-	        const response = await fetch(
-	            `/api/reviews/${reviewId}`,
-	            {
-	                method: "DELETE"
-	            }
-	        );
-
-	        const message = await response.text();
-
-	        if (!response.ok) {
-	            alert(message);
-	            return;
-	        }
-
-	        alert(message);
-
-	        // 삭제 후 리뷰 목록 다시 불러오기
-	        loadMyReviews();
-
-	    } catch (error) {
-
-	        console.error(error);
-
-	        alert("리뷰 삭제 중 오류가 발생했습니다.");
-	    }
-	}
-
-
-    // HTML 특수문자 처리
-
-    function escapeHtml(text) {
-
-
-        if (text == null) {
-
-            return "";
-
-        }
-
-
-        return String(text)
-
-            .replace(/&/g, "&amp;")
-
-            .replace(/</g, "&lt;")
-
-            .replace(/>/g, "&gt;")
-
-            .replace(/"/g, "&quot;")
-
-            .replace(/'/g, "&#039;");
-
+    if (!review) {
+        alert("리뷰를 찾을 수 없습니다.");
+        return;
     }
 
+    // 팝업으로 수정하지 않고
+    // 기존 리뷰 작성 화면으로 이동해서 수정합니다.
+    window.location.href =
+        `/review?reviewId=${reviewId}`;
+}
 
+async function deleteReview(reviewId) {
+    const confirmed = confirm(
+        "정말 이 리뷰를 삭제하시겠습니까?"
+    );
 
-	async function editReview(reviewId) {
+    if (!confirmed) {
+        return;
+    }
 
-	    // 현재 내 리뷰 목록 가져오기
-	    const response = await fetch("/api/reviews/my");
+    try {
+        const response = await fetch(
+            `/api/reviews/${reviewId}`,
+            { method: "DELETE" }
+        );
 
-	    if (!response.ok) {
-	        alert("리뷰 정보를 불러오지 못했습니다.");
-	        return;
-	    }
+        const message = await response.text();
 
-	    const reviews = await response.json();
+        if (!response.ok) {
+            alert(message);
+            return;
+        }
 
-	    // 선택한 리뷰 찾기
-	    const review = reviews.find(
-	        review => review.id === reviewId
-	    );
+        await loadMyReviews();
 
-	    if (!review) {
-	        alert("리뷰를 찾을 수 없습니다.");
-	        return;
-	    }
+    } catch (error) {
+        console.error(error);
+        alert("리뷰 삭제 중 오류가 발생했습니다.");
+    }
+}
 
-	    // 별점 수정
-	    const ratingInput = prompt(
-	        "별점을 입력해주세요. (1~5)",
-	        review.rating
-	    );
+function formatDate(value) {
+    if (!value) {
+        return "";
+    }
 
-	    if (ratingInput === null) {
-	        return;
-	    }
+    return new Date(value).toLocaleDateString("ko-KR");
+}
 
-	    const rating = Number(ratingInput);
+function escapeHtml(text) {
+    if (text == null) {
+        return "";
+    }
 
-	    if (
-	        !Number.isInteger(rating) ||
-	        rating < 1 ||
-	        rating > 5
-	    ) {
-	        alert("별점은 1점부터 5점까지 입력해주세요.");
-	        return;
-	    }
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 
-	    // 리뷰 내용 수정
-	    const content = prompt(
-	        "리뷰 내용을 입력해주세요.",
-	        review.content
-	    );
+reviewSort.addEventListener("change", renderReviews);
 
-	    if (content === null) {
-	        return;
-	    }
-
-	    if (content.trim() === "") {
-	        alert("리뷰 내용을 입력해주세요.");
-	        return;
-	    }
-
-	    // 서버로 수정 요청
-	    const formData = new FormData();
-
-	    formData.append("rating", rating);
-	    formData.append("content", content);
-
-	    try {
-
-	        const updateResponse = await fetch(
-	            `/api/reviews/${reviewId}`,
-	            {
-	                method: "PUT",
-	                body: formData
-	            }
-	        );
-
-	        const message = await updateResponse.text();
-
-	        if (!updateResponse.ok) {
-	            alert(message);
-	            return;
-	        }
-
-	        alert("리뷰가 수정되었습니다.");
-
-	        // 수정된 리뷰 다시 불러오기
-	        loadMyReviews();
-
-	    } catch (error) {
-
-	        console.error(error);
-
-	        alert("리뷰 수정 중 오류가 발생했습니다.");
-	    }
-	}
-
-
-
-	async function deleteReview(reviewId) {
-
-	    const confirmed = confirm(
-	        "정말 이 리뷰를 삭제하시겠습니까?"
-	    );
-
-	    if (!confirmed) {
-	        return;
-	    }
-
-	    try {
-
-	        const response = await fetch(
-	            `/api/reviews/${reviewId}`,
-	            {
-	                method: "DELETE"
-	            }
-	        );
-
-	        const message = await response.text();
-
-	        if (!response.ok) {
-	            alert(message);
-	            return;
-	        }
-
-	        alert(message);
-
-	        // 삭제 후 목록 새로고침
-	        loadMyReviews();
-
-	    } catch (error) {
-
-	        console.error(error);
-
-	        alert("리뷰 삭제 중 오류가 발생했습니다.");
-	    }
-	}
-
-
-
-    // 페이지가 열리면 리뷰 조회
-
-    loadMyReviews();
-
+loadMyReviews();
 
 </script>
-
 
 <script src="/js/auth-header.js" defer></script>
 </body>

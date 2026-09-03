@@ -1,5 +1,6 @@
 package com.yse.dev.Service;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,38 +17,86 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberService {
 
+
     private final MemberRepository memberRepository;
+
+
+    /*
+     * BCrypt 비밀번호 암호화 객체
+     */
+    private final BCryptPasswordEncoder passwordEncoder =
+            new BCryptPasswordEncoder();
+
 
 
     // ==========================================
     // 회원가입
     // ==========================================
     @Transactional
-    public void signup(MemberDto memberDto) {
+    public void signup(
+            MemberDto memberDto) {
 
-        if (isUserIdDuplicate(memberDto.getUserId())) {
+
+        // 아이디 중복확인
+        if (
+            isUserIdDuplicate(
+                memberDto.getUserId()
+            )
+        ) {
 
             throw new IllegalArgumentException(
-                    "이미 사용 중인 아이디입니다."
+                "이미 사용 중인 아이디입니다."
             );
 
         }
 
 
-        if (isNicknameDuplicate(memberDto.getNickname())) {
+        // 닉네임 중복확인
+        if (
+            isNicknameDuplicate(
+                memberDto.getNickname()
+            )
+        ) {
 
             throw new IllegalArgumentException(
-                    "이미 사용 중인 닉네임입니다."
+                "이미 사용 중인 닉네임입니다."
             );
 
         }
 
 
         Member member =
-                Member.toEntity(memberDto);
+                Member.toEntity(
+                    memberDto
+                );
 
 
-        memberRepository.save(member);
+        /*
+         * ★ 비밀번호 BCrypt 암호화
+         *
+         * 예:
+         *
+         * 1234
+         *
+         * ↓
+         *
+         * $2a$10$..........
+         */
+
+        String encodedPassword =
+                passwordEncoder.encode(
+                    memberDto.getPassword()
+                );
+
+
+        member.setPassword(
+            encodedPassword
+        );
+
+
+        memberRepository.save(
+            member
+        );
 
     }
 
@@ -56,32 +105,117 @@ public class MemberService {
     // ==========================================
     // 로그인
     // ==========================================
-    @Transactional(readOnly = true)
-    public Member login(LoginDto loginDto) {
+    @Transactional
+    public Member login(
+            LoginDto loginDto) {
+
 
         Member member =
                 memberRepository
-                        .findByUserId(
-                                loginDto.getUserId()
-                        )
-                        .orElseThrow(() ->
-
-                                new IllegalArgumentException(
-                                        "존재하지 않는 아이디입니다."
-                                )
-
-                        );
-
-
-        if (
-            !member.getPassword()
-                    .equals(
-                            loginDto.getPassword()
+                    .findByUserId(
+                        loginDto.getUserId()
                     )
+                    .orElseThrow(() ->
+
+                        new IllegalArgumentException(
+                            "아이디 또는 비밀번호가 올바르지 않습니다."
+                        )
+
+                    );
+
+
+        String savedPassword =
+                member.getPassword();
+
+
+        String inputPassword =
+                loginDto.getPassword();
+
+
+
+        /*
+         * =================================================
+         * 기존 회원과 새 회원 모두 로그인 가능하게 처리
+         * =================================================
+         *
+         * 새 회원
+         * → BCrypt로 저장되어 있음
+         *
+         * 기존 회원
+         * → 평문 비밀번호가 DB에 남아 있을 수 있음
+         */
+
+        boolean passwordMatches;
+
+
+
+        // BCrypt 비밀번호인지 확인
+        if (
+            savedPassword != null &&
+            (
+                savedPassword.startsWith("$2a$") ||
+                savedPassword.startsWith("$2b$") ||
+                savedPassword.startsWith("$2y$")
+            )
         ) {
 
+
+            /*
+             * 암호화된 비밀번호 비교
+             */
+
+            passwordMatches =
+                    passwordEncoder.matches(
+                        inputPassword,
+                        savedPassword
+                    );
+
+
+        } else {
+
+
+            /*
+             * 기존 평문 회원
+             */
+
+            passwordMatches =
+                    savedPassword != null &&
+                    savedPassword.equals(
+                        inputPassword
+                    );
+
+
+            /*
+             * 기존 평문 회원이 로그인에 성공하면
+             * 그 자리에서 BCrypt로 자동 변경
+             */
+
+            if (passwordMatches) {
+
+
+                member.setPassword(
+
+                    passwordEncoder.encode(
+                        inputPassword
+                    )
+
+                );
+
+
+                memberRepository.save(
+                    member
+                );
+
+            }
+
+        }
+
+
+
+        if (!passwordMatches) {
+
             throw new IllegalArgumentException(
-                    "비밀번호가 일치하지 않습니다."
+                "아이디 또는 비밀번호가 올바르지 않습니다."
             );
 
         }
@@ -100,13 +234,16 @@ public class MemberService {
     public Member getMemberByUserId(
             String userId) {
 
+
         return memberRepository
-                .findByUserId(userId)
+                .findByUserId(
+                    userId
+                )
                 .orElseThrow(() ->
 
-                        new IllegalArgumentException(
-                                "회원 정보를 찾을 수 없습니다."
-                        )
+                    new IllegalArgumentException(
+                        "회원 정보를 찾을 수 없습니다."
+                    )
 
                 );
 
@@ -122,17 +259,20 @@ public class MemberService {
             String userId,
             ProfileDto profileDto) {
 
-        // 현재 로그인 회원 찾기
+
         Member member =
                 memberRepository
-                        .findByUserId(userId)
-                        .orElseThrow(() ->
+                    .findByUserId(
+                        userId
+                    )
+                    .orElseThrow(() ->
 
-                                new IllegalArgumentException(
-                                        "회원 정보를 찾을 수 없습니다."
-                                )
+                        new IllegalArgumentException(
+                            "회원 정보를 찾을 수 없습니다."
+                        )
 
-                        );
+                    );
+
 
 
         // ==========================================
@@ -146,35 +286,41 @@ public class MemberService {
                     .isEmpty()
         ) {
 
+
             String newNickname =
                     profileDto
-                            .getNickname()
-                            .trim();
+                        .getNickname()
+                        .trim();
 
 
-            // 기존 닉네임과 다른 경우만 중복검사
+            /*
+             * 현재 닉네임과 다를 경우에만
+             * 중복검사를 합니다.
+             */
+
             if (
                 !newNickname.equals(
-                        member.getNickname()
+                    member.getNickname()
                 )
             ) {
 
+
                 if (
                     memberRepository
-                            .existsByNickname(
-                                    newNickname
-                            )
+                        .existsByNickname(
+                            newNickname
+                        )
                 ) {
 
                     throw new IllegalArgumentException(
-                            "이미 사용 중인 닉네임입니다."
+                        "이미 사용 중인 닉네임입니다."
                     );
 
                 }
 
 
                 member.setNickname(
-                        newNickname
+                    newNickname
                 );
 
             }
@@ -189,17 +335,31 @@ public class MemberService {
 
         if (
             profileDto.getPassword() != null &&
-            !profileDto.getPassword().isEmpty()
+            !profileDto.getPassword()
+                    .isBlank()
         ) {
 
+
+            /*
+             * ★ 새 비밀번호도 반드시 BCrypt 암호화
+             */
+
+            String encodedPassword =
+                    passwordEncoder.encode(
+                        profileDto.getPassword()
+                    );
+
+
             member.setPassword(
-                    profileDto.getPassword()
+                encodedPassword
             );
 
         }
 
 
-        memberRepository.save(member);
+        memberRepository.save(
+            member
+        );
 
     }
 
@@ -214,47 +374,94 @@ public class MemberService {
             String password) {
 
 
-        // 현재 로그인한 회원 찾기
         Member member =
                 memberRepository
-                        .findByUserId(userId)
-                        .orElseThrow(() ->
+                    .findByUserId(
+                        userId
+                    )
+                    .orElseThrow(() ->
 
-                                new IllegalArgumentException(
-                                        "회원 정보를 찾을 수 없습니다."
-                                )
+                        new IllegalArgumentException(
+                            "회원 정보를 찾을 수 없습니다."
+                        )
 
-                        );
+                    );
 
 
-        // 비밀번호 입력 여부 확인
+        // 비밀번호 입력 확인
         if (
             password == null ||
             password.isBlank()
         ) {
 
             throw new IllegalArgumentException(
-                    "비밀번호를 입력해 주세요."
+                "비밀번호를 입력해 주세요."
             );
 
         }
 
 
-        // 현재 비밀번호 확인
+
+        String savedPassword =
+                member.getPassword();
+
+
+        boolean passwordMatches;
+
+
+
+        /*
+         * BCrypt 저장 회원
+         */
+
         if (
-            !member.getPassword()
-                    .equals(password)
+            savedPassword != null &&
+            (
+                savedPassword.startsWith("$2a$") ||
+                savedPassword.startsWith("$2b$") ||
+                savedPassword.startsWith("$2y$")
+            )
         ) {
 
+
+            passwordMatches =
+                    passwordEncoder.matches(
+                        password,
+                        savedPassword
+                    );
+
+
+        } else {
+
+
+            /*
+             * 아직 평문으로 남아있는 기존 회원
+             */
+
+            passwordMatches =
+                    savedPassword != null &&
+                    savedPassword.equals(
+                        password
+                    );
+
+        }
+
+
+
+        // 비밀번호 틀림
+        if (!passwordMatches) {
+
             throw new IllegalArgumentException(
-                    "비밀번호가 올바르지 않습니다."
+                "비밀번호가 올바르지 않습니다."
             );
 
         }
 
 
-        // 비밀번호가 맞을 경우 회원 삭제
-        memberRepository.delete(member);
+        // 비밀번호 맞으면 회원 삭제
+        memberRepository.delete(
+            member
+        );
 
     }
 
@@ -267,8 +474,11 @@ public class MemberService {
     public boolean isUserIdDuplicate(
             String userId) {
 
+
         return memberRepository
-                .existsByUserId(userId);
+                .existsByUserId(
+                    userId
+                );
 
     }
 
@@ -281,8 +491,11 @@ public class MemberService {
     public boolean isNicknameDuplicate(
             String nickname) {
 
+
         return memberRepository
-                .existsByNickname(nickname);
+                .existsByNickname(
+                    nickname
+                );
 
     }
 

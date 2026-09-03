@@ -36,6 +36,18 @@ public class MovieDetailDto {
     private List<String> genres;
 
 
+    // 제작 국가
+    private List<String> productionCountries;
+
+
+    // 감독
+    private String director;
+
+
+    // 관람등급
+    private String certification;
+
+
     // 출연진
     private List<String> cast;
 
@@ -52,12 +64,14 @@ public class MovieDetailDto {
             posterPath.isBlank()
         ) {
 
-            return "";
+            return "/poster/no-poster.png";
+
         }
 
 
         return "https://image.tmdb.org/t/p/w500"
                 + posterPath;
+
     }
 
 
@@ -70,11 +84,13 @@ public class MovieDetailDto {
         ) {
 
             return "";
+
         }
 
 
         return "https://image.tmdb.org/t/p/original"
                 + backdropPath;
+
     }
 
 }

@@ -518,9 +518,58 @@ public class MovieService {
         );
 
 
+        // ------------------------------------------
+        // 제작 국가
+        // ------------------------------------------
+
+        List<String> productionCountries =
+                new ArrayList<>();
+
+
+        Object countryObject =
+                movie.get("production_countries");
+
+
+        if (countryObject instanceof List<?>) {
+
+
+            List<?> countries =
+                    (List<?>) countryObject;
+
+
+            for (Object countryItem : countries) {
+
+
+                if (countryItem instanceof Map<?, ?>) {
+
+
+                    Map<?, ?> country =
+                            (Map<?, ?>) countryItem;
+
+
+                    Object countryName =
+                            country.get("name");
+
+
+                    if (countryName != null) {
+
+                        productionCountries.add(
+                                countryName.toString()
+                        );
+                    }
+                }
+            }
+        }
+
+
+        detail.setProductionCountries(
+                productionCountries
+        );
+
+
 
         // ------------------------------------------
-        // 출연진
+        // 출연진 / 감독
         // ------------------------------------------
 
         URI creditUri =
@@ -609,6 +658,281 @@ public class MovieService {
                 castList
         );
 
+
+        // ------------------------------------------
+        // 감독
+        // ------------------------------------------
+
+        String director = null;
+
+
+        if (creditResponse != null) {
+
+
+            Object crewObject =
+                    creditResponse.get("crew");
+
+
+            if (crewObject instanceof List<?>) {
+
+
+                List<?> crewList =
+                        (List<?>) crewObject;
+
+
+                for (Object crewItem : crewList) {
+
+
+                    if (crewItem instanceof Map<?, ?>) {
+
+
+                        Map<?, ?> crew =
+                                (Map<?, ?>) crewItem;
+
+
+                        Object job =
+                                crew.get("job");
+
+
+                        Object name =
+                                crew.get("name");
+
+
+                        if (
+                            job != null &&
+                            "Director".equals(job.toString()) &&
+                            name != null
+                        ) {
+
+                            director =
+                                    name.toString();
+
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+
+        detail.setDirector(
+                director
+        );
+
+        // ------------------------------------------
+        // 대한민국 관람등급
+        // ------------------------------------------
+
+        URI releaseUri =
+                UriComponentsBuilder
+                        .fromUriString(
+                                baseUrl
+                                + "/movie/"
+                                + movieId
+                                + "/release_dates"
+                        )
+                        .queryParam(
+                                "api_key",
+                                apiKey
+                        )
+                        .build()
+                        .encode()
+                        .toUri();
+
+
+        Map<String, Object> releaseResponse =
+                restTemplate.getForObject(
+                        releaseUri,
+                        Map.class
+                );
+
+
+        String certification = null;
+
+
+        if (releaseResponse != null) {
+
+
+            Object releaseResultsObject =
+                    releaseResponse.get(
+                            "results"
+                    );
+
+
+            if (
+                releaseResultsObject
+                        instanceof List<?>
+            ) {
+
+
+                List<?> releaseResults =
+                        (List<?>)
+                                releaseResultsObject;
+
+
+                for (
+                    Object releaseResultItem
+                    : releaseResults
+                ) {
+
+
+                    if (
+                        releaseResultItem
+                                instanceof Map<?, ?>
+                    ) {
+
+
+                        Map<?, ?> releaseResult =
+                                (Map<?, ?>)
+                                        releaseResultItem;
+
+
+                        Object isoCountry =
+                                releaseResult.get(
+                                        "iso_3166_1"
+                                );
+
+
+                        // 대한민국(KR) 정보 찾기
+                        if (
+                            isoCountry != null &&
+                            "KR".equals(
+                                    isoCountry.toString()
+                            )
+                        ) {
+
+
+                            Object releaseDatesObject =
+                                    releaseResult.get(
+                                            "release_dates"
+                                    );
+
+
+                            if (
+                                releaseDatesObject
+                                        instanceof List<?>
+                            ) {
+
+
+                                List<?> releaseDates =
+                                        (List<?>)
+                                                releaseDatesObject;
+
+
+                                for (
+                                    Object releaseDateItem
+                                    : releaseDates
+                                ) {
+
+
+                                    if (
+                                        releaseDateItem
+                                                instanceof Map<?, ?>
+                                    ) {
+
+
+                                        Map<?, ?> releaseDateMap =
+                                                (Map<?, ?>)
+                                                        releaseDateItem;
+
+
+                                        Object certificationObject =
+                                                releaseDateMap.get(
+                                                        "certification"
+                                                );
+
+
+                                        if (
+                                            certificationObject != null &&
+                                            !certificationObject
+                                                    .toString()
+                                                    .isBlank()
+                                        ) {
+
+
+                                            certification =
+                                                    certificationObject
+                                                            .toString();
+
+
+                                            break;
+
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+
+                            // KR 정보는 찾았으므로 종료
+                            break;
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+
+        // ------------------------------------------
+        // 관람등급 한글 표시
+        // ------------------------------------------
+
+        if (certification == null) {
+
+            detail.setCertification(
+                    "정보 없음"
+            );
+
+        } else {
+
+
+            switch (certification) {
+
+                case "ALL":
+                    detail.setCertification(
+                            "전체 관람가"
+                    );
+                    break;
+
+
+                case "12":
+                    detail.setCertification(
+                            "12세 이상 관람가"
+                    );
+                    break;
+
+
+                case "15":
+                    detail.setCertification(
+                            "15세 이상 관람가"
+                    );
+                    break;
+
+
+                case "18":
+                case "19":
+                    detail.setCertification(
+                            "청소년 관람불가"
+                    );
+                    break;
+
+
+                default:
+                    detail.setCertification(
+                            certification
+                    );
+                    break;
+
+            }
+
+        }
 
 
         // ------------------------------------------
