@@ -143,6 +143,50 @@
         }
 
 
+        .header-right {
+
+            margin-left: auto;
+
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+        }
+
+
+        .login-button,
+        .signup-button {
+
+            padding: 9px 18px;
+
+            border-radius: 5px;
+
+            font-size: 12px;
+
+        }
+
+
+        .login-button {
+
+            border: 1px solid #444;
+
+            color: #fff;
+
+        }
+
+
+        .signup-button {
+
+            border: 1px solid var(--red);
+
+            background: var(--red);
+
+            color: #fff;
+
+        }
+
+
 
         /* =========================
            MAIN
@@ -726,6 +770,25 @@
         </a>
 
     </nav>
+
+
+    <div class="header-right">
+
+        <a
+            href="/login"
+            class="login-button"
+        >
+            로그인
+        </a>
+
+        <a
+            href="/signup"
+            class="signup-button"
+        >
+            회원가입
+        </a>
+
+    </div>
 
 
 </header>

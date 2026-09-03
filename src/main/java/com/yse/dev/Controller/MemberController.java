@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.yse.dev.DTO.LoginDto;
 import com.yse.dev.DTO.MemberDto;
 import com.yse.dev.DTO.ProfileDto;
+import com.yse.dev.DTO.WithdrawDto;
 import com.yse.dev.Entity.Member;
 import com.yse.dev.Service.MemberService;
 
@@ -30,6 +31,7 @@ public class MemberController {
     private final MemberService memberService;
 
 
+
     // ==========================================
     // 회원가입
     // ==========================================
@@ -39,18 +41,26 @@ public class MemberController {
 
         try {
 
-            memberService.signup(memberDto);
+            memberService.signup(
+                    memberDto
+            );
+
 
             return ResponseEntity.ok(
                     "회원가입이 성공적으로 완료되었습니다."
             );
 
+
         } catch (IllegalArgumentException e) {
 
             return ResponseEntity
                     .badRequest()
-                    .body(e.getMessage());
+                    .body(
+                            e.getMessage()
+                    );
+
         }
+
     }
 
 
@@ -65,19 +75,19 @@ public class MemberController {
 
         try {
 
-            // 아이디 / 비밀번호 확인
             Member member =
-                    memberService.login(loginDto);
+                    memberService.login(
+                            loginDto
+                    );
 
 
-            // ★ 로그인 성공한 회원 아이디를 세션에 저장
+            // 로그인 회원 아이디 세션 저장
             session.setAttribute(
                     "loginUserId",
                     member.getUserId()
             );
 
 
-            // 콘솔 확인용
             System.out.println(
                     "================================"
             );
@@ -112,8 +122,12 @@ public class MemberController {
 
             return ResponseEntity
                     .badRequest()
-                    .body(e.getMessage());
+                    .body(
+                            e.getMessage()
+                    );
+
         }
+
     }
 
 
@@ -126,14 +140,12 @@ public class MemberController {
             HttpSession session) {
 
 
-        // 세션에서 로그인한 아이디 꺼내기
         String userId =
                 (String) session.getAttribute(
                         "loginUserId"
                 );
 
 
-        // 콘솔 확인용
         System.out.println(
                 "================================"
         );
@@ -157,7 +169,6 @@ public class MemberController {
         );
 
 
-        // 로그인하지 않은 상태
         if (userId == null) {
 
             return ResponseEntity
@@ -165,10 +176,10 @@ public class MemberController {
                     .body(
                             "로그인이 필요합니다."
                     );
+
         }
 
 
-        // DB에서 로그인 회원 정보 찾기
         Member member =
                 memberService
                         .getMemberByUserId(
@@ -176,13 +187,20 @@ public class MemberController {
                         );
 
 
-        // 비밀번호는 브라우저로 보내지 않고 필요한 정보만 전달
         return ResponseEntity.ok(
+
                 Map.of(
-                        "userId", member.getUserId(),
-                        "nickname", member.getNickname()
+
+                        "userId",
+                        member.getUserId(),
+
+                        "nickname",
+                        member.getNickname()
+
                 )
+
         );
+
     }
 
 
@@ -203,13 +221,13 @@ public class MemberController {
         );
 
 
-        // 세션 삭제
         session.invalidate();
 
 
         return ResponseEntity.ok(
                 "로그아웃 되었습니다."
         );
+
     }
 
 
@@ -236,18 +254,33 @@ public class MemberController {
                     .body(
                             "로그인이 필요합니다."
                     );
+
         }
 
 
-        memberService.updateProfile(
-                userId,
-                profileDto
-        );
+        try {
+
+            memberService.updateProfile(
+                    userId,
+                    profileDto
+            );
 
 
-        return ResponseEntity.ok(
-                "프로필 정보가 수정되었습니다."
-        );
+            return ResponseEntity.ok(
+                    "프로필 정보가 수정되었습니다."
+            );
+
+
+        } catch (IllegalArgumentException e) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(
+                            e.getMessage()
+                    );
+
+        }
+
     }
 
 
@@ -257,6 +290,9 @@ public class MemberController {
     // ==========================================
     @DeleteMapping("/withdraw")
     public ResponseEntity<String> withdraw(
+
+            @RequestBody WithdrawDto withdrawDto,
+
             HttpSession session) {
 
 
@@ -266,6 +302,7 @@ public class MemberController {
                 );
 
 
+        // 로그인 확인
         if (userId == null) {
 
             return ResponseEntity
@@ -273,21 +310,45 @@ public class MemberController {
                     .body(
                             "로그인이 필요합니다."
                     );
+
         }
 
 
-        memberService.withdraw(
-                userId
-        );
+        try {
+
+            /*
+             * 현재 로그인 회원의 비밀번호와
+             * 사용자가 입력한 비밀번호 확인 후 탈퇴
+             */
+
+            memberService.withdraw(
+
+                    userId,
+
+                    withdrawDto.getPassword()
+
+            );
 
 
-        // 탈퇴 후 세션 삭제
-        session.invalidate();
+            // 탈퇴 성공 후 세션 삭제
+            session.invalidate();
 
 
-        return ResponseEntity.ok(
-                "회원 탈퇴 처리가 완료되었습니다."
-        );
+            return ResponseEntity.ok(
+                    "회원 탈퇴 처리가 완료되었습니다."
+            );
+
+
+        } catch (IllegalArgumentException e) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(
+                            e.getMessage()
+                    );
+
+        }
+
     }
 
 
@@ -312,6 +373,7 @@ public class MemberController {
         return ResponseEntity.ok(
                 duplicate
         );
+
     }
 
 
@@ -336,6 +398,7 @@ public class MemberController {
         return ResponseEntity.ok(
                 duplicate
         );
+
     }
 
 }

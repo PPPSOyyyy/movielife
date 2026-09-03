@@ -26,22 +26,31 @@ public class MemberService {
     public void signup(MemberDto memberDto) {
 
         if (isUserIdDuplicate(memberDto.getUserId())) {
+
             throw new IllegalArgumentException(
                     "이미 사용 중인 아이디입니다."
             );
+
         }
 
+
         if (isNicknameDuplicate(memberDto.getNickname())) {
+
             throw new IllegalArgumentException(
                     "이미 사용 중인 닉네임입니다."
             );
+
         }
+
 
         Member member =
                 Member.toEntity(memberDto);
 
+
         memberRepository.save(member);
+
     }
+
 
 
     // ==========================================
@@ -52,25 +61,36 @@ public class MemberService {
 
         Member member =
                 memberRepository
-                        .findByUserId(loginDto.getUserId())
+                        .findByUserId(
+                                loginDto.getUserId()
+                        )
                         .orElseThrow(() ->
+
                                 new IllegalArgumentException(
                                         "존재하지 않는 아이디입니다."
                                 )
+
                         );
 
 
-        if (!member.getPassword()
-                .equals(loginDto.getPassword())) {
+        if (
+            !member.getPassword()
+                    .equals(
+                            loginDto.getPassword()
+                    )
+        ) {
 
             throw new IllegalArgumentException(
                     "비밀번호가 일치하지 않습니다."
             );
+
         }
 
 
         return member;
+
     }
+
 
 
     // ==========================================
@@ -83,11 +103,15 @@ public class MemberService {
         return memberRepository
                 .findByUserId(userId)
                 .orElseThrow(() ->
+
                         new IllegalArgumentException(
                                 "회원 정보를 찾을 수 없습니다."
                         )
+
                 );
+
     }
+
 
 
     // ==========================================
@@ -103,16 +127,23 @@ public class MemberService {
                 memberRepository
                         .findByUserId(userId)
                         .orElseThrow(() ->
+
                                 new IllegalArgumentException(
                                         "회원 정보를 찾을 수 없습니다."
                                 )
+
                         );
 
 
-        // 닉네임이 입력된 경우
+        // ==========================================
+        // 닉네임 변경
+        // ==========================================
+
         if (
             profileDto.getNickname() != null &&
-            !profileDto.getNickname().trim().isEmpty()
+            !profileDto.getNickname()
+                    .trim()
+                    .isEmpty()
         ) {
 
             String newNickname =
@@ -138,16 +169,24 @@ public class MemberService {
                     throw new IllegalArgumentException(
                             "이미 사용 중인 닉네임입니다."
                     );
+
                 }
+
 
                 member.setNickname(
                         newNickname
                 );
+
             }
+
         }
 
 
-        // 비밀번호가 입력된 경우
+
+        // ==========================================
+        // 비밀번호 변경
+        // ==========================================
+
         if (
             profileDto.getPassword() != null &&
             !profileDto.getPassword().isEmpty()
@@ -156,13 +195,14 @@ public class MemberService {
             member.setPassword(
                     profileDto.getPassword()
             );
+
         }
 
 
-        // JPA 변경 감지로 저장되지만
-        // 명확하게 save 호출
         memberRepository.save(member);
+
     }
+
 
 
     // ==========================================
@@ -170,19 +210,54 @@ public class MemberService {
     // ==========================================
     @Transactional
     public void withdraw(
-            String userId) {
+            String userId,
+            String password) {
 
+
+        // 현재 로그인한 회원 찾기
         Member member =
                 memberRepository
                         .findByUserId(userId)
                         .orElseThrow(() ->
+
                                 new IllegalArgumentException(
                                         "회원 정보를 찾을 수 없습니다."
                                 )
+
                         );
 
+
+        // 비밀번호 입력 여부 확인
+        if (
+            password == null ||
+            password.isBlank()
+        ) {
+
+            throw new IllegalArgumentException(
+                    "비밀번호를 입력해 주세요."
+            );
+
+        }
+
+
+        // 현재 비밀번호 확인
+        if (
+            !member.getPassword()
+                    .equals(password)
+        ) {
+
+            throw new IllegalArgumentException(
+                    "비밀번호가 올바르지 않습니다."
+            );
+
+        }
+
+
+        // 비밀번호가 맞을 경우 회원 삭제
         memberRepository.delete(member);
+
     }
+
 
 
     // ==========================================
@@ -194,7 +269,9 @@ public class MemberService {
 
         return memberRepository
                 .existsByUserId(userId);
+
     }
+
 
 
     // ==========================================
@@ -206,6 +283,7 @@ public class MemberService {
 
         return memberRepository
                 .existsByNickname(nickname);
+
     }
 
 }
