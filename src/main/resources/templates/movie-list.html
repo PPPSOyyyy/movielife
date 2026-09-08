@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="ko">
 
 <head>
@@ -12,7 +11,6 @@
     >
 
     <title>영화 | movieLife</title>
-
 
     <style>
 
@@ -32,9 +30,7 @@
 
         body {
             min-height: 100vh;
-
             background: #000;
-
             color: #fff;
 
             font-family:
@@ -76,29 +72,34 @@
                 1px solid #191919;
 
             background: #000;
+
+            white-space: nowrap;
         }
 
 
         .logo {
             width: 145px;
-
             flex-shrink: 0;
         }
 
 
         .logo img {
             display: block;
-
             width: 145px;
         }
 
 
         .nav {
             display: flex;
+            align-items: center;
 
             gap: 30px;
 
             margin-left: 45px;
+
+            flex-wrap: nowrap;
+
+            white-space: nowrap;
         }
 
 
@@ -108,6 +109,10 @@
             color: #bbb;
 
             font-size: 13px;
+
+            white-space: nowrap;
+
+            flex-shrink: 0;
         }
 
 
@@ -118,7 +123,6 @@
 
         .nav a.active {
             color: white;
-
             font-weight: 700;
         }
 
@@ -130,23 +134,24 @@
 
             left: 0;
             right: 0;
-
             bottom: -27px;
 
             height: 2px;
 
-            background: var(--red);
+            background:
+                var(--red);
         }
 
 
         .header-right {
             display: flex;
-
             align-items: center;
 
             gap: 10px;
 
             margin-left: auto;
+
+            flex-shrink: 0;
         }
 
 
@@ -160,6 +165,9 @@
 
             font-size:
                 11px;
+
+            white-space:
+                nowrap;
         }
 
 
@@ -203,9 +211,11 @@
         .container {
             width: 100%;
 
-            max-width: 1120px;
+            max-width:
+                1120px;
 
-            margin: 0 auto;
+            margin:
+                0 auto;
 
             padding:
                 65px 30px 100px;
@@ -248,6 +258,71 @@
 
             font-size:
                 12px;
+        }
+
+
+
+        /* =========================
+           영화 페이지 안쪽 메뉴
+        ========================= */
+
+        .movie-category-menu {
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 8px;
+
+            margin-top:
+                25px;
+        }
+
+
+        .movie-category-button {
+            padding:
+                10px 15px;
+
+            border:
+                1px solid #333;
+
+            border-radius:
+                5px;
+
+            background:
+                #0d0d0d;
+
+            color:
+                #888;
+
+            font-size:
+                11px;
+
+            transition:
+                0.2s;
+        }
+
+
+        .movie-category-button:hover {
+            color:
+                white;
+
+            border-color:
+                #555;
+        }
+
+
+        .movie-category-button.active {
+            border-color:
+                var(--red);
+
+            background:
+                var(--red);
+
+            color:
+                white;
+
+            font-weight:
+                700;
         }
 
 
@@ -385,7 +460,7 @@
 
 
         /* =========================
-           COMPLEX FILTER
+           FILTER
         ========================= */
 
         .filter-box {
@@ -869,9 +944,63 @@
 
 
 
-        @media (
-            max-width: 900px
-        ) {
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 1100px) {
+
+            .header {
+                padding:
+                    0 20px;
+
+                overflow-x:
+                    auto;
+
+                overflow-y:
+                    hidden;
+            }
+
+
+            .nav {
+                gap:
+                    22px;
+
+                margin-left:
+                    30px;
+
+                flex-wrap:
+                    nowrap;
+
+                white-space:
+                    nowrap;
+            }
+
+
+            .nav a {
+                white-space:
+                    nowrap;
+
+                flex-shrink:
+                    0;
+            }
+
+
+            .logo {
+                width:
+                    125px;
+            }
+
+
+            .logo img {
+                width:
+                    125px;
+            }
+
+        }
+
+
+        @media (max-width: 900px) {
 
             .filter-form {
                 grid-template-columns:
@@ -887,13 +1016,35 @@
         }
 
 
-        @media (
-            max-width: 600px
-        ) {
+        @media (max-width: 600px) {
+
+            .header {
+                overflow-x:
+                    auto;
+
+                overflow-y:
+                    hidden;
+            }
+
 
             .nav {
                 display:
-                    none;
+                    flex;
+
+                flex-wrap:
+                    nowrap;
+
+                white-space:
+                    nowrap;
+            }
+
+
+            .nav a {
+                white-space:
+                    nowrap;
+
+                flex-shrink:
+                    0;
             }
 
 
@@ -915,7 +1066,6 @@
 </head>
 
 
-
 <body>
 
 
@@ -935,39 +1085,66 @@
     </a>
 
 
+
+    <!-- =========================
+         상단 메뉴
+    ========================= -->
+
     <nav class="nav">
+
 
         <a href="/">
             홈
         </a>
 
+
+        <!--
+            인기영화 화면이 아닐 때
+            영화 메뉴 활성화
+        -->
+
         <a
             href="/movies"
-            class="active"
+            th:classappend="${listType != 'popular'} ? 'active' : ''"
         >
             영화
         </a>
 
-        <a href="/popular">
+
+        <!--
+            인기영화 화면일 때
+            인기영화 메뉴 활성화
+        -->
+
+        <a
+            href="/movies/popular"
+            th:classappend="${listType == 'popular'} ? 'active' : ''"
+        >
             인기영화
         </a>
+
 
         <a href="/movie-recommend">
             영화추천
         </a>
 
+
         <a href="/ott">
             OTT
         </a>
+
 
         <a href="/mypage">
             마이페이지
         </a>
 
+
     </nav>
 
 
+
     <div class="header-right">
+
 
         <a
             href="/login"
@@ -976,12 +1153,14 @@
             로그인
         </a>
 
+
         <a
             href="/signup"
             class="signup-button"
         >
             회원가입
         </a>
+
 
     </div>
 
@@ -1005,7 +1184,7 @@
             class="page-title"
             th:text="${pageTitle}"
         >
-            지금 인기있는 영화
+            전체 영화
         </h1>
 
 
@@ -1015,8 +1194,51 @@
 
 
 
+        <!-- ==========================================
+             영화 페이지 안쪽 메뉴
+
+             인기영화에서는 아예 표시하지 않음
+        ========================================== -->
+
+        <div
+            class="movie-category-menu"
+            th:if="${listType != 'popular'}"
+        >
+
+
+            <a
+                href="/movies"
+                class="movie-category-button"
+                th:classappend="${listType == 'all'} ? ' active' : ''"
+            >
+                전체 영화
+            </a>
+
+
+            <a
+                href="/movies/top-rated"
+                class="movie-category-button"
+                th:classappend="${listType == 'topRated'} ? ' active' : ''"
+            >
+                평점 높은 영화
+            </a>
+
+
+            <a
+                href="/movies/upcoming"
+                class="movie-category-button"
+                th:classappend="${listType == 'upcoming'} ? ' active' : ''"
+            >
+                개봉 예정 영화
+            </a>
+
+
+        </div>
+
+
+
         <!-- =========================
-             제목 검색
+             검색
         ========================= -->
 
         <div class="search-area">
@@ -1032,11 +1254,17 @@
 
                 <input
                     type="text"
+
                     id="movieSearchInput"
+
                     class="search-input"
+
                     name="query"
+
                     th:value="${query}"
+
                     placeholder="영화 제목을 입력하세요"
+
                     autocomplete="off"
                 >
 
@@ -1063,7 +1291,7 @@
 
 
         <!-- =========================
-             복합 필터
+             필터
         ========================= -->
 
         <section class="filter-box">
@@ -1100,9 +1328,11 @@
                     name="genre"
                 >
 
+
                     <option value="">
                         장르 전체
                     </option>
+
 
                     <option
                         value="28"
@@ -1111,12 +1341,14 @@
                         액션
                     </option>
 
+
                     <option
                         value="12"
                         th:selected="${selectedGenre == 12}"
                     >
                         모험
                     </option>
+
 
                     <option
                         value="16"
@@ -1125,12 +1357,14 @@
                         애니메이션
                     </option>
 
+
                     <option
                         value="35"
                         th:selected="${selectedGenre == 35}"
                     >
                         코미디
                     </option>
+
 
                     <option
                         value="80"
@@ -1139,12 +1373,14 @@
                         범죄
                     </option>
 
+
                     <option
                         value="18"
                         th:selected="${selectedGenre == 18}"
                     >
                         드라마
                     </option>
+
 
                     <option
                         value="14"
@@ -1153,12 +1389,14 @@
                         판타지
                     </option>
 
+
                     <option
                         value="27"
                         th:selected="${selectedGenre == 27}"
                     >
                         공포
                     </option>
+
 
                     <option
                         value="10749"
@@ -1167,6 +1405,7 @@
                         로맨스
                     </option>
 
+
                     <option
                         value="878"
                         th:selected="${selectedGenre == 878}"
@@ -1174,12 +1413,14 @@
                         SF
                     </option>
 
+
                     <option
                         value="53"
                         th:selected="${selectedGenre == 53}"
                     >
                         스릴러
                     </option>
+
 
                 </select>
 
@@ -1192,9 +1433,11 @@
                     name="minRating"
                 >
 
+
                     <option value="">
                         최소 평점 전체
                     </option>
+
 
                     <option
                         value="5"
@@ -1203,12 +1446,14 @@
                         5점 이상
                     </option>
 
+
                     <option
                         value="6"
                         th:selected="${selectedMinRating == 6.0}"
                     >
                         6점 이상
                     </option>
+
 
                     <option
                         value="7"
@@ -1217,6 +1462,7 @@
                         7점 이상
                     </option>
 
+
                     <option
                         value="8"
                         th:selected="${selectedMinRating == 8.0}"
@@ -1224,12 +1470,14 @@
                         8점 이상
                     </option>
 
+
                     <option
                         value="9"
                         th:selected="${selectedMinRating == 9.0}"
                     >
                         9점 이상
                     </option>
+
 
                 </select>
 
@@ -1242,9 +1490,11 @@
                     name="year"
                 >
 
+
                     <option value="">
                         개봉연도 전체
                     </option>
+
 
                     <option
                         value="2026"
@@ -1253,12 +1503,14 @@
                         2026년
                     </option>
 
+
                     <option
                         value="2025"
                         th:selected="${selectedYear == 2025}"
                     >
                         2025년
                     </option>
+
 
                     <option
                         value="2024"
@@ -1267,12 +1519,14 @@
                         2024년
                     </option>
 
+
                     <option
                         value="2023"
                         th:selected="${selectedYear == 2023}"
                     >
                         2023년
                     </option>
+
 
                     <option
                         value="2022"
@@ -1281,12 +1535,14 @@
                         2022년
                     </option>
 
+
                     <option
                         value="2021"
                         th:selected="${selectedYear == 2021}"
                     >
                         2021년
                     </option>
+
 
                     <option
                         value="2020"
@@ -1295,12 +1551,14 @@
                         2020년
                     </option>
 
+
                     <option
                         value="2019"
                         th:selected="${selectedYear == 2019}"
                     >
                         2019년
                     </option>
+
 
                     <option
                         value="2018"
@@ -1309,12 +1567,14 @@
                         2018년
                     </option>
 
+
                     <option
                         value="2017"
                         th:selected="${selectedYear == 2017}"
                     >
                         2017년
                     </option>
+
 
                     <option
                         value="2016"
@@ -1323,12 +1583,14 @@
                         2016년
                     </option>
 
+
                     <option
                         value="2015"
                         th:selected="${selectedYear == 2015}"
                     >
                         2015년
                     </option>
+
 
                 </select>
 
@@ -1341,9 +1603,11 @@
                     name="provider"
                 >
 
+
                     <option value="">
                         OTT 전체
                     </option>
+
 
                     <option
                         value="8"
@@ -1352,12 +1616,14 @@
                         Netflix
                     </option>
 
+
                     <option
                         value="337"
                         th:selected="${selectedProvider == 337}"
                     >
                         Disney+
                     </option>
+
 
                     <option
                         value="97"
@@ -1366,12 +1632,14 @@
                         Watcha
                     </option>
 
+
                     <option
                         value="356"
                         th:selected="${selectedProvider == 356}"
                     >
                         Wavve
                     </option>
+
 
                 </select>
 
@@ -1421,21 +1689,21 @@
 
                     <img
                         class="movie-poster"
+
                         th:src="${movie.posterUrl}"
+
                         th:alt="${movie.title}"
+
                         onerror="this.onerror=null; this.src='/poster/no-poster.png';"
                     >
 
 
                     <span
                         class="movie-rating"
+
                         th:if="${movie.voteAverage != null}"
-                        th:text="'★ '
-                            + ${#numbers.formatDecimal(
-                                movie.voteAverage,
-                                1,
-                                1
-                            )}"
+
+                        th:text="'★ ' + ${#numbers.formatDecimal(movie.voteAverage, 1, 1)}"
                     >
                         ★ 0.0
                     </span>
@@ -1450,7 +1718,9 @@
 
                     <a
                         class="movie-title"
+
                         th:href="@{/movies/{id}(id=${movie.id})}"
+
                         th:text="${movie.title}"
                     >
                         영화 제목
@@ -1459,13 +1729,10 @@
 
                     <div
                         class="movie-date"
-                        th:text="
-                            ${movie.releaseDate != null
-                            && !movie.releaseDate.isEmpty()}
-                            ? '개봉일 : '
-                                + ${movie.releaseDate}
-                            : '개봉일 정보 없음'
-                        "
+
+                        th:text="${movie.releaseDate != null && !movie.releaseDate.isEmpty()}
+                            ? '개봉일 : ' + ${movie.releaseDate}
+                            : '개봉일 정보 없음'"
                     >
                         개봉일
                     </div>
@@ -1474,14 +1741,16 @@
 
                     <div
                         class="movie-genres"
-                        th:if="${movie.genreNames != null
-                            && !movie.genreNames.isEmpty()}"
+
+                        th:if="${movie.genreNames != null && !movie.genreNames.isEmpty()}"
                     >
 
 
                         <span
                             class="movie-genre"
+
                             th:each="genreName : ${movie.genreNames}"
+
                             th:text="${genreName}"
                         >
                             장르
@@ -1494,12 +1763,10 @@
 
                     <p
                         class="movie-overview"
-                        th:text="
-                            ${movie.overview != null
-                            && !movie.overview.isEmpty()}
+
+                        th:text="${movie.overview != null && !movie.overview.isEmpty()}
                             ? ${movie.overview}
-                            : '줄거리 정보가 없습니다.'
-                        "
+                            : '줄거리 정보가 없습니다.'"
                     >
                         줄거리
                     </p>
@@ -1514,11 +1781,13 @@
 
             <div
                 class="empty-result"
-                th:if="${movies == null
-                    || movies.isEmpty()}"
+
+                th:if="${movies == null || movies.isEmpty()}"
             >
 
-                선택한 조건에 맞는 영화가 없습니다.<br><br>
+                선택한 조건에 맞는 영화가 없습니다.
+
+                <br><br>
 
                 다른 조건으로 검색해보세요.
 
@@ -1530,21 +1799,25 @@
 
 
         <!-- =========================
-             페이지
+             일반 영화 페이지
         ========================= -->
 
         <div
             class="pagination"
+
             th:if="${totalPages != null
-                && totalPages > 1}"
+                && totalPages > 1
+                && listType == 'all'}"
         >
 
 
             <a
                 class="page-button"
+
                 th:classappend="${currentPage <= 1}
                     ? ' disabled'
                     : ''"
+
                 th:href="@{/movies(
                     page=${currentPage - 1},
                     query=${query},
@@ -1561,15 +1834,19 @@
 
             <a
                 class="page-button"
+
                 th:each="pageNumber :
                     ${#numbers.sequence(
                         startPage,
                         endPage
                     )}"
+
                 th:text="${pageNumber}"
+
                 th:classappend="${pageNumber == currentPage}
                     ? ' active'
                     : ''"
+
                 th:href="@{/movies(
                     page=${pageNumber},
                     query=${query},
@@ -1586,9 +1863,11 @@
 
             <a
                 class="page-button"
+
                 th:classappend="${currentPage >= totalPages}
                     ? ' disabled'
                     : ''"
+
                 th:href="@{/movies(
                     page=${currentPage + 1},
                     query=${query},
@@ -1596,6 +1875,222 @@
                     minRating=${selectedMinRating},
                     year=${selectedYear},
                     provider=${selectedProvider}
+                )}"
+            >
+                다음
+            </a>
+
+
+        </div>
+
+
+
+        <!-- =========================
+             인기 영화 페이지
+        ========================= -->
+
+        <div
+            class="pagination"
+
+            th:if="${totalPages != null
+                && totalPages > 1
+                && listType == 'popular'}"
+        >
+
+
+            <a
+                class="page-button"
+
+                th:classappend="${currentPage <= 1}
+                    ? ' disabled'
+                    : ''"
+
+                th:href="@{/movies/popular(
+                    page=${currentPage - 1}
+                )}"
+            >
+                이전
+            </a>
+
+
+
+            <a
+                class="page-button"
+
+                th:each="pageNumber :
+                    ${#numbers.sequence(
+                        startPage,
+                        endPage
+                    )}"
+
+                th:text="${pageNumber}"
+
+                th:classappend="${pageNumber == currentPage}
+                    ? ' active'
+                    : ''"
+
+                th:href="@{/movies/popular(
+                    page=${pageNumber}
+                )}"
+            >
+                1
+            </a>
+
+
+
+            <a
+                class="page-button"
+
+                th:classappend="${currentPage >= totalPages}
+                    ? ' disabled'
+                    : ''"
+
+                th:href="@{/movies/popular(
+                    page=${currentPage + 1}
+                )}"
+            >
+                다음
+            </a>
+
+
+        </div>
+
+
+
+        <!-- =========================
+             평점 높은 영화
+        ========================= -->
+
+        <div
+            class="pagination"
+
+            th:if="${totalPages != null
+                && totalPages > 1
+                && listType == 'topRated'}"
+        >
+
+
+            <a
+                class="page-button"
+
+                th:classappend="${currentPage <= 1}
+                    ? ' disabled'
+                    : ''"
+
+                th:href="@{/movies/top-rated(
+                    page=${currentPage - 1}
+                )}"
+            >
+                이전
+            </a>
+
+
+
+            <a
+                class="page-button"
+
+                th:each="pageNumber :
+                    ${#numbers.sequence(
+                        startPage,
+                        endPage
+                    )}"
+
+                th:text="${pageNumber}"
+
+                th:classappend="${pageNumber == currentPage}
+                    ? ' active'
+                    : ''"
+
+                th:href="@{/movies/top-rated(
+                    page=${pageNumber}
+                )}"
+            >
+                1
+            </a>
+
+
+
+            <a
+                class="page-button"
+
+                th:classappend="${currentPage >= totalPages}
+                    ? ' disabled'
+                    : ''"
+
+                th:href="@{/movies/top-rated(
+                    page=${currentPage + 1}
+                )}"
+            >
+                다음
+            </a>
+
+
+        </div>
+
+
+
+        <!-- =========================
+             개봉 예정 영화
+        ========================= -->
+
+        <div
+            class="pagination"
+
+            th:if="${totalPages != null
+                && totalPages > 1
+                && listType == 'upcoming'}"
+        >
+
+
+            <a
+                class="page-button"
+
+                th:classappend="${currentPage <= 1}
+                    ? ' disabled'
+                    : ''"
+
+                th:href="@{/movies/upcoming(
+                    page=${currentPage - 1}
+                )}"
+            >
+                이전
+            </a>
+
+
+
+            <a
+                class="page-button"
+
+                th:each="pageNumber :
+                    ${#numbers.sequence(
+                        startPage,
+                        endPage
+                    )}"
+
+                th:text="${pageNumber}"
+
+                th:classappend="${pageNumber == currentPage}
+                    ? ' active'
+                    : ''"
+
+                th:href="@{/movies/upcoming(
+                    page=${pageNumber}
+                )}"
+            >
+                1
+            </a>
+
+
+
+            <a
+                class="page-button"
+
+                th:classappend="${currentPage >= totalPages}
+                    ? ' disabled'
+                    : ''"
+
+                th:href="@{/movies/upcoming(
+                    page=${currentPage + 1}
                 )}"
             >
                 다음
@@ -1613,7 +2108,6 @@
 
 
 <script>
-
 
     document.addEventListener(
 
@@ -1647,7 +2141,6 @@
             ) {
 
                 return;
-
             }
 
 
@@ -1655,9 +2148,7 @@
 
                 "submit",
 
-                function (
-                    event
-                ) {
+                function (event) {
 
 
                     const keyword =
@@ -1666,9 +2157,7 @@
                             .trim();
 
 
-                    if (
-                        keyword === ""
-                    ) {
+                    if (keyword === "") {
 
 
                         event.preventDefault();
@@ -1689,7 +2178,6 @@
 
 
                         return;
-
                     }
 
 
@@ -1739,11 +2227,9 @@
 
             );
 
-
         }
 
     );
-
 
 </script>
 
