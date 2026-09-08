@@ -30,7 +30,7 @@ public class MovieController {
     // 검색 + 장르 + 복합필터
     // ==========================================
 
-    @GetMapping("/movies")
+    @GetMapping({"/movies", "/movie-list"})
     public String movieList(
 
             @RequestParam(

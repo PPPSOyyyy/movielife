@@ -2,6 +2,7 @@ package com.yse.dev.Controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,7 +24,24 @@ public class HomeController {
     private final MovieService movieService;
 
     @GetMapping("/")
-    public String indexPage() {
+    public String indexPage(Model model) {
+
+        List<com.yse.dev.DTO.MovieDto> popularMovies = new ArrayList<>();
+
+        try {
+            Map<String, Object> response = movieService.getPopularMovies(1);
+            List<com.yse.dev.DTO.MovieDto> movies =
+                    movieService.convertToMovieList(response);
+
+            int endIndex = Math.min(5, movies.size());
+            popularMovies.addAll(movies.subList(0, endIndex));
+
+        } catch (Exception e) {
+            System.out.println("홈 인기영화 조회 실패: " + e.getMessage());
+        }
+
+        model.addAttribute("popularMovies", popularMovies);
+
         return "index";
     }
 
@@ -48,7 +66,7 @@ public class HomeController {
         return "mypage";
     }
 
-    @GetMapping("/movie-recommend")
+    @GetMapping({"/movie-recommend", "/recommend"})
     public String movieRecommendPage() {
         return "movie-recommend";
     }

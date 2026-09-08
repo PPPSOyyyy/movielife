@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
 
@@ -884,6 +884,24 @@
         }
 
 
+        .movie-poster img {
+
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: 0.4s;
+
+        }
+
+
+        .movie-card:hover .movie-poster img {
+
+            transform: scale(1.04);
+
+        }
+
+
         .poster {
 
             width: 100%;
@@ -1585,7 +1603,7 @@
 
             <div class="hero-buttons">
 
-                <button class="btn-primary">
+                <button class="btn-primary" onclick="location.href='/movies'">
 
                     🎬 영화 찾아보기
 
@@ -1687,23 +1705,25 @@
     <section class="search-section">
 
 
-        <div class="search-box">
+        <form class="search-box" action="/movies" method="get">
 
 
             <input
                 type="text"
-                placeholder="영화 제목, 배우, 감독을 검색해보세요."
+                name="query"
+                placeholder="영화 제목을 검색해보세요."
+                required
             >
 
 
-            <button type="button">
+            <button type="submit">
 
                 검색
 
             </button>
 
 
-        </div>
+        </form>
 
 
     </section>
@@ -1738,7 +1758,7 @@
             </div>
 
 
-            <a href="#" class="more">
+            <a href="/movies" class="more">
 
                 전체보기 →
 
@@ -1752,40 +1772,50 @@
         <div class="movie-grid">
 
 
-            <article class="movie-card">
+            <article
+                class="movie-card"
+                th:each="movie : ${popularMovies}"
+                th:onclick="|location.href='/movies/${movie.id}'|"
+            >
 
                 <div class="movie-poster">
 
-                    <div class="poster">
+                    <img
+                        th:if="${movie.posterPath != null and !#strings.isEmpty(movie.posterPath)}"
+                        th:src="${movie.posterUrl}"
+                        th:alt="${movie.title}"
+                        onerror="this.onerror=null; this.src='/poster/no-poster.png';"
+                    >
 
-                        <div class="poster-title">
-                            INCEPTION
-                        </div>
-
-                        <div class="poster-year">
-                            2010
-                        </div>
-
-                    </div>
+                    <img
+                        th:unless="${movie.posterPath != null and !#strings.isEmpty(movie.posterPath)}"
+                        src="/poster/no-poster.png"
+                        alt="포스터 없음"
+                    >
 
                 </div>
 
 
                 <div class="movie-info">
 
-                    <h3>
-                        인셉션
-                    </h3>
+                    <h3 th:text="${movie.title}">영화 제목</h3>
 
 
                     <div class="movie-meta">
 
-                        <span class="rating">
-                            ★ 4.8
+                        <span
+                            class="rating"
+                            th:if="${movie.voteAverage != null}"
+                            th:text="${'★ ' + #numbers.formatDecimal(movie.voteAverage, 1, 1)}"
+                        >
+                            ★ 0.0
                         </span>
 
-                        <span>
-                            SF · 액션
+                        <span
+                            th:if="${movie.releaseDate != null and #strings.length(movie.releaseDate) >= 4}"
+                            th:text="${#strings.substring(movie.releaseDate, 0, 4)}"
+                        >
+                            2026
                         </span>
 
                     </div>
@@ -1795,184 +1825,15 @@
             </article>
 
 
-
-            <article class="movie-card">
-
-                <div class="movie-poster">
-
-                    <div class="poster poster-2">
-
-                        <div class="poster-title">
-                            INTERSTELLAR
-                        </div>
-
-                        <div class="poster-year">
-                            2014
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="movie-info">
-
-                    <h3>
-                        인터스텔라
-                    </h3>
-
-
-                    <div class="movie-meta">
-
-                        <span class="rating">
-                            ★ 4.9
-                        </span>
-
-                        <span>
-                            SF · 드라마
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </article>
-
-
-
-            <article class="movie-card">
-
-                <div class="movie-poster">
-
-                    <div class="poster poster-3">
-
-                        <div class="poster-title">
-                            LA LA LAND
-                        </div>
-
-                        <div class="poster-year">
-                            2016
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="movie-info">
-
-                    <h3>
-                        라라랜드
-                    </h3>
-
-
-                    <div class="movie-meta">
-
-                        <span class="rating">
-                            ★ 4.7
-                        </span>
-
-                        <span>
-                            로맨스 · 음악
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </article>
-
-
-
-            <article class="movie-card">
-
-                <div class="movie-poster">
-
-                    <div class="poster poster-4">
-
-                        <div class="poster-title">
-                            DUNE
-                        </div>
-
-                        <div class="poster-year">
-                            2024
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="movie-info">
-
-                    <h3>
-                        듄: 파트 2
-                    </h3>
-
-
-                    <div class="movie-meta">
-
-                        <span class="rating">
-                            ★ 4.8
-                        </span>
-
-                        <span>
-                            SF · 액션
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </article>
-
-
-
-            <article class="movie-card">
-
-                <div class="movie-poster">
-
-                    <div class="poster poster-5">
-
-                        <div class="poster-title">
-                            AVATAR
-                        </div>
-
-                        <div class="poster-year">
-                            2009
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="movie-info">
-
-                    <h3>
-                        아바타
-                    </h3>
-
-
-                    <div class="movie-meta">
-
-                        <span class="rating">
-                            ★ 4.6
-                        </span>
-
-                        <span>
-                            SF · 판타지
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </article>
+            <div
+                th:if="${popularMovies == null or #lists.isEmpty(popularMovies)}"
+                style="grid-column: 1 / -1; color: #777; padding: 30px 0;"
+            >
+                인기 영화 정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.
+            </div>
 
 
         </div>
-
 
     </section>
 
@@ -2006,7 +1867,7 @@
             </div>
 
 
-            <a href="#" class="more">
+            <a href="/recommend" class="more">
 
                 추천 더보기 →
 
@@ -2084,7 +1945,7 @@
 
                 <div>
 
-                    <button class="btn-primary">
+                    <button class="btn-primary" onclick="location.href='/recommend'">
 
                         추천 영화 보기
 
@@ -2138,7 +1999,7 @@
         <div class="service-grid">
 
 
-            <div class="service-card">
+            <div class="service-card" onclick="location.href='/ott'" style="cursor:pointer;">
 
 
                 <div class="service-icon">
