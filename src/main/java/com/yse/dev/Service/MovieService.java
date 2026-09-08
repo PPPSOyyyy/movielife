@@ -1,7 +1,9 @@
 package com.yse.dev.Service;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +59,10 @@ public class MovieService {
                                 "ko-KR"
                         )
                         .queryParam(
+                                "region",
+                                "KR"
+                        )
+                        .queryParam(
                                 "page",
                                 page
                         )
@@ -69,6 +75,329 @@ public class MovieService {
                 uri,
                 Map.class
         );
+    }
+
+
+
+    // ==========================================
+    // 평점 높은 영화 조회
+    // ==========================================
+    public Map<String, Object> getTopRatedMovies(
+            int page) {
+
+
+        URI uri =
+                UriComponentsBuilder
+                        .fromUriString(
+                                baseUrl
+                                + "/movie/top_rated"
+                        )
+                        .queryParam(
+                                "api_key",
+                                apiKey
+                        )
+                        .queryParam(
+                                "language",
+                                "ko-KR"
+                        )
+                        .queryParam(
+                                "region",
+                                "KR"
+                        )
+                        .queryParam(
+                                "page",
+                                page
+                        )
+                        .build()
+                        .encode()
+                        .toUri();
+
+
+        return restTemplate.getForObject(
+                uri,
+                Map.class
+        );
+    }
+
+
+
+    // ==========================================
+    // 개봉 예정 영화 조회
+    //
+    // TMDB Upcoming 사용
+    // + 대한민국 기준
+    // + 이미 지난 개봉일 제거
+    // + 포스터 없는 영화 제거
+    // ==========================================
+    public Map<String, Object> getUpcomingMovies(
+            int page) {
+
+
+        if (page < 1) {
+            page = 1;
+        }
+
+
+        LocalDate today =
+                LocalDate.now();
+
+
+        List<Map<String, Object>> filteredResults =
+                new ArrayList<>();
+
+
+        /*
+         * 화면 한 페이지에 20개 정도를 채우기 위해
+         * TMDB Upcoming 여러 페이지를 확인
+         */
+        int startApiPage =
+                ((page - 1) * 3) + 1;
+
+
+        int lastCheckedApiPage =
+                startApiPage;
+
+
+        for (
+            int apiPage = startApiPage;
+            apiPage < startApiPage + 3;
+            apiPage++
+        ) {
+
+
+            lastCheckedApiPage =
+                    apiPage;
+
+
+            URI uri =
+                    UriComponentsBuilder
+                            .fromUriString(
+                                    baseUrl
+                                    + "/movie/upcoming"
+                            )
+                            .queryParam(
+                                    "api_key",
+                                    apiKey
+                            )
+                            .queryParam(
+                                    "language",
+                                    "ko-KR"
+                            )
+                            .queryParam(
+                                    "region",
+                                    "KR"
+                            )
+                            .queryParam(
+                                    "page",
+                                    apiPage
+                            )
+                            .build()
+                            .encode()
+                            .toUri();
+
+
+            Map<String, Object> response =
+                    restTemplate.getForObject(
+                            uri,
+                            Map.class
+                    );
+
+
+            if (response == null) {
+                continue;
+            }
+
+
+            Object resultsObject =
+                    response.get(
+                            "results"
+                    );
+
+
+            if (!(resultsObject instanceof List<?>)) {
+                continue;
+            }
+
+
+            List<?> results =
+                    (List<?>) resultsObject;
+
+
+            for (Object item : results) {
+
+
+                if (!(item instanceof Map<?, ?>)) {
+                    continue;
+                }
+
+
+                Map<?, ?> movie =
+                        (Map<?, ?>) item;
+
+
+                // ==========================================
+                // 포스터 없는 영화 제외
+                // ==========================================
+
+                Object posterPath =
+                        movie.get(
+                                "poster_path"
+                        );
+
+
+                if (
+                    posterPath == null ||
+                    posterPath.toString().isBlank()
+                ) {
+
+                    continue;
+                }
+
+
+                // ==========================================
+                // 개봉일 없는 영화 제외
+                // ==========================================
+
+                Object releaseDateObject =
+                        movie.get(
+                                "release_date"
+                        );
+
+
+                if (
+                    releaseDateObject == null ||
+                    releaseDateObject.toString().isBlank()
+                ) {
+
+                    continue;
+                }
+
+
+                try {
+
+
+                    LocalDate releaseDate =
+                            LocalDate.parse(
+                                    releaseDateObject
+                                            .toString()
+                            );
+
+
+                    // 오늘보다 이전이면 제외
+                    if (
+                        releaseDate.isBefore(
+                                today
+                        )
+                    ) {
+
+                        continue;
+                    }
+
+
+                } catch (Exception e) {
+
+                    continue;
+                }
+
+
+                // ==========================================
+                // 조건 통과 영화 추가
+                // ==========================================
+
+                Map<String, Object> movieMap =
+                        new HashMap<>();
+
+
+                for (
+                    Map.Entry<?, ?> entry
+                    : movie.entrySet()
+                ) {
+
+
+                    if (entry.getKey() != null) {
+
+                        movieMap.put(
+                                entry.getKey()
+                                        .toString(),
+
+                                entry.getValue()
+                        );
+                    }
+                }
+
+
+                filteredResults.add(
+                        movieMap
+                );
+
+
+                /*
+                 * 한 페이지에 최대 20개
+                 */
+                if (
+                    filteredResults.size()
+                    >= 20
+                ) {
+
+                    break;
+                }
+
+            }
+
+
+            if (
+                filteredResults.size()
+                >= 20
+            ) {
+
+                break;
+            }
+
+        }
+
+
+        // ==========================================
+        // Controller가 기존 방식 그대로 쓸 수 있도록
+        // TMDB 응답 형태와 비슷하게 반환
+        // ==========================================
+
+        Map<String, Object> filteredResponse =
+                new HashMap<>();
+
+
+        filteredResponse.put(
+                "page",
+                page
+        );
+
+
+        filteredResponse.put(
+                "results",
+                filteredResults
+        );
+
+
+        /*
+         * 실제 TMDB 페이지 수와 완벽히 동일한
+         * 필터 페이지 계산은 아니지만,
+         * 기존 페이지 UI가 동작할 수 있도록 설정
+         */
+        filteredResponse.put(
+                "total_pages",
+                Math.max(
+                        page,
+                        lastCheckedApiPage
+                )
+        );
+
+
+        filteredResponse.put(
+                "total_results",
+                filteredResults.size()
+        );
+
+
+        return filteredResponse;
     }
 
 
@@ -168,135 +497,119 @@ public class MovieService {
                 Map.class
         );
     }
-    
- // ==========================================
- // 복합 필터 영화 조회
- // 장르 + 최소평점 + 개봉연도 + OTT
- // ==========================================
- public Map<String, Object> getFilteredMovies(
-         Integer genre,
-         Double minRating,
-         Integer year,
-         Integer provider,
-         int page) {
 
 
-     UriComponentsBuilder builder =
-             UriComponentsBuilder
-                     .fromUriString(
-                             baseUrl
-                             + "/discover/movie"
-                     )
-                     .queryParam(
-                             "api_key",
-                             apiKey
-                     )
-                     .queryParam(
-                             "language",
-                             "ko-KR"
-                     )
-                     .queryParam(
-                             "include_adult",
-                             false
-                     )
-                     .queryParam(
-                             "sort_by",
-                             "popularity.desc"
-                     )
-                     .queryParam(
-                             "page",
-                             page
-                     );
+
+    // ==========================================
+    // 복합 필터 영화 조회
+    // 장르 + 최소평점 + 개봉연도 + OTT
+    // ==========================================
+    public Map<String, Object> getFilteredMovies(
+
+            Integer genre,
+            Double minRating,
+            Integer year,
+            Integer provider,
+            int page) {
 
 
-     // ==========================================
-     // 장르
-     // ==========================================
-
-     if (genre != null) {
-
-         builder.queryParam(
-                 "with_genres",
-                 genre
-         );
-
-     }
-
-
-     // ==========================================
-     // 최소 평점
-     // ==========================================
-
-     if (
-         minRating != null &&
-         minRating > 0
-     ) {
-
-         builder.queryParam(
-                 "vote_average.gte",
-                 minRating
-         );
-
-     }
+        UriComponentsBuilder builder =
+                UriComponentsBuilder
+                        .fromUriString(
+                                baseUrl
+                                + "/discover/movie"
+                        )
+                        .queryParam(
+                                "api_key",
+                                apiKey
+                        )
+                        .queryParam(
+                                "language",
+                                "ko-KR"
+                        )
+                        .queryParam(
+                                "include_adult",
+                                false
+                        )
+                        .queryParam(
+                                "sort_by",
+                                "popularity.desc"
+                        )
+                        .queryParam(
+                                "page",
+                                page
+                        );
 
 
-     // ==========================================
-     // 개봉연도
-     // ==========================================
+        if (genre != null) {
 
-     if (year != null) {
-
-         builder.queryParam(
-                 "primary_release_date.gte",
-                 year + "-01-01"
-         );
-
-         builder.queryParam(
-                 "primary_release_date.lte",
-                 year + "-12-31"
-         );
-
-     }
+            builder.queryParam(
+                    "with_genres",
+                    genre
+            );
+        }
 
 
-     // ==========================================
-     // OTT
-     // 대한민국 기준
-     // ==========================================
+        if (
+            minRating != null &&
+            minRating > 0
+        ) {
 
-     if (provider != null) {
-
-         builder.queryParam(
-                 "watch_region",
-                 "KR"
-         );
-
-         builder.queryParam(
-                 "with_watch_providers",
-                 provider
-         );
-
-         builder.queryParam(
-                 "with_watch_monetization_types",
-                 "flatrate"
-         );
-
-     }
+            builder.queryParam(
+                    "vote_average.gte",
+                    minRating
+            );
+        }
 
 
-     URI uri =
-             builder
-                     .build()
-                     .encode()
-                     .toUri();
+        if (year != null) {
+
+            builder.queryParam(
+                    "primary_release_date.gte",
+                    year + "-01-01"
+            );
 
 
-     return restTemplate.getForObject(
-             uri,
-             Map.class
-     );
+            builder.queryParam(
+                    "primary_release_date.lte",
+                    year + "-12-31"
+            );
+        }
 
- }
+
+        if (provider != null) {
+
+            builder.queryParam(
+                    "watch_region",
+                    "KR"
+            );
+
+
+            builder.queryParam(
+                    "with_watch_providers",
+                    provider
+            );
+
+
+            builder.queryParam(
+                    "with_watch_monetization_types",
+                    "flatrate"
+            );
+        }
+
+
+        URI uri =
+                builder
+                        .build()
+                        .encode()
+                        .toUri();
+
+
+        return restTemplate.getForObject(
+                uri,
+                Map.class
+        );
+    }
 
 
 
@@ -317,7 +630,9 @@ public class MovieService {
 
 
         Object resultObject =
-                response.get("results");
+                response.get(
+                        "results"
+                );
 
 
         if (!(resultObject instanceof List<?>)) {
@@ -345,9 +660,11 @@ public class MovieService {
                     new MovieDto();
 
 
-            // ID
             Object id =
-                    movie.get("id");
+                    movie.get(
+                            "id"
+                    );
+
 
             if (id instanceof Number) {
 
@@ -358,9 +675,11 @@ public class MovieService {
             }
 
 
-            // 제목
             Object title =
-                    movie.get("title");
+                    movie.get(
+                            "title"
+                    );
+
 
             if (title != null) {
 
@@ -370,9 +689,11 @@ public class MovieService {
             }
 
 
-            // 줄거리
             Object overview =
-                    movie.get("overview");
+                    movie.get(
+                            "overview"
+                    );
+
 
             if (overview != null) {
 
@@ -382,9 +703,11 @@ public class MovieService {
             }
 
 
-            // 포스터
             Object posterPath =
-                    movie.get("poster_path");
+                    movie.get(
+                            "poster_path"
+                    );
+
 
             if (posterPath != null) {
 
@@ -394,9 +717,11 @@ public class MovieService {
             }
 
 
-            // 개봉일
             Object releaseDate =
-                    movie.get("release_date");
+                    movie.get(
+                            "release_date"
+                    );
+
 
             if (releaseDate != null) {
 
@@ -406,9 +731,11 @@ public class MovieService {
             }
 
 
-            // 평점
             Object voteAverage =
-                    movie.get("vote_average");
+                    movie.get(
+                            "vote_average"
+                    );
+
 
             if (voteAverage instanceof Number) {
 
@@ -419,13 +746,14 @@ public class MovieService {
             }
 
 
-            // 장르 ID 목록
             List<Integer> genreIds =
                     new ArrayList<>();
 
 
             Object genreObject =
-                    movie.get("genre_ids");
+                    movie.get(
+                            "genre_ids"
+                    );
 
 
             if (genreObject instanceof List<?>) {
@@ -476,10 +804,6 @@ public class MovieService {
                 new MovieDetailDto();
 
 
-        // ------------------------------------------
-        // 영화 기본정보
-        // ------------------------------------------
-
         URI detailUri =
                 UriComponentsBuilder
                         .fromUriString(
@@ -512,21 +836,33 @@ public class MovieService {
         }
 
 
-        detail.setId(movieId);
+        detail.setId(
+                movieId
+        );
 
 
         Object title =
-                movie.get("title");
+                movie.get(
+                        "title"
+                );
+
 
         if (title != null) {
-            detail.setTitle(title.toString());
+
+            detail.setTitle(
+                    title.toString()
+            );
         }
 
 
         Object originalTitle =
-                movie.get("original_title");
+                movie.get(
+                        "original_title"
+                );
+
 
         if (originalTitle != null) {
+
             detail.setOriginalTitle(
                     originalTitle.toString()
             );
@@ -534,9 +870,13 @@ public class MovieService {
 
 
         Object overview =
-                movie.get("overview");
+                movie.get(
+                        "overview"
+                );
+
 
         if (overview != null) {
+
             detail.setOverview(
                     overview.toString()
             );
@@ -544,9 +884,13 @@ public class MovieService {
 
 
         Object posterPath =
-                movie.get("poster_path");
+                movie.get(
+                        "poster_path"
+                );
+
 
         if (posterPath != null) {
+
             detail.setPosterPath(
                     posterPath.toString()
             );
@@ -554,9 +898,13 @@ public class MovieService {
 
 
         Object backdropPath =
-                movie.get("backdrop_path");
+                movie.get(
+                        "backdrop_path"
+                );
+
 
         if (backdropPath != null) {
+
             detail.setBackdropPath(
                     backdropPath.toString()
             );
@@ -564,9 +912,13 @@ public class MovieService {
 
 
         Object releaseDate =
-                movie.get("release_date");
+                movie.get(
+                        "release_date"
+                );
+
 
         if (releaseDate != null) {
+
             detail.setReleaseDate(
                     releaseDate.toString()
             );
@@ -574,7 +926,10 @@ public class MovieService {
 
 
         Object voteAverage =
-                movie.get("vote_average");
+                movie.get(
+                        "vote_average"
+                );
+
 
         if (voteAverage instanceof Number) {
 
@@ -586,7 +941,10 @@ public class MovieService {
 
 
         Object runtime =
-                movie.get("runtime");
+                movie.get(
+                        "runtime"
+                );
+
 
         if (runtime instanceof Number) {
 
@@ -598,16 +956,18 @@ public class MovieService {
 
 
 
-        // ------------------------------------------
+        // ==========================================
         // 장르
-        // ------------------------------------------
+        // ==========================================
 
         List<String> genreNames =
                 new ArrayList<>();
 
 
         Object genresObject =
-                movie.get("genres");
+                movie.get(
+                        "genres"
+                );
 
 
         if (genresObject instanceof List<?>) {
@@ -628,7 +988,9 @@ public class MovieService {
 
 
                     Object genreName =
-                            genre.get("name");
+                            genre.get(
+                                    "name"
+                            );
 
 
                     if (genreName != null) {
@@ -647,16 +1009,19 @@ public class MovieService {
         );
 
 
-        // ------------------------------------------
+
+        // ==========================================
         // 제작 국가
-        // ------------------------------------------
+        // ==========================================
 
         List<String> productionCountries =
                 new ArrayList<>();
 
 
         Object countryObject =
-                movie.get("production_countries");
+                movie.get(
+                        "production_countries"
+                );
 
 
         if (countryObject instanceof List<?>) {
@@ -677,7 +1042,9 @@ public class MovieService {
 
 
                     Object countryName =
-                            country.get("name");
+                            country.get(
+                                    "name"
+                            );
 
 
                     if (countryName != null) {
@@ -697,9 +1064,9 @@ public class MovieService {
 
 
 
-        // ------------------------------------------
+        // ==========================================
         // 출연진 / 감독
-        // ------------------------------------------
+        // ==========================================
 
         URI creditUri =
                 UriComponentsBuilder
@@ -737,7 +1104,9 @@ public class MovieService {
 
 
             Object castObject =
-                    creditResponse.get("cast");
+                    creditResponse.get(
+                            "cast"
+                    );
 
 
             if (castObject instanceof List<?>) {
@@ -766,7 +1135,9 @@ public class MovieService {
 
 
                         Object castName =
-                                cast.get("name");
+                                cast.get(
+                                        "name"
+                                );
 
 
                         if (castName != null) {
@@ -774,6 +1145,7 @@ public class MovieService {
                             castList.add(
                                     castName.toString()
                             );
+
 
                             count++;
                         }
@@ -788,18 +1160,18 @@ public class MovieService {
         );
 
 
-        // ------------------------------------------
-        // 감독
-        // ------------------------------------------
 
-        String director = null;
+        String director =
+                null;
 
 
         if (creditResponse != null) {
 
 
             Object crewObject =
-                    creditResponse.get("crew");
+                    creditResponse.get(
+                            "crew"
+                    );
 
 
             if (crewObject instanceof List<?>) {
@@ -820,21 +1192,28 @@ public class MovieService {
 
 
                         Object job =
-                                crew.get("job");
+                                crew.get(
+                                        "job"
+                                );
 
 
                         Object name =
-                                crew.get("name");
+                                crew.get(
+                                        "name"
+                                );
 
 
                         if (
                             job != null &&
-                            "Director".equals(job.toString()) &&
+                            "Director".equals(
+                                    job.toString()
+                            ) &&
                             name != null
                         ) {
 
                             director =
                                     name.toString();
+
 
                             break;
                         }
@@ -848,9 +1227,11 @@ public class MovieService {
                 director
         );
 
-        // ------------------------------------------
+
+
+        // ==========================================
         // 대한민국 관람등급
-        // ------------------------------------------
+        // ==========================================
 
         URI releaseUri =
                 UriComponentsBuilder
@@ -876,7 +1257,8 @@ public class MovieService {
                 );
 
 
-        String certification = null;
+        String certification =
+                null;
 
 
         if (releaseResponse != null) {
@@ -890,13 +1272,13 @@ public class MovieService {
 
             if (
                 releaseResultsObject
-                        instanceof List<?>
+                instanceof List<?>
             ) {
 
 
                 List<?> releaseResults =
                         (List<?>)
-                                releaseResultsObject;
+                        releaseResultsObject;
 
 
                 for (
@@ -907,13 +1289,13 @@ public class MovieService {
 
                     if (
                         releaseResultItem
-                                instanceof Map<?, ?>
+                        instanceof Map<?, ?>
                     ) {
 
 
                         Map<?, ?> releaseResult =
                                 (Map<?, ?>)
-                                        releaseResultItem;
+                                releaseResultItem;
 
 
                         Object isoCountry =
@@ -922,7 +1304,6 @@ public class MovieService {
                                 );
 
 
-                        // 대한민국(KR) 정보 찾기
                         if (
                             isoCountry != null &&
                             "KR".equals(
@@ -939,13 +1320,13 @@ public class MovieService {
 
                             if (
                                 releaseDatesObject
-                                        instanceof List<?>
+                                instanceof List<?>
                             ) {
 
 
                                 List<?> releaseDates =
                                         (List<?>)
-                                                releaseDatesObject;
+                                        releaseDatesObject;
 
 
                                 for (
@@ -956,13 +1337,13 @@ public class MovieService {
 
                                     if (
                                         releaseDateItem
-                                                instanceof Map<?, ?>
+                                        instanceof Map<?, ?>
                                     ) {
 
 
                                         Map<?, ?> releaseDateMap =
                                                 (Map<?, ?>)
-                                                        releaseDateItem;
+                                                releaseDateItem;
 
 
                                         Object certificationObject =
@@ -985,33 +1366,19 @@ public class MovieService {
 
 
                                             break;
-
                                         }
-
                                     }
-
                                 }
-
                             }
 
 
-                            // KR 정보는 찾았으므로 종료
                             break;
-
                         }
-
                     }
-
                 }
-
             }
-
         }
 
-
-        // ------------------------------------------
-        // 관람등급 한글 표시
-        // ------------------------------------------
 
         if (certification == null) {
 
@@ -1025,48 +1392,57 @@ public class MovieService {
             switch (certification) {
 
                 case "ALL":
+
                     detail.setCertification(
                             "전체 관람가"
                     );
+
                     break;
 
 
                 case "12":
+
                     detail.setCertification(
                             "12세 이상 관람가"
                     );
+
                     break;
 
 
                 case "15":
+
                     detail.setCertification(
                             "15세 이상 관람가"
                     );
+
                     break;
 
 
                 case "18":
                 case "19":
+
                     detail.setCertification(
                             "청소년 관람불가"
                     );
+
                     break;
 
 
                 default:
+
                     detail.setCertification(
                             certification
                     );
+
                     break;
-
             }
-
         }
 
 
-        // ------------------------------------------
+
+        // ==========================================
         // 한국 OTT
-        // ------------------------------------------
+        // ==========================================
 
         URI providerUri =
                 UriComponentsBuilder
@@ -1100,7 +1476,9 @@ public class MovieService {
 
 
             Object resultsObject =
-                    providerResponse.get("results");
+                    providerResponse.get(
+                            "results"
+                    );
 
 
             if (resultsObject instanceof Map<?, ?>) {
@@ -1111,7 +1489,9 @@ public class MovieService {
 
 
                 Object krObject =
-                        results.get("KR");
+                        results.get(
+                                "KR"
+                        );
 
 
                 if (krObject instanceof Map<?, ?>) {
@@ -1122,19 +1502,25 @@ public class MovieService {
 
 
                     addProviders(
-                            kr.get("flatrate"),
+                            kr.get(
+                                    "flatrate"
+                            ),
                             providers
                     );
 
 
                     addProviders(
-                            kr.get("rent"),
+                            kr.get(
+                                    "rent"
+                            ),
                             providers
                     );
 
 
                     addProviders(
-                            kr.get("buy"),
+                            kr.get(
+                                    "buy"
+                            ),
                             providers
                     );
                 }
@@ -1156,7 +1542,9 @@ public class MovieService {
     // OTT 제공처 이름 중복 없이 추가
     // ==========================================
     private void addProviders(
+
             Object providerObject,
+
             List<String> providers) {
 
 
@@ -1192,9 +1580,15 @@ public class MovieService {
                             providerName.toString();
 
 
-                    if (!providers.contains(name)) {
+                    if (
+                        !providers.contains(
+                                name
+                        )
+                    ) {
 
-                        providers.add(name);
+                        providers.add(
+                                name
+                        );
                     }
                 }
             }
