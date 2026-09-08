@@ -27,9 +27,10 @@ public class MovieController {
 
     // ==========================================
     // 영화 목록
-    // 인기 / 검색 / 장르 / 페이지네이션
+    // 검색 + 장르 + 복합필터
     // ==========================================
-    @GetMapping({"/movies", "/movie-list"})
+
+    @GetMapping("/movies")
     public String movieList(
 
             @RequestParam(
@@ -45,6 +46,24 @@ public class MovieController {
             Integer genre,
 
             @RequestParam(
+                    value = "minRating",
+                    required = false
+            )
+            Double minRating,
+
+            @RequestParam(
+                    value = "year",
+                    required = false
+            )
+            Integer year,
+
+            @RequestParam(
+                    value = "provider",
+                    required = false
+            )
+            Integer provider,
+
+            @RequestParam(
                     value = "page",
                     defaultValue = "1"
             )
@@ -53,17 +72,28 @@ public class MovieController {
             Model model) {
 
 
+        /*
+         * 잘못된 페이지값 방지
+         */
+
         if (page < 1) {
+
             page = 1;
+
         }
 
 
         Map<String, Object> response;
 
 
-        // ======================================
-        // 1. 검색어가 있으면 검색 우선
-        // ======================================
+        String pageTitle =
+                "지금 인기있는 영화";
+
+
+
+        // ==========================================
+        // 제목 검색
+        // ==========================================
 
         if (
             query != null &&
@@ -72,132 +102,116 @@ public class MovieController {
 
 
             response =
-                    movieService
-                            .searchMovies(
-                                    query.trim(),
-                                    page
-                            );
+                    movieService.searchMovies(
+                            query.trim(),
+                            page
+                    );
 
 
-            model.addAttribute(
-                    "pageTitle",
-                    "'" + query
-                    + "' 검색 결과"
-            );
+            pageTitle =
+                    "'" + query.trim()
+                    + "' 검색 결과";
 
 
-        // ======================================
-        // 2. 검색어 없고 장르가 있으면 장르
-        // ======================================
-
-        } else if (genre != null) {
-
-
-            response =
-                    movieService
-                            .getMoviesByGenre(
-                                    genre,
-                                    page
-                            );
-
-
-            model.addAttribute(
-                    "pageTitle",
-                    getGenreName(genre)
-                    + " 영화"
-            );
-
-
-        // ======================================
-        // 3. 아무것도 없으면 인기영화
-        // ======================================
-
-        } else {
-
-
-            response =
-                    movieService
-                            .getPopularMovies(
-                                    page
-                            );
-
-
-            model.addAttribute(
-                    "pageTitle",
-                    "지금 인기있는 영화"
-            );
         }
 
 
+        // ==========================================
+        // 복합 필터
+        // ==========================================
+
+        else if (
+            genre != null ||
+            minRating != null ||
+            year != null ||
+            provider != null
+        ) {
+
+
+            response =
+                    movieService.getFilteredMovies(
+
+                            genre,
+
+                            minRating,
+
+                            year,
+
+                            provider,
+
+                            page
+
+                    );
+
+
+            pageTitle =
+                    "필터 검색 결과";
+
+        }
+
+
+        // ==========================================
+        // 기본 인기영화
+        // ==========================================
+
+        else {
+
+
+            response =
+                    movieService.getPopularMovies(
+                            page
+                    );
+
+        }
+
+
+
+        // ==========================================
+        // 영화 목록 변환
+        // ==========================================
 
         List<MovieDto> movies =
-                movieService
-                        .convertToMovieList(
-                                response
-                        );
-
-
-
-        // ======================================
-        // 현재 페이지
-        // ======================================
-
-        int currentPage = 1;
-
-
-        Object responsePage =
-                response.get("page");
-
-
-        if (responsePage instanceof Number) {
-
-            currentPage =
-                    ((Number) responsePage)
-                            .intValue();
-        }
-
-
-
-        // ======================================
-        // 전체 페이지
-        // ======================================
-
-        int totalPages = 1;
-
-
-        Object totalPagesObject =
-                response.get("total_pages");
-
-
-        if (totalPagesObject instanceof Number) {
-
-            totalPages =
-                    ((Number) totalPagesObject)
-                            .intValue();
-        }
-
-
-        /*
-         * TMDB API는 페이지를 최대 500까지
-         * 접근 가능하도록 제한되는 경우가 있어서
-         * 화면에서도 최대 500으로 제한합니다.
-         */
-        totalPages =
-                Math.min(
-                        totalPages,
-                        500
+                movieService.convertToMovieList(
+                        response
                 );
 
 
 
-        // ======================================
-        // 화면에 페이지 번호 5개 표시
-        // ======================================
+        // ==========================================
+        // 전체 페이지
+        // ==========================================
+
+        int totalPages =
+                getNumber(
+                        response,
+                        "total_pages",
+                        1
+                );
+
+
+        /*
+         * TMDB는 최대 페이지가 많을 수 있으므로
+         * 화면에서는 최대 500까지만
+         */
+
+        if (
+            totalPages > 500
+        ) {
+
+            totalPages = 500;
+
+        }
+
+
+
+        // ==========================================
+        // 페이지 번호 범위
+        // ==========================================
 
         int startPage =
                 Math.max(
                         1,
-                        currentPage - 2
+                        page - 2
                 );
 
 
@@ -208,13 +222,23 @@ public class MovieController {
                 );
 
 
-        startPage =
-                Math.max(
-                        1,
-                        endPage - 4
-                );
+        if (
+            endPage - startPage < 4
+        ) {
+
+            startPage =
+                    Math.max(
+                            1,
+                            endPage - 4
+                    );
+
+        }
 
 
+
+        // ==========================================
+        // Model
+        // ==========================================
 
         model.addAttribute(
                 "movies",
@@ -224,9 +248,7 @@ public class MovieController {
 
         model.addAttribute(
                 "query",
-                query == null
-                        ? ""
-                        : query
+                query
         );
 
 
@@ -237,8 +259,26 @@ public class MovieController {
 
 
         model.addAttribute(
+                "selectedMinRating",
+                minRating
+        );
+
+
+        model.addAttribute(
+                "selectedYear",
+                year
+        );
+
+
+        model.addAttribute(
+                "selectedProvider",
+                provider
+        );
+
+
+        model.addAttribute(
                 "currentPage",
-                currentPage
+                page
         );
 
 
@@ -260,7 +300,14 @@ public class MovieController {
         );
 
 
+        model.addAttribute(
+                "pageTitle",
+                pageTitle
+        );
+
+
         return "movie-list";
+
     }
 
 
@@ -268,18 +315,20 @@ public class MovieController {
     // ==========================================
     // 영화 상세페이지
     // ==========================================
-    @GetMapping("/movies/{id}")
+
+    @GetMapping("/movies/{movieId}")
     public String movieDetail(
 
-            @PathVariable("id")
-            Long id,
+            @PathVariable("movieId")
+            Long movieId,
 
             Model model) {
 
 
         MovieDetailDto movie =
-                movieService
-                        .getMovieDetail(id);
+                movieService.getMovieDetail(
+                        movieId
+                );
 
 
         model.addAttribute(
@@ -289,76 +338,48 @@ public class MovieController {
 
 
         return "movie-detail";
+
     }
 
 
 
     // ==========================================
-    // 장르 ID → 한글 이름
+    // Map 숫자 읽기
     // ==========================================
-    private String getGenreName(
-            int genreId) {
+
+    private int getNumber(
+            Map<String, Object> response,
+            String key,
+            int defaultValue) {
 
 
-        return switch (genreId) {
+        if (
+            response == null
+        ) {
 
-            case 28 ->
-                "액션";
+            return defaultValue;
 
-            case 12 ->
-                "모험";
+        }
 
-            case 16 ->
-                "애니메이션";
 
-            case 35 ->
-                "코미디";
+        Object value =
+                response.get(
+                        key
+                );
 
-            case 80 ->
-                "범죄";
 
-            case 99 ->
-                "다큐멘터리";
+        if (
+            value instanceof Number
+        ) {
 
-            case 18 ->
-                "드라마";
+            return ((Number) value)
+                    .intValue();
 
-            case 10751 ->
-                "가족";
+        }
 
-            case 14 ->
-                "판타지";
 
-            case 36 ->
-                "역사";
+        return defaultValue;
 
-            case 27 ->
-                "공포";
-
-            case 10402 ->
-                "음악";
-
-            case 9648 ->
-                "미스터리";
-
-            case 10749 ->
-                "로맨스";
-
-            case 878 ->
-                "SF";
-
-            case 53 ->
-                "스릴러";
-
-            case 10752 ->
-                "전쟁";
-
-            case 37 ->
-                "서부";
-
-            default ->
-                "장르별";
-        };
     }
 
 }

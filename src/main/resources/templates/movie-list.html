@@ -25,29 +25,23 @@
 
         :root {
             --red: #D92234;
+            --white: #ffffff;
+            --black: #000000;
         }
 
 
         body {
-
             min-height: 100vh;
 
-            background:
-                radial-gradient(
-                    circle at 50% 0%,
-                    rgba(217,34,52,0.10),
-                    transparent 30%
-                ),
-                #000;
+            background: #000;
 
-            color: white;
+            color: #fff;
 
             font-family:
                 "Pretendard",
                 "Noto Sans KR",
                 Arial,
                 sans-serif;
-
         }
 
 
@@ -64,19 +58,12 @@
         }
 
 
-        button,
-        select {
-            cursor: pointer;
-        }
-
-
 
         /* =========================
            HEADER
         ========================= */
 
         .header {
-
             width: 100%;
             height: 76px;
 
@@ -86,46 +73,41 @@
             padding: 0 6%;
 
             border-bottom:
-                1px solid rgba(255,255,255,0.07);
+                1px solid #191919;
 
-            background:
-                rgba(0,0,0,0.95);
-
+            background: #000;
         }
 
 
         .logo {
-
-            display: flex;
-            align-items: center;
-
             width: 145px;
 
+            flex-shrink: 0;
         }
 
 
         .logo img {
+            display: block;
+
             width: 145px;
         }
 
 
         .nav {
-
             display: flex;
 
             gap: 30px;
 
             margin-left: 45px;
-
         }
 
 
         .nav a {
+            position: relative;
 
             color: #bbb;
 
-            font-size: 14px;
-
+            font-size: 13px;
         }
 
 
@@ -135,55 +117,67 @@
 
 
         .nav a.active {
-
             color: white;
 
             font-weight: 700;
+        }
 
+
+        .nav a.active::after {
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+            right: 0;
+
+            bottom: -27px;
+
+            height: 2px;
+
+            background: var(--red);
         }
 
 
         .header-right {
-
-            margin-left: auto;
-
             display: flex;
+
             align-items: center;
 
             gap: 10px;
 
+            margin-left: auto;
         }
 
 
         .login-button,
         .signup-button {
+            padding:
+                9px 18px;
 
-            padding: 9px 18px;
+            border-radius:
+                5px;
 
-            border-radius: 5px;
-
-            font-size: 12px;
-
+            font-size:
+                11px;
         }
 
 
         .login-button {
+            border:
+                1px solid #444;
 
-            border: 1px solid #444;
-
-            color: #fff;
-
+            color:
+                #fff;
         }
 
 
         .signup-button {
+            background:
+                var(--red);
 
-            border: 1px solid var(--red);
-
-            background: var(--red);
-
-            color: #fff;
-
+            color:
+                white;
         }
 
 
@@ -192,50 +186,68 @@
            MAIN
         ========================= */
 
-        .container {
+        .main {
+            min-height:
+                calc(100vh - 76px);
 
+            background:
+                radial-gradient(
+                    circle at 50% 0%,
+                    rgba(217,34,52,0.10),
+                    transparent 32%
+                ),
+                #000;
+        }
+
+
+        .container {
             width: 100%;
-            max-width: 1250px;
+
+            max-width: 1120px;
 
             margin: 0 auto;
 
             padding:
-                70px 30px 100px;
-
+                65px 30px 100px;
         }
 
 
-        .title-small {
+        .section-label {
+            margin-bottom:
+                10px;
 
-            color: var(--red);
+            color:
+                var(--red);
 
-            font-size: 11px;
-            font-weight: 700;
+            font-size:
+                11px;
 
-            letter-spacing: 2px;
+            font-weight:
+                800;
 
-            margin-bottom: 10px;
-
+            letter-spacing:
+                2px;
         }
 
 
         .page-title {
+            margin-bottom:
+                7px;
 
-            font-size: 35px;
+            font-size:
+                34px;
 
-            letter-spacing: -2px;
-
-            margin-bottom: 8px;
-
+            letter-spacing:
+                -2px;
         }
 
 
         .page-description {
+            color:
+                #666;
 
-            color: #666;
-
-            font-size: 13px;
-
+            font-size:
+                12px;
         }
 
 
@@ -245,113 +257,304 @@
         ========================= */
 
         .search-area {
+            margin-top:
+                30px;
+        }
 
-            display: flex;
 
-            gap: 10px;
+        .search-form {
+            display:
+                grid;
 
-            margin-top: 35px;
+            grid-template-columns:
+                minmax(0, 1fr)
+                105px;
 
+            grid-template-rows:
+                44px auto;
+
+            column-gap:
+                10px;
+
+            width:
+                100%;
         }
 
 
         .search-input {
+            grid-column:
+                1;
 
-            flex: 1;
+            grid-row:
+                1;
 
-            height: 50px;
+            width:
+                100%;
 
-            padding: 0 17px;
+            height:
+                44px;
+
+            padding:
+                0 15px;
 
             border:
                 1px solid #333;
 
-            border-radius: 6px;
+            border-radius:
+                5px;
 
-            outline: none;
+            outline:
+                none;
 
-            background: #101010;
+            background:
+                #111;
 
-            color: white;
+            color:
+                #fff;
 
+            font-size:
+                13px;
         }
 
 
         .search-input:focus {
-
             border-color:
                 var(--red);
+        }
 
+
+        .search-input.error {
+            border-color:
+                var(--red);
         }
 
 
         .search-button {
+            grid-column:
+                2;
 
-            width: 110px;
+            grid-row:
+                1;
 
-            border: none;
+            height:
+                44px;
 
-            border-radius: 6px;
+            border:
+                none;
+
+            border-radius:
+                5px;
 
             background:
                 var(--red);
 
-            color: white;
+            color:
+                white;
 
-            font-weight: 700;
+            font-size:
+                12px;
 
+            font-weight:
+                700;
+
+            cursor:
+                pointer;
+        }
+
+
+        .search-error-message {
+            grid-column:
+                1;
+
+            grid-row:
+                2;
+
+            min-height:
+                19px;
+
+            padding-top:
+                6px;
+
+            color:
+                var(--red);
+
+            font-size:
+                11px;
         }
 
 
 
         /* =========================
-           GENRE
+           COMPLEX FILTER
         ========================= */
 
-        .filter-area {
+        .filter-box {
+            margin-top:
+                18px;
 
-            display: flex;
+            padding:
+                18px;
+
+            border:
+                1px solid #242424;
+
+            border-radius:
+                7px;
+
+            background:
+                #0d0d0d;
+        }
+
+
+        .filter-header {
+            display:
+                flex;
+
+            align-items:
+                center;
 
             justify-content:
                 space-between;
 
-            align-items: center;
-
-            gap: 15px;
-
-            margin:
-                25px 0 30px;
-
+            margin-bottom:
+                14px;
         }
 
 
         .filter-title {
+            color:
+                #ddd;
 
-            color: #888;
+            font-size:
+                12px;
 
-            font-size: 12px;
-
+            font-weight:
+                700;
         }
 
 
-        .genre-select {
+        .filter-description {
+            color:
+                #555;
 
-            width: 180px;
-            height: 42px;
+            font-size:
+                10px;
+        }
 
-            padding: 0 12px;
+
+        .filter-form {
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(4, 1fr)
+                90px
+                70px;
+
+            gap:
+                8px;
+        }
+
+
+        .filter-select {
+            width:
+                100%;
+
+            height:
+                40px;
+
+            padding:
+                0 10px;
 
             border:
                 1px solid #333;
 
-            border-radius: 5px;
+            border-radius:
+                5px;
 
-            outline: none;
+            outline:
+                none;
 
-            background: #101010;
+            background:
+                #111;
 
-            color: white;
+            color:
+                #ccc;
 
+            font-size:
+                11px;
+        }
+
+
+        .filter-select:focus {
+            border-color:
+                var(--red);
+        }
+
+
+        .filter-button {
+            height:
+                40px;
+
+            border:
+                1px solid var(--red);
+
+            border-radius:
+                5px;
+
+            background:
+                var(--red);
+
+            color:
+                white;
+
+            font-size:
+                11px;
+
+            font-weight:
+                700;
+
+            cursor:
+                pointer;
+        }
+
+
+        .filter-reset {
+            height:
+                40px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            border:
+                1px solid #333;
+
+            border-radius:
+                5px;
+
+            background:
+                transparent;
+
+            color:
+                #777;
+
+            font-size:
+                11px;
+        }
+
+
+        .filter-reset:hover {
+            color:
+                white;
+
+            border-color:
+                #555;
         }
 
 
@@ -361,227 +564,227 @@
         ========================= */
 
         .movie-grid {
-
-            display: grid;
+            display:
+                grid;
 
             grid-template-columns:
-                repeat(5, 1fr);
+                repeat(
+                    5,
+                    minmax(0, 1fr)
+                );
 
             gap:
-                30px 18px;
+                26px 16px;
 
+            margin-top:
+                30px;
         }
 
 
         .movie-card {
-
-            display: block;
-
-            min-width: 0;
-
-            transition: 0.25s;
-
+            min-width:
+                0;
         }
 
 
-        .movie-card:hover {
+        .poster-link {
+            position:
+                relative;
 
-            transform:
-                translateY(-6px);
+            display:
+                block;
 
-        }
+            width:
+                100%;
 
+            aspect-ratio:
+                2 / 3;
 
-        .poster-box {
+            overflow:
+                hidden;
 
-            position: relative;
-
-            width: 100%;
-
-            aspect-ratio: 2 / 3;
-
-            overflow: hidden;
-
-            border-radius: 7px;
-
-            background: #151515;
-
-        }
-
-
-        .poster-box img {
-
-            width: 100%;
-            height: 100%;
-
-            display: block;
-
-            object-fit: cover;
-
-        }
-
-
-        .movie-card:hover
-        .poster-box {
-
-            box-shadow:
-                0 0 0 1px var(--red),
-                0 15px 35px
-                rgba(0,0,0,0.65);
-
-        }
-
-
-        .no-poster {
-
-            width: 100%;
-            height: 100%;
-
-            display: flex;
-
-            align-items: center;
-            justify-content: center;
-
-            color: #555;
-
-        }
-
-
-        .rating {
-
-            position: absolute;
-
-            top: 8px;
-            right: 8px;
-
-            padding:
-                5px 8px;
-
-            border-radius: 4px;
+            border-radius:
+                7px;
 
             background:
-                rgba(0,0,0,0.78);
+                #111;
 
-            color: #ffd54a;
+            transition:
+                0.2s;
+        }
 
-            font-size: 11px;
 
+        .poster-link:hover {
+            transform:
+                translateY(-3px);
+        }
+
+
+        .movie-poster {
+            width:
+                100%;
+
+            height:
+                100%;
+
+            object-fit:
+                cover;
+        }
+
+
+        .movie-rating {
+            position:
+                absolute;
+
+            top:
+                9px;
+
+            right:
+                9px;
+
+            padding:
+                5px 7px;
+
+            border-radius:
+                4px;
+
+            background:
+                rgba(0,0,0,0.82);
+
+            color:
+                #ffd54a;
+
+            font-size:
+                10px;
         }
 
 
         .movie-info {
-
-            padding-top: 12px;
-
+            padding-top:
+                10px;
         }
 
 
         .movie-title {
+            display:
+                block;
 
-            overflow: hidden;
+            overflow:
+                hidden;
 
-            font-size: 15px;
-            font-weight: 700;
+            color:
+                white;
 
-            white-space: nowrap;
+            font-size:
+                13px;
 
-            text-overflow: ellipsis;
+            font-weight:
+                700;
 
+            white-space:
+                nowrap;
+
+            text-overflow:
+                ellipsis;
         }
 
 
         .movie-date {
+            margin-top:
+                4px;
 
-            margin-top: 5px;
+            color:
+                #555;
 
-            color: #666;
-
-            font-size: 11px;
-
+            font-size:
+                10px;
         }
 
-		.movie-genres {
 
-		    display: flex;
+        .movie-genres {
+            display:
+                flex;
 
-		    flex-wrap: wrap;
+            flex-wrap:
+                wrap;
 
-		    gap: 5px;
+            gap:
+                5px;
 
-		    margin-top: 8px;
+            margin-top:
+                8px;
+        }
 
-		}
 
+        .movie-genre {
+            padding:
+                4px 6px;
 
-		.movie-genre {
+            border:
+                1px solid
+                rgba(217,34,52,0.30);
 
-		    padding: 4px 7px;
+            border-radius:
+                3px;
 
-		    border:
+            color:
+                #c5c5c5;
 
-		        1px solid
-		        rgba(217,34,52,0.28);
+            font-size:
+                9px;
+        }
 
-		    border-radius: 4px;
-
-		    background:
-
-		        rgba(217,34,52,0.08);
-
-		    color: #cfcfcf;
-
-		    font-size: 10px;
-
-		    line-height: 1;
-
-		}
 
         .movie-overview {
+            display:
+                -webkit-box;
 
-            display: -webkit-box;
+            overflow:
+                hidden;
 
-            overflow: hidden;
+            margin-top:
+                8px;
 
-            margin-top: 8px;
+            color:
+                #6c6c6c;
 
-            color: #777;
+            font-size:
+                10px;
 
-            font-size: 11px;
+            line-height:
+                1.6;
 
-            line-height: 1.6;
+            -webkit-line-clamp:
+                2;
 
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-
+            -webkit-box-orient:
+                vertical;
         }
 
 
 
         /* =========================
-           NO RESULTS
+           EMPTY
         ========================= */
 
-        .no-results {
-
+        .empty-result {
             grid-column:
                 1 / -1;
 
             padding:
-                90px 20px;
+                70px 20px;
 
-            text-align: center;
+            border:
+                1px solid #222;
 
-            color: #666;
+            border-radius:
+                7px;
 
-        }
+            text-align:
+                center;
 
-
-        .no-results h3 {
-
-            margin-bottom: 8px;
-
-            color: white;
-
+            color:
+                #666;
         }
 
 
@@ -591,169 +794,126 @@
         ========================= */
 
         .pagination {
+            display:
+                flex;
 
-            display: flex;
+            align-items:
+                center;
 
-            justify-content: center;
-            align-items: center;
+            justify-content:
+                center;
 
-            flex-wrap: wrap;
+            gap:
+                6px;
 
-            gap: 7px;
-
-            margin-top: 55px;
-
+            margin-top:
+                55px;
         }
 
 
         .page-button {
+            min-width:
+                34px;
 
-            min-width: 38px;
-            height: 38px;
+            height:
+                34px;
 
-            display: flex;
+            display:
+                inline-flex;
 
-            align-items: center;
-            justify-content: center;
+            align-items:
+                center;
 
-            padding: 0 10px;
+            justify-content:
+                center;
+
+            padding:
+                0 10px;
 
             border:
-                1px solid #303030;
+                1px solid #292929;
 
-            border-radius: 5px;
+            border-radius:
+                4px;
 
-            background: #101010;
+            background:
+                #101010;
 
-            color: #aaa;
+            color:
+                #777;
 
-            font-size: 12px;
-
-            transition: 0.2s;
-
-        }
-
-
-        .page-button:hover {
-
-            border-color:
-                var(--red);
-
-            color: white;
-
+            font-size:
+                10px;
         }
 
 
         .page-button.active {
-
             border-color:
                 var(--red);
 
             background:
                 var(--red);
 
-            color: white;
-
-            font-weight: 700;
-
+            color:
+                white;
         }
 
 
         .page-button.disabled {
+            pointer-events:
+                none;
 
-            opacity: 0.25;
-
-            pointer-events: none;
-
-        }
-
-
-        .page-info {
-
-            margin-top: 14px;
-
-            text-align: center;
-
-            color: #555;
-
-            font-size: 11px;
-
+            opacity:
+                0.35;
         }
 
 
 
-        @media (max-width: 1100px) {
+        @media (
+            max-width: 900px
+        ) {
 
-            .movie-grid {
-
-                grid-template-columns:
-                    repeat(4, 1fr);
-
-            }
-        }
-
-
-        @media (max-width: 850px) {
-
-            .movie-grid {
-
-                grid-template-columns:
-                    repeat(3, 1fr);
-
-            }
-        }
-
-
-        @media (max-width: 650px) {
-
-            .nav {
-                display: none;
-            }
-
-
-            .movie-grid {
-
+            .filter-form {
                 grid-template-columns:
                     repeat(2, 1fr);
-
             }
 
 
-            .search-area {
+            .movie-grid {
+                grid-template-columns:
+                    repeat(3, 1fr);
+            }
 
-                flex-direction:
-                    column;
+        }
 
+
+        @media (
+            max-width: 600px
+        ) {
+
+            .nav {
+                display:
+                    none;
             }
 
 
-            .search-button {
-
-                width: 100%;
-                height: 45px;
-
+            .filter-form {
+                grid-template-columns:
+                    1fr;
             }
 
 
-            .filter-area {
-
-                align-items:
-                    flex-start;
-
-                flex-direction:
-                    column;
-
+            .movie-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
             }
 
-
-            .genre-select {
-                width: 100%;
-            }
         }
 
     </style>
 
 </head>
+
 
 
 <body>
@@ -788,15 +948,15 @@
             영화
         </a>
 
-        <a href="/movies">
+        <a href="/popular">
             인기영화
         </a>
 
-        <a href="#">
+        <a href="/movie-recommend">
             영화추천
         </a>
 
-        <a href="#">
+        <a href="/ott">
             OTT
         </a>
 
@@ -830,481 +990,621 @@
 
 
 
-<main class="container">
+<main class="main">
 
 
-    <div class="title-small">
-        FIND YOUR MOVIE
-    </div>
+    <div class="container">
 
 
-    <h1
-        class="page-title"
-        th:text="${pageTitle}"
-    >
-        영화
-    </h1>
+        <div class="section-label">
+            FIND YOUR MOVIE
+        </div>
 
 
-    <p class="page-description">
-
-        영화 제목을 검색하거나
-        원하는 장르의 영화를 찾아보세요.
-
-    </p>
-
-
-
-    <!-- =========================
-         검색
-    ========================= -->
-
-    <form
-        action="/movies"
-        method="get"
-        class="search-area"
-    >
-
-        <input
-            type="text"
-            name="query"
-            class="search-input"
-            placeholder="영화 제목을 입력해주세요."
-            th:value="${query}"
+        <h1
+            class="page-title"
+            th:text="${pageTitle}"
         >
+            지금 인기있는 영화
+        </h1>
 
-        <button
-            type="submit"
-            class="search-button"
-        >
-            검색
-        </button>
 
-    </form>
+        <p class="page-description">
+            영화 제목을 검색하거나 여러 조건을 조합해 원하는 영화를 찾아보세요.
+        </p>
 
 
 
-    <!-- =========================
-         장르 선택
-    ========================= -->
+        <!-- =========================
+             제목 검색
+        ========================= -->
 
-    <div class="filter-area">
+        <div class="search-area">
 
 
-        <div class="filter-title">
+            <form
+                id="movieSearchForm"
+                class="search-form"
+                action="/movies"
+                method="get"
+            >
 
-            장르를 선택하면
-            해당 장르의 영화 전체를 불러옵니다.
+
+                <input
+                    type="text"
+                    id="movieSearchInput"
+                    class="search-input"
+                    name="query"
+                    th:value="${query}"
+                    placeholder="영화 제목을 입력하세요"
+                    autocomplete="off"
+                >
+
+
+                <button
+                    type="submit"
+                    class="search-button"
+                >
+                    검색
+                </button>
+
+
+                <p
+                    id="searchErrorMessage"
+                    class="search-error-message"
+                ></p>
+
+
+            </form>
+
 
         </div>
 
 
-        <select
-            id="genreSelect"
-            class="genre-select"
-            onchange="changeGenre()"
-        >
+
+        <!-- =========================
+             복합 필터
+        ========================= -->
+
+        <section class="filter-box">
 
 
-            <option
-                value=""
-                th:selected="${selectedGenre == null}"
-            >
-                전체 / 인기영화
-            </option>
+            <div class="filter-header">
 
 
-            <option
-                value="28"
-                th:selected="${selectedGenre == 28}"
-            >
-                액션
-            </option>
-
-
-            <option
-                value="12"
-                th:selected="${selectedGenre == 12}"
-            >
-                모험
-            </option>
-
-
-            <option
-                value="16"
-                th:selected="${selectedGenre == 16}"
-            >
-                애니메이션
-            </option>
-
-
-            <option
-                value="35"
-                th:selected="${selectedGenre == 35}"
-            >
-                코미디
-            </option>
-
-
-            <option
-                value="80"
-                th:selected="${selectedGenre == 80}"
-            >
-                범죄
-            </option>
-
-
-            <option
-                value="99"
-                th:selected="${selectedGenre == 99}"
-            >
-                다큐멘터리
-            </option>
-
-
-            <option
-                value="18"
-                th:selected="${selectedGenre == 18}"
-            >
-                드라마
-            </option>
-
-
-            <option
-                value="10751"
-                th:selected="${selectedGenre == 10751}"
-            >
-                가족
-            </option>
-
-
-            <option
-                value="14"
-                th:selected="${selectedGenre == 14}"
-            >
-                판타지
-            </option>
-
-
-            <option
-                value="36"
-                th:selected="${selectedGenre == 36}"
-            >
-                역사
-            </option>
-
-
-            <option
-                value="27"
-                th:selected="${selectedGenre == 27}"
-            >
-                공포
-            </option>
-
-
-            <option
-                value="10402"
-                th:selected="${selectedGenre == 10402}"
-            >
-                음악
-            </option>
-
-
-            <option
-                value="9648"
-                th:selected="${selectedGenre == 9648}"
-            >
-                미스터리
-            </option>
-
-
-            <option
-                value="10749"
-                th:selected="${selectedGenre == 10749}"
-            >
-                로맨스
-            </option>
-
-
-            <option
-                value="878"
-                th:selected="${selectedGenre == 878}"
-            >
-                SF
-            </option>
-
-
-            <option
-                value="53"
-                th:selected="${selectedGenre == 53}"
-            >
-                스릴러
-            </option>
-
-
-            <option
-                value="10752"
-                th:selected="${selectedGenre == 10752}"
-            >
-                전쟁
-            </option>
-
-
-            <option
-                value="37"
-                th:selected="${selectedGenre == 37}"
-            >
-                서부
-            </option>
-
-
-        </select>
-
-
-    </div>
-
-
-
-    <!-- =========================
-         영화 목록
-    ========================= -->
-
-    <section class="movie-grid">
-
-
-        <a
-            class="movie-card"
-
-            th:each="movie : ${movies}"
-
-            th:href="@{/movies/{id}(id=${movie.id})}"
-        >
-
-
-            <div class="poster-box">
-
-
-				<img
-				    th:src="${movie.posterUrl}"
-				    th:alt="${movie.title}"
-				    onerror="this.onerror=null; this.src='/poster/no-poster.png';"
-				>
-
-
-                <div
-                    class="no-poster"
-                    th:if="${movie.posterPath == null}"
-                >
-                    포스터 없음
+                <div class="filter-title">
+                    영화 상세 필터
                 </div>
 
 
-                <div
-                    class="rating"
-                    th:if="${movie.voteAverage != null}"
-                    th:text="'★ '
-                        + ${#numbers.formatDecimal(
-                            movie.voteAverage,
-                            1,
-                            1
-                        )}"
-                >
-                    ★ 0.0
+                <div class="filter-description">
+                    여러 조건을 동시에 선택할 수 있습니다.
                 </div>
 
 
             </div>
 
 
-            <div class="movie-info">
+
+            <form
+                class="filter-form"
+                action="/movies"
+                method="get"
+            >
 
 
-                <h2
-                    class="movie-title"
-                    th:text="${movie.title}"
+                <!-- 장르 -->
+
+                <select
+                    class="filter-select"
+                    name="genre"
                 >
-                    영화 제목
-                </h2>
+
+                    <option value="">
+                        장르 전체
+                    </option>
+
+                    <option
+                        value="28"
+                        th:selected="${selectedGenre == 28}"
+                    >
+                        액션
+                    </option>
+
+                    <option
+                        value="12"
+                        th:selected="${selectedGenre == 12}"
+                    >
+                        모험
+                    </option>
+
+                    <option
+                        value="16"
+                        th:selected="${selectedGenre == 16}"
+                    >
+                        애니메이션
+                    </option>
+
+                    <option
+                        value="35"
+                        th:selected="${selectedGenre == 35}"
+                    >
+                        코미디
+                    </option>
+
+                    <option
+                        value="80"
+                        th:selected="${selectedGenre == 80}"
+                    >
+                        범죄
+                    </option>
+
+                    <option
+                        value="18"
+                        th:selected="${selectedGenre == 18}"
+                    >
+                        드라마
+                    </option>
+
+                    <option
+                        value="14"
+                        th:selected="${selectedGenre == 14}"
+                    >
+                        판타지
+                    </option>
+
+                    <option
+                        value="27"
+                        th:selected="${selectedGenre == 27}"
+                    >
+                        공포
+                    </option>
+
+                    <option
+                        value="10749"
+                        th:selected="${selectedGenre == 10749}"
+                    >
+                        로맨스
+                    </option>
+
+                    <option
+                        value="878"
+                        th:selected="${selectedGenre == 878}"
+                    >
+                        SF
+                    </option>
+
+                    <option
+                        value="53"
+                        th:selected="${selectedGenre == 53}"
+                    >
+                        스릴러
+                    </option>
+
+                </select>
 
 
-				<!-- 개봉일 -->
 
-				<div
-				    class="movie-date"
-				    th:text="
-				        ${movie.releaseDate != null
-				        && !movie.releaseDate.isEmpty()}
-				        ? '개봉일 : '
-				          + ${movie.releaseDate}
-				        : '개봉일 정보 없음'
-				    "
-				>
-				    개봉일
-				</div>
+                <!-- 최소 평점 -->
+
+                <select
+                    class="filter-select"
+                    name="minRating"
+                >
+
+                    <option value="">
+                        최소 평점 전체
+                    </option>
+
+                    <option
+                        value="5"
+                        th:selected="${selectedMinRating == 5.0}"
+                    >
+                        5점 이상
+                    </option>
+
+                    <option
+                        value="6"
+                        th:selected="${selectedMinRating == 6.0}"
+                    >
+                        6점 이상
+                    </option>
+
+                    <option
+                        value="7"
+                        th:selected="${selectedMinRating == 7.0}"
+                    >
+                        7점 이상
+                    </option>
+
+                    <option
+                        value="8"
+                        th:selected="${selectedMinRating == 8.0}"
+                    >
+                        8점 이상
+                    </option>
+
+                    <option
+                        value="9"
+                        th:selected="${selectedMinRating == 9.0}"
+                    >
+                        9점 이상
+                    </option>
+
+                </select>
 
 
 
-				<!-- 장르 -->
+                <!-- 개봉연도 -->
 
-				<div
-				    class="movie-genres"
-				    th:if="${movie.genreNames != null
-				        && !movie.genreNames.isEmpty()}"
-				>
+                <select
+                    class="filter-select"
+                    name="year"
+                >
+
+                    <option value="">
+                        개봉연도 전체
+                    </option>
+
+                    <option
+                        value="2026"
+                        th:selected="${selectedYear == 2026}"
+                    >
+                        2026년
+                    </option>
+
+                    <option
+                        value="2025"
+                        th:selected="${selectedYear == 2025}"
+                    >
+                        2025년
+                    </option>
+
+                    <option
+                        value="2024"
+                        th:selected="${selectedYear == 2024}"
+                    >
+                        2024년
+                    </option>
+
+                    <option
+                        value="2023"
+                        th:selected="${selectedYear == 2023}"
+                    >
+                        2023년
+                    </option>
+
+                    <option
+                        value="2022"
+                        th:selected="${selectedYear == 2022}"
+                    >
+                        2022년
+                    </option>
+
+                    <option
+                        value="2021"
+                        th:selected="${selectedYear == 2021}"
+                    >
+                        2021년
+                    </option>
+
+                    <option
+                        value="2020"
+                        th:selected="${selectedYear == 2020}"
+                    >
+                        2020년
+                    </option>
+
+                    <option
+                        value="2019"
+                        th:selected="${selectedYear == 2019}"
+                    >
+                        2019년
+                    </option>
+
+                    <option
+                        value="2018"
+                        th:selected="${selectedYear == 2018}"
+                    >
+                        2018년
+                    </option>
+
+                    <option
+                        value="2017"
+                        th:selected="${selectedYear == 2017}"
+                    >
+                        2017년
+                    </option>
+
+                    <option
+                        value="2016"
+                        th:selected="${selectedYear == 2016}"
+                    >
+                        2016년
+                    </option>
+
+                    <option
+                        value="2015"
+                        th:selected="${selectedYear == 2015}"
+                    >
+                        2015년
+                    </option>
+
+                </select>
 
 
-				    <span
-				        class="movie-genre"
-				        th:each="genre : ${movie.genreNames}"
-				        th:text="${genre}"
-				    >
-				        장르
-				    </span>
+
+                <!-- OTT -->
+
+                <select
+                    class="filter-select"
+                    name="provider"
+                >
+
+                    <option value="">
+                        OTT 전체
+                    </option>
+
+                    <option
+                        value="8"
+                        th:selected="${selectedProvider == 8}"
+                    >
+                        Netflix
+                    </option>
+
+                    <option
+                        value="337"
+                        th:selected="${selectedProvider == 337}"
+                    >
+                        Disney+
+                    </option>
+
+                    <option
+                        value="97"
+                        th:selected="${selectedProvider == 97}"
+                    >
+                        Watcha
+                    </option>
+
+                    <option
+                        value="356"
+                        th:selected="${selectedProvider == 356}"
+                    >
+                        Wavve
+                    </option>
+
+                </select>
 
 
-				</div>
+
+                <button
+                    type="submit"
+                    class="filter-button"
+                >
+                    적용
+                </button>
+
+
+                <a
+                    href="/movies"
+                    class="filter-reset"
+                >
+                    초기화
+                </a>
+
+
+            </form>
+
+
+        </section>
 
 
 
-				<!-- 줄거리 -->
+        <!-- =========================
+             영화 목록
+        ========================= -->
 
-				<p
-				    class="movie-overview"
-				    th:text="
-				        ${movie.overview != null
-				        && !movie.overview.isEmpty()}
-				        ? ${movie.overview}
-				        : '줄거리 정보가 없습니다.'
-				    "
-				>
-				    줄거리
-				</p>
+        <section class="movie-grid">
 
+
+            <article
+                class="movie-card"
+                th:each="movie : ${movies}"
+            >
+
+
+                <a
+                    class="poster-link"
+                    th:href="@{/movies/{id}(id=${movie.id})}"
+                >
+
+
+                    <img
+                        class="movie-poster"
+                        th:src="${movie.posterUrl}"
+                        th:alt="${movie.title}"
+                        onerror="this.onerror=null; this.src='/poster/no-poster.png';"
+                    >
+
+
+                    <span
+                        class="movie-rating"
+                        th:if="${movie.voteAverage != null}"
+                        th:text="'★ '
+                            + ${#numbers.formatDecimal(
+                                movie.voteAverage,
+                                1,
+                                1
+                            )}"
+                    >
+                        ★ 0.0
+                    </span>
+
+
+                </a>
+
+
+
+                <div class="movie-info">
+
+
+                    <a
+                        class="movie-title"
+                        th:href="@{/movies/{id}(id=${movie.id})}"
+                        th:text="${movie.title}"
+                    >
+                        영화 제목
+                    </a>
+
+
+                    <div
+                        class="movie-date"
+                        th:text="
+                            ${movie.releaseDate != null
+                            && !movie.releaseDate.isEmpty()}
+                            ? '개봉일 : '
+                                + ${movie.releaseDate}
+                            : '개봉일 정보 없음'
+                        "
+                    >
+                        개봉일
+                    </div>
+
+
+
+                    <div
+                        class="movie-genres"
+                        th:if="${movie.genreNames != null
+                            && !movie.genreNames.isEmpty()}"
+                    >
+
+
+                        <span
+                            class="movie-genre"
+                            th:each="genreName : ${movie.genreNames}"
+                            th:text="${genreName}"
+                        >
+                            장르
+                        </span>
+
+
+                    </div>
+
+
+
+                    <p
+                        class="movie-overview"
+                        th:text="
+                            ${movie.overview != null
+                            && !movie.overview.isEmpty()}
+                            ? ${movie.overview}
+                            : '줄거리 정보가 없습니다.'
+                        "
+                    >
+                        줄거리
+                    </p>
+
+
+                </div>
+
+
+            </article>
+
+
+
+            <div
+                class="empty-result"
+                th:if="${movies == null
+                    || movies.isEmpty()}"
+            >
+
+                선택한 조건에 맞는 영화가 없습니다.<br><br>
+
+                다른 조건으로 검색해보세요.
 
             </div>
 
 
-        </a>
+        </section>
 
 
+
+        <!-- =========================
+             페이지
+        ========================= -->
 
         <div
-            class="no-results"
-            th:if="${movies == null || movies.isEmpty()}"
+            class="pagination"
+            th:if="${totalPages != null
+                && totalPages > 1}"
         >
 
-            <h3>
-                영화 검색 결과가 없습니다.
-            </h3>
 
-            <p>
-                다른 검색어나 장르를 선택해보세요.
-            </p>
+            <a
+                class="page-button"
+                th:classappend="${currentPage <= 1}
+                    ? ' disabled'
+                    : ''"
+                th:href="@{/movies(
+                    page=${currentPage - 1},
+                    query=${query},
+                    genre=${selectedGenre},
+                    minRating=${selectedMinRating},
+                    year=${selectedYear},
+                    provider=${selectedProvider}
+                )}"
+            >
+                이전
+            </a>
+
+
+
+            <a
+                class="page-button"
+                th:each="pageNumber :
+                    ${#numbers.sequence(
+                        startPage,
+                        endPage
+                    )}"
+                th:text="${pageNumber}"
+                th:classappend="${pageNumber == currentPage}
+                    ? ' active'
+                    : ''"
+                th:href="@{/movies(
+                    page=${pageNumber},
+                    query=${query},
+                    genre=${selectedGenre},
+                    minRating=${selectedMinRating},
+                    year=${selectedYear},
+                    provider=${selectedProvider}
+                )}"
+            >
+                1
+            </a>
+
+
+
+            <a
+                class="page-button"
+                th:classappend="${currentPage >= totalPages}
+                    ? ' disabled'
+                    : ''"
+                th:href="@{/movies(
+                    page=${currentPage + 1},
+                    query=${query},
+                    genre=${selectedGenre},
+                    minRating=${selectedMinRating},
+                    year=${selectedYear},
+                    provider=${selectedProvider}
+                )}"
+            >
+                다음
+            </a>
+
 
         </div>
 
 
-    </section>
-
-
-
-    <!-- =========================
-         페이지
-    ========================= -->
-
-    <div
-        class="pagination"
-        th:if="${totalPages > 1}"
-    >
-
-
-        <!-- 이전 -->
-        <a
-            class="page-button"
-
-            th:classappend="
-                ${currentPage <= 1}
-                ? ' disabled'
-                : ''
-            "
-
-            th:href="@{/movies(
-                page=${currentPage - 1},
-                query=${query},
-                genre=${selectedGenre}
-            )}"
-        >
-            ← 이전
-        </a>
-
-
-
-        <!-- 페이지 번호 -->
-        <a
-            class="page-button"
-
-            th:each="
-                pageNumber :
-                ${#numbers.sequence(
-                    startPage,
-                    endPage
-                )}
-            "
-
-            th:text="${pageNumber}"
-
-            th:classappend="
-                ${pageNumber == currentPage}
-                ? ' active'
-                : ''
-            "
-
-            th:href="@{/movies(
-                page=${pageNumber},
-                query=${query},
-                genre=${selectedGenre}
-            )}"
-        >
-            1
-        </a>
-
-
-
-        <!-- 다음 -->
-        <a
-            class="page-button"
-
-            th:classappend="
-                ${currentPage >= totalPages}
-                ? ' disabled'
-                : ''
-            "
-
-            th:href="@{/movies(
-                page=${currentPage + 1},
-                query=${query},
-                genre=${selectedGenre}
-            )}"
-        >
-            다음 →
-        </a>
-
-
-    </div>
-
-
-
-    <div
-        class="page-info"
-        th:if="${totalPages > 1}"
-        th:text="
-            ${currentPage}
-            + ' / '
-            + ${totalPages}
-            + ' 페이지'
-        "
-    >
-        1 / 1 페이지
     </div>
 
 
@@ -1315,46 +1615,146 @@
 <script>
 
 
-    // ==========================================
-    // 장르 변경
-    // ==========================================
-    function changeGenre() {
+    document.addEventListener(
+
+        "DOMContentLoaded",
+
+        function () {
 
 
-        const genre =
-            document
-                .getElementById(
-                    "genreSelect"
-                )
-                .value;
+            const form =
+                document.getElementById(
+                    "movieSearchForm"
+                );
 
 
-        if (genre === "") {
+            const input =
+                document.getElementById(
+                    "movieSearchInput"
+                );
 
 
-            // 전체 인기영화
-            window.location.href =
-                "/movies";
+            const error =
+                document.getElementById(
+                    "searchErrorMessage"
+                );
 
 
-        } else {
+            if (
+                !form ||
+                !input ||
+                !error
+            ) {
+
+                return;
+
+            }
 
 
-            // 선택한 장르
-            window.location.href =
-                "/movies?genre="
-                + genre
-                + "&page=1";
+            form.addEventListener(
+
+                "submit",
+
+                function (
+                    event
+                ) {
+
+
+                    const keyword =
+                        input
+                            .value
+                            .trim();
+
+
+                    if (
+                        keyword === ""
+                    ) {
+
+
+                        event.preventDefault();
+
+
+                        error.textContent =
+                            "검색할 영화 제목을 입력해 주세요.";
+
+
+                        input
+                            .classList
+                            .add(
+                                "error"
+                            );
+
+
+                        input.focus();
+
+
+                        return;
+
+                    }
+
+
+                    error.textContent =
+                        "";
+
+
+                    input
+                        .classList
+                        .remove(
+                            "error"
+                        );
+
+                }
+
+            );
+
+
+            input.addEventListener(
+
+                "input",
+
+                function () {
+
+
+                    if (
+                        input
+                            .value
+                            .trim()
+                            .length > 0
+                    ) {
+
+
+                        error.textContent =
+                            "";
+
+
+                        input
+                            .classList
+                            .remove(
+                                "error"
+                            );
+
+                    }
+
+                }
+
+            );
+
 
         }
 
-    }
+    );
 
 
 </script>
 
 
-<script src="/js/auth-header.js" defer></script>
+
+<script
+    src="/js/auth-header.js"
+    defer
+></script>
+
+
 </body>
 
 </html>

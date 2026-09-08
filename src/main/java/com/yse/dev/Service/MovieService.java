@@ -168,6 +168,135 @@ public class MovieService {
                 Map.class
         );
     }
+    
+ // ==========================================
+ // 복합 필터 영화 조회
+ // 장르 + 최소평점 + 개봉연도 + OTT
+ // ==========================================
+ public Map<String, Object> getFilteredMovies(
+         Integer genre,
+         Double minRating,
+         Integer year,
+         Integer provider,
+         int page) {
+
+
+     UriComponentsBuilder builder =
+             UriComponentsBuilder
+                     .fromUriString(
+                             baseUrl
+                             + "/discover/movie"
+                     )
+                     .queryParam(
+                             "api_key",
+                             apiKey
+                     )
+                     .queryParam(
+                             "language",
+                             "ko-KR"
+                     )
+                     .queryParam(
+                             "include_adult",
+                             false
+                     )
+                     .queryParam(
+                             "sort_by",
+                             "popularity.desc"
+                     )
+                     .queryParam(
+                             "page",
+                             page
+                     );
+
+
+     // ==========================================
+     // 장르
+     // ==========================================
+
+     if (genre != null) {
+
+         builder.queryParam(
+                 "with_genres",
+                 genre
+         );
+
+     }
+
+
+     // ==========================================
+     // 최소 평점
+     // ==========================================
+
+     if (
+         minRating != null &&
+         minRating > 0
+     ) {
+
+         builder.queryParam(
+                 "vote_average.gte",
+                 minRating
+         );
+
+     }
+
+
+     // ==========================================
+     // 개봉연도
+     // ==========================================
+
+     if (year != null) {
+
+         builder.queryParam(
+                 "primary_release_date.gte",
+                 year + "-01-01"
+         );
+
+         builder.queryParam(
+                 "primary_release_date.lte",
+                 year + "-12-31"
+         );
+
+     }
+
+
+     // ==========================================
+     // OTT
+     // 대한민국 기준
+     // ==========================================
+
+     if (provider != null) {
+
+         builder.queryParam(
+                 "watch_region",
+                 "KR"
+         );
+
+         builder.queryParam(
+                 "with_watch_providers",
+                 provider
+         );
+
+         builder.queryParam(
+                 "with_watch_monetization_types",
+                 "flatrate"
+         );
+
+     }
+
+
+     URI uri =
+             builder
+                     .build()
+                     .encode()
+                     .toUri();
+
+
+     return restTemplate.getForObject(
+             uri,
+             Map.class
+     );
+
+ }
 
 
 
