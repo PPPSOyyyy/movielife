@@ -26,11 +26,11 @@ public class MovieController {
 
 
     // ==========================================
-    // 영화 목록
-    // 검색 + 장르 + 복합필터
+    // 영화
+    // 전체 영화 + 검색 + 복합필터
     // ==========================================
 
-    @GetMapping({"/movies", "/movie-list"})
+    @GetMapping("/movies")
     public String movieList(
 
             @RequestParam(
@@ -72,23 +72,15 @@ public class MovieController {
             Model model) {
 
 
-        /*
-         * 잘못된 페이지값 방지
-         */
-
         if (page < 1) {
-
             page = 1;
-
         }
 
 
         Map<String, Object> response;
 
-
         String pageTitle =
-                "지금 인기있는 영화";
-
+                "전체 영화";
 
 
         // ==========================================
@@ -111,7 +103,6 @@ public class MovieController {
             pageTitle =
                     "'" + query.trim()
                     + "' 검색 결과";
-
 
         }
 
@@ -151,19 +142,242 @@ public class MovieController {
 
 
         // ==========================================
-        // 기본 인기영화
+        // 기본 전체 영화
+        // 인기영화 전용 API를 사용하지 않음
         // ==========================================
 
         else {
 
 
             response =
-                    movieService.getPopularMovies(
+                    movieService.getFilteredMovies(
+
+                            null,
+                            null,
+                            null,
+                            null,
                             page
+
                     );
 
         }
 
+
+        addMovieListModel(
+                model,
+                response,
+                page,
+                pageTitle,
+                "all",
+                query,
+                genre,
+                minRating,
+                year,
+                provider
+        );
+
+
+        return "movie-list";
+    }
+
+
+
+    // ==========================================
+    // 인기 영화
+    // TMDB Popular
+    // ==========================================
+
+    @GetMapping("/movies/popular")
+    public String popularMovies(
+
+            @RequestParam(
+                    value = "page",
+                    defaultValue = "1"
+            )
+            int page,
+
+            Model model) {
+
+
+        if (page < 1) {
+            page = 1;
+        }
+
+
+        Map<String, Object> response =
+                movieService.getPopularMovies(
+                        page
+                );
+
+
+        addMovieListModel(
+                model,
+                response,
+                page,
+                "현재 인기 영화",
+                "popular",
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+
+        return "movie-list";
+    }
+
+
+
+    // ==========================================
+    // 평점 높은 영화
+    // TMDB Top Rated
+    // ==========================================
+
+    @GetMapping("/movies/top-rated")
+    public String topRatedMovies(
+
+            @RequestParam(
+                    value = "page",
+                    defaultValue = "1"
+            )
+            int page,
+
+            Model model) {
+
+
+        if (page < 1) {
+            page = 1;
+        }
+
+
+        Map<String, Object> response =
+                movieService.getTopRatedMovies(
+                        page
+                );
+
+
+        addMovieListModel(
+                model,
+                response,
+                page,
+                "평점 높은 영화",
+                "topRated",
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+
+        return "movie-list";
+    }
+
+
+
+    // ==========================================
+    // 개봉 예정 영화
+    // TMDB Upcoming
+    // ==========================================
+
+    @GetMapping("/movies/upcoming")
+    public String upcomingMovies(
+
+            @RequestParam(
+                    value = "page",
+                    defaultValue = "1"
+            )
+            int page,
+
+            Model model) {
+
+
+        if (page < 1) {
+            page = 1;
+        }
+
+
+        Map<String, Object> response =
+                movieService.getUpcomingMovies(
+                        page
+                );
+
+
+        addMovieListModel(
+                model,
+                response,
+                page,
+                "개봉 예정 영화",
+                "upcoming",
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+
+        return "movie-list";
+    }
+
+
+
+    // ==========================================
+    // 영화 상세페이지
+    // ==========================================
+
+    @GetMapping("/movies/{movieId}")
+    public String movieDetail(
+
+            @PathVariable("movieId")
+            Long movieId,
+
+            Model model) {
+
+
+        MovieDetailDto movie =
+                movieService.getMovieDetail(
+                        movieId
+                );
+
+
+        model.addAttribute(
+                "movie",
+                movie
+        );
+
+
+        return "movie-detail";
+    }
+
+
+
+    // ==========================================
+    // 영화 목록 공통 Model 처리
+    // ==========================================
+
+    private void addMovieListModel(
+
+            Model model,
+
+            Map<String, Object> response,
+
+            int page,
+
+            String pageTitle,
+
+            String listType,
+
+            String query,
+
+            Integer genre,
+
+            Double minRating,
+
+            Integer year,
+
+            Integer provider) {
 
 
         // ==========================================
@@ -174,7 +388,6 @@ public class MovieController {
                 movieService.convertToMovieList(
                         response
                 );
-
 
 
         // ==========================================
@@ -189,19 +402,9 @@ public class MovieController {
                 );
 
 
-        /*
-         * TMDB는 최대 페이지가 많을 수 있으므로
-         * 화면에서는 최대 500까지만
-         */
-
-        if (
-            totalPages > 500
-        ) {
-
+        if (totalPages > 500) {
             totalPages = 500;
-
         }
-
 
 
         // ==========================================
@@ -231,9 +434,7 @@ public class MovieController {
                             1,
                             endPage - 4
                     );
-
         }
-
 
 
         // ==========================================
@@ -306,39 +507,10 @@ public class MovieController {
         );
 
 
-        return "movie-list";
-
-    }
-
-
-
-    // ==========================================
-    // 영화 상세페이지
-    // ==========================================
-
-    @GetMapping("/movies/{movieId}")
-    public String movieDetail(
-
-            @PathVariable("movieId")
-            Long movieId,
-
-            Model model) {
-
-
-        MovieDetailDto movie =
-                movieService.getMovieDetail(
-                        movieId
-                );
-
-
         model.addAttribute(
-                "movie",
-                movie
+                "listType",
+                listType
         );
-
-
-        return "movie-detail";
-
     }
 
 
@@ -348,17 +520,17 @@ public class MovieController {
     // ==========================================
 
     private int getNumber(
+
             Map<String, Object> response,
+
             String key,
+
             int defaultValue) {
 
 
-        if (
-            response == null
-        ) {
+        if (response == null) {
 
             return defaultValue;
-
         }
 
 
@@ -368,18 +540,14 @@ public class MovieController {
                 );
 
 
-        if (
-            value instanceof Number
-        ) {
+        if (value instanceof Number) {
 
             return ((Number) value)
                     .intValue();
-
         }
 
 
         return defaultValue;
-
     }
 
 }
