@@ -37,7 +37,7 @@ public class MemberController {
     // 회원가입
     // ==========================================
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(
+    public ResponseEntity<?> signup(
             @RequestBody MemberDto memberDto) {
 
         try {
@@ -48,7 +48,7 @@ public class MemberController {
 
 
             return ResponseEntity.ok(
-                    "회원가입이 성공적으로 완료되었습니다."
+                    Map.of("message", "회원가입이 성공적으로 완료되었습니다.")
             );
 
 
@@ -57,7 +57,7 @@ public class MemberController {
             return ResponseEntity
                     .badRequest()
                     .body(
-                            e.getMessage()
+                            Map.of("message", e.getMessage())
                     );
 
         }
@@ -70,7 +70,7 @@ public class MemberController {
     // 로그인
     // ==========================================
     @PostMapping("/login")
-    public ResponseEntity<String> login(
+    public ResponseEntity<?> login(
             @RequestBody LoginDto loginDto,
             HttpSession session, HttpServletRequest request) {
 
@@ -92,7 +92,11 @@ public class MemberController {
 
 
             return ResponseEntity.ok(
-                    "로그인에 성공했습니다."
+                    Map.of(
+                            "message", "로그인에 성공했습니다.",
+                            "userId", member.getUserId(),
+                            "nickname", member.getNickname()
+                    )
             );
 
 
@@ -101,7 +105,7 @@ public class MemberController {
             return ResponseEntity
                     .badRequest()
                     .body(
-                            e.getMessage()
+                            Map.of("message", e.getMessage())
                     );
 
         }
@@ -129,7 +133,7 @@ public class MemberController {
             return ResponseEntity
                     .status(401)
                     .body(
-                            "로그인이 필요합니다."
+                            Map.of("message", "로그인이 필요합니다.")
                     );
 
         }
@@ -164,7 +168,7 @@ public class MemberController {
     // 로그아웃
     // ==========================================
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(
+    public ResponseEntity<?> logout(
             HttpSession session) {
 
 
@@ -183,7 +187,7 @@ public class MemberController {
     // 프로필 수정
     // ==========================================
     @PutMapping("/profile")
-    public ResponseEntity<String> updateProfile(
+    public ResponseEntity<?> updateProfile(
             @RequestBody ProfileDto profileDto,
             HttpSession session) {
 
@@ -199,7 +203,7 @@ public class MemberController {
             return ResponseEntity
                     .status(401)
                     .body(
-                            "로그인이 필요합니다."
+                            Map.of("message", "로그인이 필요합니다.")
                     );
 
         }
@@ -214,7 +218,7 @@ public class MemberController {
 
 
             return ResponseEntity.ok(
-                    "프로필 정보가 수정되었습니다."
+                    Map.of("message", "프로필 정보가 수정되었습니다.")
             );
 
 
@@ -223,7 +227,7 @@ public class MemberController {
             return ResponseEntity
                     .badRequest()
                     .body(
-                            e.getMessage()
+                            Map.of("message", e.getMessage())
                     );
 
         }
@@ -236,7 +240,7 @@ public class MemberController {
     // 회원 탈퇴
     // ==========================================
     @DeleteMapping("/withdraw")
-    public ResponseEntity<String> withdraw(
+    public ResponseEntity<?> withdraw(
 
             @RequestBody WithdrawDto withdrawDto,
 
@@ -255,7 +259,7 @@ public class MemberController {
             return ResponseEntity
                     .status(401)
                     .body(
-                            "로그인이 필요합니다."
+                            Map.of("message", "로그인이 필요합니다.")
                     );
 
         }
@@ -282,7 +286,7 @@ public class MemberController {
 
 
             return ResponseEntity.ok(
-                    "회원 탈퇴 처리가 완료되었습니다."
+                    Map.of("message", "회원 탈퇴 처리가 완료되었습니다.")
             );
 
 
@@ -291,7 +295,7 @@ public class MemberController {
             return ResponseEntity
                     .badRequest()
                     .body(
-                            e.getMessage()
+                            Map.of("message", e.getMessage())
                     );
 
         }

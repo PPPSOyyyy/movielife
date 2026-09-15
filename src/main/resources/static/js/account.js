@@ -22,7 +22,6 @@
     button.disabled=true;
     try{await ML.request('/api/members/login',ML.json('POST',{userId:$('#loginUserId').value.trim(),password:$('#loginPassword').value}));
     await ML.request('/api/members/me');
-    await ML.dialog({title:'로그인되었습니다',message:'movieLife에 오신 것을 환영합니다.'});
     location.href=returnUrl;
     }
     catch(e){error.textContent=e.message;
