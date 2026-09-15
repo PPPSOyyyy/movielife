@@ -26,6 +26,8 @@ public class MovieDto {
     // 포스터 경로
     private String posterPath;
 
+    private String backdropPath;
+
     // 개봉일
     private String releaseDate;
 
@@ -34,6 +36,9 @@ public class MovieDto {
 
     // 장르 번호 목록
     private List<Integer> genreIds;
+
+    // OTT 제공처
+    private List<String> ottProviders;
 
 
     // ==========================================
@@ -72,10 +77,8 @@ public class MovieDto {
 
     public List<String> getGenreNames() {
 
-
         List<String> genreNames =
                 new ArrayList<>();
-
 
         if (
             genreIds == null ||
@@ -86,13 +89,10 @@ public class MovieDto {
 
         }
 
-
         for (Integer genreId : genreIds) {
-
 
             String genreName =
                     GENRE_MAP.get(genreId);
-
 
             if (genreName != null) {
 
@@ -103,7 +103,6 @@ public class MovieDto {
             }
 
         }
-
 
         return genreNames;
 
@@ -121,11 +120,15 @@ public class MovieDto {
             posterPath.isBlank()
         ) {
 
-            return "/poster/no-poster.png";
+            return "/poster/no-poster.svg";
         }
 
         return "https://image.tmdb.org/t/p/w500"
                 + posterPath;
     }
 
+
+    public String getBackdropUrl() {
+        return backdropPath == null || backdropPath.isBlank() ? "" : "https://image.tmdb.org/t/p/w1280" + backdropPath;
+    }
 }

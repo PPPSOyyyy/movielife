@@ -1,6 +1,7 @@
 package com.yse.dev.Service;
 
 import java.util.List;
+import com.yse.dev.Repository.MemberRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,8 @@ public class ReviewService {
     private final ReviewRepository
             reviewRepository;
 
+    private final MemberRepository memberRepository;
+
 
 
     // ==========================================
@@ -35,6 +38,13 @@ public class ReviewService {
             Long movieId,
             Integer rating,
             String content) {
+        if (movieId == null || movieId <= 0) throw new IllegalArgumentException("영화 정보가 올바르지 않습니다.");
+        memberRepository.findByUserIdForUpdate(userId)
+                .orElseThrow(() -> new IllegalArgumentException("로그인이 필요합니다."));
+        if (reviewRepository.countByUserIdAndMovieId(userId, movieId) > 0) {
+            throw new IllegalArgumentException("이미 작성한 리뷰가 있습니다. 기존 리뷰를 수정해 주세요.");
+        }
+
 
 
         validateReview(
@@ -212,7 +222,7 @@ public class ReviewService {
 
 
         return reviewRepository
-                .findByUserId(
+                .findByUserIdOrderByCreatedAtDesc(
                         userId
                 );
 

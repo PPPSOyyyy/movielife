@@ -1,0 +1,37 @@
+<!doctype html><html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0c10">
+  <title>회원가입 | movieLife</title>
+  <link rel="stylesheet" href="../src/main/resources/static/css/app.css">
+  </head>
+<body class="ml-app">
+<div style="padding:12px 20px;background:#fff4d8;color:#563d10;font:13px/1.6 sans-serif;text-align:center">샘플 데이터를 사용한 <strong>디자인 미리보기</strong>입니다. 실제 영화 조회·로그인·저장은 Spring Boot 실행 후 이용해 주세요.<br><a href="preview-home.html">홈</a> · <a href="preview-movies.html">영화</a> · <a href="preview-detail.html">상세</a> · <a href="preview-mypage.html">마이페이지</a> · <a href="preview-login.html">로그인</a> · <a href="preview-signup.html">회원가입</a></div><a class="ml-skip" href="#main">본문으로 이동</a>
+  <header class="ml-header"><div class="ml-header-inner">
+    <a href="preview-home.html" class="ml-brand" aria-label="movieLife 홈"><img src="../src/main/resources/static/images/logo.png" alt="movieLife" width="158" height="57"></a>
+    <nav class="ml-nav" aria-label="주 메뉴">
+      <a href="preview-home.html" data-nav="home">홈</a><a href="preview-movies.html" data-nav="movies">영화</a>
+      <a href="#" data-nav="domestic">국내영화</a><a href="#" data-nav="foreign">해외영화</a>
+      <a href="#" data-nav="recommend">영화추천</a><a href="#" data-nav="ott">OTT</a><a href="preview-mypage.html" data-nav="mypage">마이페이지</a>
+    </nav>
+    <form class="ml-search" action="/movies" method="get" role="search" onsubmit="return false">
+      <input type="search" name="query" placeholder="영화 제목을 검색해 보세요" aria-label="영화 제목 검색" maxlength="100" required value="">
+      <button type="button" aria-label="검색"><svg width="17" height="17" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m16 16 5 5"></path></svg></button>
+    </form>
+    <div class="ml-auth"><a href="preview-login.html" data-login-link>로그인</a><a href="preview-signup.html" class="signup-link">회원가입</a></div>
+  </div></header>
+
+<main id="main" class="shell auth-page"><section class="auth-intro"><p class="eyebrow">START YOUR MOVIELIFE</p><h1>취향을 발견하는<br><span>첫 번째 장면.</span></h1><p>마음에 드는 영화를 모으고,<br>나만의 별점과 리뷰를 남겨 보세요.</p><div class="auth-note">좋은 영화가 남기는 여운, movieLife와 함께.</div></section>
+  <section class="auth-card"><h2>회원가입</h2><p>나만의 영화 기록을 시작해 보세요.</p><form id="signupForm" class="form-stack" onsubmit="return false">
+    <label class="field"><span>아이디</span><div class="field-row"><input id="signupUserId" name="userId" autocomplete="username" placeholder="영문, 숫자, 밑줄 4~20자" minlength="4" maxlength="20" pattern="[A-Za-z0-9_]{4,20}" required><button class="btn" type="button" data-check="userId">중복확인</button></div><small id="userIdCheck" aria-live="polite"></small></label>
+    <label class="field"><span>닉네임</span><div class="field-row"><input id="signupNickname" name="nickname" placeholder="한글, 영문, 숫자, 밑줄 2~20자" minlength="2" maxlength="20" pattern="[가-힣A-Za-z0-9_]{2,20}" required><button class="btn" type="button" data-check="nickname">중복확인</button></div><small id="nicknameCheck" aria-live="polite"></small></label>
+    <label class="field"><span>비밀번호</span><div class="password-field"><input id="signupPassword" name="password" type="password" autocomplete="new-password" placeholder="영문, 숫자, 특수문자 포함 8자 이상" minlength="8" maxlength="50" required><button type="button" data-password-toggle="signupPassword" aria-label="비밀번호 표시">보기</button></div><small>8~50자 · 공백 제외 · 최대 72바이트</small></label>
+    <label class="field"><span>비밀번호 확인</span><input id="signupPasswordConfirm" type="password" autocomplete="new-password" placeholder="비밀번호를 한 번 더 입력해 주세요" minlength="8" maxlength="50" required></label>
+    <p class="error-text" id="signupError" role="alert"></p><button class="btn btn-primary btn-wide" type="button">회원가입</button>
+  </form><p class="auth-bottom">이미 회원이신가요?<a href="preview-login.html" id="loginReturnLink">로그인</a></p></section>
+</main>
+<footer class="ml-footer"><div class="shell footer-inner">
+  <div><a href="preview-home.html" class="footer-brand">movie<span>Life</span></a><p>영화를 발견하고, 나만의 감상을 기록하는 공간.</p></div>
+  <div class="footer-meta"><p>영화 정보 · TMDB / 시청 정보 · JustWatch</p><p>This product uses the TMDB API but is not endorsed or certified by TMDB.</p><p>© movieLife · Team Project</p></div>
+</div></footer>
+</body></html>

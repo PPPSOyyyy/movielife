@@ -1,0 +1,124 @@
+<!doctype html><html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0c10">
+  <title>당신의 인생작품을 찾아보세요 | movieLife</title>
+  <link rel="stylesheet" href="../src/main/resources/static/css/app.css">
+  </head>
+<body class="ml-app">
+<div style="padding:12px 20px;background:#fff4d8;color:#563d10;font:13px/1.6 sans-serif;text-align:center">샘플 데이터를 사용한 <strong>디자인 미리보기</strong>입니다. 실제 영화 조회·로그인·저장은 Spring Boot 실행 후 이용해 주세요.<br><a href="preview-home.html">홈</a> · <a href="preview-movies.html">영화</a> · <a href="preview-detail.html">상세</a> · <a href="preview-mypage.html">마이페이지</a> · <a href="preview-login.html">로그인</a> · <a href="preview-signup.html">회원가입</a></div><a class="ml-skip" href="#main">본문으로 이동</a>
+  <header class="ml-header"><div class="ml-header-inner">
+    <a href="preview-home.html" class="ml-brand" aria-label="movieLife 홈"><img src="../src/main/resources/static/images/logo.png" alt="movieLife" width="158" height="57"></a>
+    <nav class="ml-nav" aria-label="주 메뉴">
+      <a href="preview-home.html" data-nav="home" class="active">홈</a><a href="preview-movies.html" data-nav="movies">영화</a>
+      <a href="#" data-nav="domestic">국내영화</a><a href="#" data-nav="foreign">해외영화</a>
+      <a href="#" data-nav="recommend">영화추천</a><a href="#" data-nav="ott">OTT</a><a href="preview-mypage.html" data-nav="mypage">마이페이지</a>
+    </nav>
+    <form class="ml-search" action="/movies" method="get" role="search" onsubmit="return false">
+      <input type="search" name="query" placeholder="영화 제목을 검색해 보세요" aria-label="영화 제목 검색" maxlength="100" required value="">
+      <button type="button" aria-label="검색"><svg width="17" height="17" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m16 16 5 5"></path></svg></button>
+    </form>
+    <div class="ml-auth"><a href="preview-login.html" data-login-link>로그인</a><a href="preview-signup.html" class="signup-link">회원가입</a></div>
+  </div></header>
+
+<main id="main" class="shell home-main">
+  <section class="hero">
+    <div><p class="eyebrow">A FILM FOR YOUR LIFE</p><h1>오늘의 영화가,<br>내일의 <span>인생작품.</span></h1>
+      <p class="hero-description">취향에 맞는 영화를 발견하고,<br>오래 기억하고 싶은 순간을 기록해 보세요.</p>
+      <div class="actions"><a class="btn btn-primary" href="preview-movies.html">영화 둘러보기 <span aria-hidden="true">↗</span></a><a class="btn btn-ghost" href="#">내가 찜한 영화</a></div>
+    </div>
+    <div class="hero-pick">
+      <div class="hero-pick-info"><span class="badge">TODAY'S PICK</span><h2>오래 남는 여름</h2><p class="small muted"><span class="gold">★ <span>8.4</span></span> · TMDB</p></div>
+      <a href="preview-detail.html"><img class="hero-poster" data-poster src="../src/main/resources/static/poster/no-poster.svg"></a>
+    </div>
+    </section>
+  <div class="quick-bar"><a href="preview-movies.html"><div><strong>평점 높은 영화</strong><span>많은 관객이 선택한 작품</span></div><span class="quick-arrow">↗</span></a><a href="preview-movies.html"><div><strong>개봉 예정 영화</strong><span>곧 극장에서 만날 이야기</span></div><span class="quick-arrow">↗</span></a><a href="#"><div><strong>OTT에서 찾아보기</strong><span>오늘, 집에서 즐기는 영화</span></div><span class="quick-arrow">↗</span></a></div>
+  <section class="section"><div class="section-head"><div><p class="eyebrow">TRENDING NOW</p><h2>지금 주목받는 영화</h2></div><a class="text-link" href="preview-movies.html">전체 보기 →</a></div>
+    <div class="movie-grid compact"><article class="movie-card">
+  <div class="poster-wrap">
+    <a href="preview-detail.html" aria-label="오래 남는 여름 상세 보기"><img loading="lazy" width="240" height="360" data-poster src="../src/main/resources/static/poster/no-poster.svg"></a>
+    <span class="rating-badge">★ <span>8.4</span></span>
+    <button type="button" class="favorite-toggle" aria-label="찜하기" aria-pressed="false" data-favorite="1" data-title="오래 남는 여름">♡</button>
+  </div>
+  <div class="movie-info"><h3><a href="preview-detail.html">오래 남는 여름</a></h3><p>2026-09-24</p></div>
+</article><article class="movie-card">
+  <div class="poster-wrap">
+    <a href="#" aria-label="어느 멋진 하루 상세 보기"><img loading="lazy" width="240" height="360" data-poster src="../src/main/resources/static/poster/no-poster.svg"></a>
+    <span class="rating-badge">★ <span>8.1</span></span>
+    <button type="button" class="favorite-toggle" aria-label="찜하기" aria-pressed="false" data-favorite="2" data-title="어느 멋진 하루">♡</button>
+  </div>
+  <div class="movie-info"><h3><a href="#">어느 멋진 하루</a></h3><p>2026-09-24</p></div>
+</article><article class="movie-card">
+  <div class="poster-wrap">
+    <a href="#" aria-label="달빛 아래에서 상세 보기"><img loading="lazy" width="240" height="360" data-poster src="../src/main/resources/static/poster/no-poster.svg"></a>
+    <span class="rating-badge">★ <span>7.8</span></span>
+    <button type="button" class="favorite-toggle" aria-label="찜하기" aria-pressed="false" data-favorite="3" data-title="달빛 아래에서">♡</button>
+  </div>
+  <div class="movie-info"><h3><a href="#">달빛 아래에서</a></h3><p>2026-09-24</p></div>
+</article><article class="movie-card">
+  <div class="poster-wrap">
+    <a href="#" aria-label="우리의 다음 장면 상세 보기"><img loading="lazy" width="240" height="360" data-poster src="../src/main/resources/static/poster/no-poster.svg"></a>
+    <span class="rating-badge">★ <span>7.5</span></span>
+    <button type="button" class="favorite-toggle" aria-label="찜하기" aria-pressed="false" data-favorite="4" data-title="우리의 다음 장면">♡</button>
+  </div>
+  <div class="movie-info"><h3><a href="#">우리의 다음 장면</a></h3><p>2026-09-24</p></div>
+</article><article class="movie-card">
+  <div class="poster-wrap">
+    <a href="#" aria-label="여행의 끝 상세 보기"><img loading="lazy" width="240" height="360" data-poster src="../src/main/resources/static/poster/no-poster.svg"></a>
+    <span class="rating-badge">★ <span>7.2</span></span>
+    <button type="button" class="favorite-toggle" aria-label="찜하기" aria-pressed="false" data-favorite="5" data-title="여행의 끝">♡</button>
+  </div>
+  <div class="movie-info"><h3><a href="#">여행의 끝</a></h3><p>2026-09-24</p></div>
+</article></div>
+    </section>
+  <section class="section two-panels">
+    <article class="panel feature-panel"><div><span class="feature-label">BEST MOVIE</span><h2>한 편의 좋은 영화.</h2><p>오래 남는 여름</p><a class="btn btn-sm" href="preview-movies.html">평점 높은 영화 보기 →</a></div><img class="feature-poster" data-poster src="../src/main/resources/static/poster/no-poster.svg"></article>
+    <article class="panel feature-panel"><div><span class="feature-label">MY COLLECTION</span><h2>다음에 보고 싶은 영화.</h2><p>달빛 아래에서</p><a class="btn btn-sm" href="#">내가 찜한 영화 →</a></div><img class="feature-poster" data-poster src="../src/main/resources/static/poster/no-poster.svg"></article>
+  </section>
+  <section class="section" data-ott-section data-limit="5"><div class="section-head"><div><p class="eyebrow">ON YOUR SCREEN</p><h2>OTT에서 지금 볼 수 있는 영화</h2></div><a href="#" class="text-link">전체 보기 →</a></div>
+    <div class="provider-tabs" role="group" aria-label="OTT 서비스 선택">
+    <button type="button" data-provider="8" aria-pressed="true">Netflix</button><button type="button" data-provider="337" aria-pressed="false">Disney+</button><button type="button" data-provider="356" aria-pressed="false">TVING</button><button type="button" data-provider="309" aria-pressed="false">Wavve</button><button type="button" data-provider="97" aria-pressed="false">Watcha</button>
+  </div><div class="movie-grid compact" data-ott-results aria-live="polite"><article class="movie-card">
+  <div class="poster-wrap">
+    <a href="preview-detail.html" aria-label="오래 남는 여름 상세 보기"><img loading="lazy" width="240" height="360" data-poster src="../src/main/resources/static/poster/no-poster.svg"></a>
+    <span class="rating-badge">★ <span>8.4</span></span>
+    <button type="button" class="favorite-toggle" aria-label="찜하기" aria-pressed="false" data-favorite="1" data-title="오래 남는 여름">♡</button>
+  </div>
+  <div class="movie-info"><h3><a href="preview-detail.html">오래 남는 여름</a></h3><p>2026-09-24</p></div>
+</article><article class="movie-card">
+  <div class="poster-wrap">
+    <a href="preview-detail.html" aria-label="어느 멋진 하루 상세 보기"><img loading="lazy" width="240" height="360" data-poster src="../src/main/resources/static/poster/no-poster.svg"></a>
+    <span class="rating-badge">★ <span>8.1</span></span>
+    <button type="button" class="favorite-toggle" aria-label="찜하기" aria-pressed="false" data-favorite="2" data-title="어느 멋진 하루">♡</button>
+  </div>
+  <div class="movie-info"><h3><a href="preview-detail.html">어느 멋진 하루</a></h3><p>2026-09-24</p></div>
+</article><article class="movie-card">
+  <div class="poster-wrap">
+    <a href="preview-detail.html" aria-label="달빛 아래에서 상세 보기"><img loading="lazy" width="240" height="360" data-poster src="../src/main/resources/static/poster/no-poster.svg"></a>
+    <span class="rating-badge">★ <span>7.8</span></span>
+    <button type="button" class="favorite-toggle" aria-label="찜하기" aria-pressed="false" data-favorite="3" data-title="달빛 아래에서">♡</button>
+  </div>
+  <div class="movie-info"><h3><a href="preview-detail.html">달빛 아래에서</a></h3><p>2026-09-24</p></div>
+</article><article class="movie-card">
+  <div class="poster-wrap">
+    <a href="preview-detail.html" aria-label="우리의 다음 장면 상세 보기"><img loading="lazy" width="240" height="360" data-poster src="../src/main/resources/static/poster/no-poster.svg"></a>
+    <span class="rating-badge">★ <span>7.5</span></span>
+    <button type="button" class="favorite-toggle" aria-label="찜하기" aria-pressed="false" data-favorite="4" data-title="우리의 다음 장면">♡</button>
+  </div>
+  <div class="movie-info"><h3><a href="preview-detail.html">우리의 다음 장면</a></h3><p>2026-09-24</p></div>
+</article><article class="movie-card">
+  <div class="poster-wrap">
+    <a href="preview-detail.html" aria-label="여행의 끝 상세 보기"><img loading="lazy" width="240" height="360" data-poster src="../src/main/resources/static/poster/no-poster.svg"></a>
+    <span class="rating-badge">★ <span>7.2</span></span>
+    <button type="button" class="favorite-toggle" aria-label="찜하기" aria-pressed="false" data-favorite="5" data-title="여행의 끝">♡</button>
+  </div>
+  <div class="movie-info"><h3><a href="preview-detail.html">여행의 끝</a></h3><p>2026-09-24</p></div>
+</article></div>
+  </section>
+  <section class="section cta-panel"><div><h2>당신의 영화 취향을 남겨 주세요.</h2><p>별점과 리뷰로, 나만의 인생작품을 기록해 보세요.</p></div><a class="btn btn-primary" href="/review">영화 리뷰 쓰기 ↗</a></section>
+</main>
+<footer class="ml-footer"><div class="shell footer-inner">
+  <div><a href="/" class="footer-brand">movie<span>Life</span></a><p>영화를 발견하고, 나만의 감상을 기록하는 공간.</p></div>
+  <div class="footer-meta"><p>영화 정보 · TMDB / 시청 정보 · JustWatch</p><p>This product uses the TMDB API but is not endorsed or certified by TMDB.</p><p>© movieLife · Team Project</p></div>
+</div></footer>
+</body></html>

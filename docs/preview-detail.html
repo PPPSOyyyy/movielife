@@ -1,0 +1,48 @@
+<!doctype html><html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0c10">
+  <title>영화 상세 | movieLife</title>
+  <link rel="stylesheet" href="../src/main/resources/static/css/app.css">
+  </head>
+<body class="ml-app">
+<div style="padding:12px 20px;background:#fff4d8;color:#563d10;font:13px/1.6 sans-serif;text-align:center">샘플 데이터를 사용한 <strong>디자인 미리보기</strong>입니다. 실제 영화 조회·로그인·저장은 Spring Boot 실행 후 이용해 주세요.<br><a href="preview-home.html">홈</a> · <a href="preview-movies.html">영화</a> · <a href="preview-detail.html">상세</a> · <a href="preview-mypage.html">마이페이지</a> · <a href="preview-login.html">로그인</a> · <a href="preview-signup.html">회원가입</a></div><a class="ml-skip" href="#main">본문으로 이동</a>
+  <header class="ml-header"><div class="ml-header-inner">
+    <a href="preview-home.html" class="ml-brand" aria-label="movieLife 홈"><img src="../src/main/resources/static/images/logo.png" alt="movieLife" width="158" height="57"></a>
+    <nav class="ml-nav" aria-label="주 메뉴">
+      <a href="preview-home.html" data-nav="home">홈</a><a href="preview-movies.html" data-nav="movies" class="active">영화</a>
+      <a href="#" data-nav="domestic">국내영화</a><a href="#" data-nav="foreign">해외영화</a>
+      <a href="#" data-nav="recommend">영화추천</a><a href="#" data-nav="ott">OTT</a><a href="preview-mypage.html" data-nav="mypage">마이페이지</a>
+    </nav>
+    <form class="ml-search" action="/movies" method="get" role="search" onsubmit="return false">
+      <input type="search" name="query" placeholder="영화 제목을 검색해 보세요" aria-label="영화 제목 검색" maxlength="100" required value="">
+      <button type="button" aria-label="검색"><svg width="17" height="17" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m16 16 5 5"></path></svg></button>
+    </form>
+    <div class="ml-auth"><a href="preview-login.html" data-login-link>로그인</a><a href="preview-signup.html" class="signup-link">회원가입</a></div>
+  </div></header>
+
+<main id="main" data-movie-id="1">
+  <section class="detail-banner"><div class="shell">
+    <div class="breadcrumb"><a href="preview-movies.html">영화</a> / <span>오래 남는 여름</span></div>
+    <div class="detail-layout"><img class="detail-poster" data-poster src="../src/main/resources/static/poster/no-poster.svg">
+      <div class="detail-info"><div class="chips"><span class="badge">드라마</span><span class="badge">로맨스</span></div>
+        <h1>오래 남는 여름</h1><p class="muted small">A moment to remember</p>
+        <div class="detail-meta"><span>2026-09-24</span><span>124분</span><span>12세 이상 관람가</span></div>
+        <div class="detail-scores"><div class="score-block"><strong>★ <span>8.4</span></strong><small>TMDB · 10점 만점</small></div><div class="score-block"><strong>★ <span data-average-rating>4.5</span></strong><small>movieLife · 5점 만점 · <span data-review-count>2</span>명</small></div></div>
+        <div class="actions"><button type="button" class="favorite-toggle favorite-full" aria-pressed="false" data-full-label data-favorite="1" data-title="오래 남는 여름">♡ 찜하기</button><a class="btn btn-primary" data-review-link href="#">리뷰 작성하기 ↗</a><a class="btn btn-ghost" href="#reviews">리뷰 보기</a></div>
+      </div>
+    </div></div></section>
+  <div class="shell detail-body"><div><section><h2>줄거리</h2><p class="overview">한 번의 우연한 만남이 평범했던 일상을 조금씩 바꿔 놓습니다. 서로 다른 시간을 살아온 사람들이 함께 만들어 가는 따뜻한 이야기.
+
+※ 화면 검증용 예시 데이터입니다.</p></section>
+    <section class="section" id="reviews"><div class="section-head"><h2>관객들의 감상 <span class="muted small" data-review-count>2</span></h2><label class="small muted">정렬 <select class="input" id="reviewSort" style="display:inline-block;width:auto;min-height:36px;padding:5px 10px;margin-left:8px"><option value="latest">최신순</option><option value="high">별점 높은순</option><option value="low">별점 낮은순</option></select></label></div>
+      <div class="review-list" id="movieReviews" aria-live="polite"><article class="review-item"><div class="review-top"><strong>영화산책</strong><span class="review-rating">★★★★★ 5 / 5</span></div><p class="review-content">마지막 장면의 여운이 오래 남는 영화였어요. 아름다운 화면과 음악이 잘 어울렸습니다.</p></article></div>
+    </section></div>
+    <aside class="detail-sidebar"><div class="panel"><dl class="facts"><div><dt>감독</dt><dd>감독 정보</dd></div><div><dt>제작 국가</dt><dd>대한민국</dd></div><div><dt>주요 출연진</dt><dd>배우 1, 배우 2, 배우 3</dd></div><div><dt>한국 OTT · 대여 · 구매</dt><dd><div class="chips"><span class="badge">Netflix</span><span class="badge">TVING</span></div><p class="muted small" style="margin-top:10px">구독 포함 여부와 가격은 각 서비스에서 확인해 주세요.</p></dd></div></dl></div></aside>
+  </div>
+</main>
+<footer class="ml-footer"><div class="shell footer-inner">
+  <div><a href="/" class="footer-brand">movie<span>Life</span></a><p>영화를 발견하고, 나만의 감상을 기록하는 공간.</p></div>
+  <div class="footer-meta"><p>영화 정보 · TMDB / 시청 정보 · JustWatch</p><p>This product uses the TMDB API but is not endorsed or certified by TMDB.</p><p>© movieLife · Team Project</p></div>
+</div></footer>
+</body></html>

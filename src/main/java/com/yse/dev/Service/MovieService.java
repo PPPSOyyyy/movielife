@@ -2,1597 +2,205 @@ package com.yse.dev.Service;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import com.yse.dev.DTO.MovieDetailDto;
 import com.yse.dev.DTO.MovieDto;
 
-
 @Service
 public class MovieService {
-
-
-    @Value("${tmdb.api.key}")
-    private String apiKey;
-
-
-    @Value("${tmdb.api.base-url}")
-    private String baseUrl;
-
-
+    @Value("${tmdb.api.key}") private String apiKey;
+    @Value("${tmdb.api.base-url}") private String baseUrl;
     private final RestTemplate restTemplate;
-
+    private record CachedResponse(long expiresAt, Map<String, Object> value) { }
+    private final Map<URI, CachedResponse> cache = new LinkedHashMap<>(256, .75f, true);
 
     public MovieService() {
-        this.restTemplate = new RestTemplate();
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(4000);
+        factory.setReadTimeout(7000);
+        restTemplate = new RestTemplate(factory);
     }
 
-
-
-    // ==========================================
-    // 인기 영화 조회
-    // ==========================================
-    public Map<String, Object> getPopularMovies(
-            int page) {
-
-
-        URI uri =
-                UriComponentsBuilder
-                        .fromUriString(
-                                baseUrl
-                                + "/movie/popular"
-                        )
-                        .queryParam(
-                                "api_key",
-                                apiKey
-                        )
-                        .queryParam(
-                                "language",
-                                "ko-KR"
-                        )
-                        .queryParam(
-                                "region",
-                                "KR"
-                        )
-                        .queryParam(
-                                "page",
-                                page
-                        )
-                        .build()
-                        .encode()
-                        .toUri();
-
-
-        return restTemplate.getForObject(
-                uri,
-                Map.class
-        );
+    private UriComponentsBuilder endpoint(String path) {
+        return UriComponentsBuilder.fromUriString(baseUrl + path)
+                .queryParam("api_key", apiKey).queryParam("language", "ko-KR");
     }
+    private int page(int value) { return Math.max(1, Math.min(500, value)); }
 
-
-
-    // ==========================================
-    // 평점 높은 영화 조회
-    // ==========================================
-    public Map<String, Object> getTopRatedMovies(
-            int page) {
-
-
-        URI uri =
-                UriComponentsBuilder
-                        .fromUriString(
-                                baseUrl
-                                + "/movie/top_rated"
-                        )
-                        .queryParam(
-                                "api_key",
-                                apiKey
-                        )
-                        .queryParam(
-                                "language",
-                                "ko-KR"
-                        )
-                        .queryParam(
-                                "region",
-                                "KR"
-                        )
-                        .queryParam(
-                                "page",
-                                page
-                        )
-                        .build()
-                        .encode()
-                        .toUri();
-
-
-        return restTemplate.getForObject(
-                uri,
-                Map.class
-        );
-    }
-
-
-
-    // ==========================================
-    // 개봉 예정 영화 조회
-    //
-    // TMDB Upcoming 사용
-    // + 대한민국 기준
-    // + 이미 지난 개봉일 제거
-    // + 포스터 없는 영화 제거
-    // ==========================================
-    public Map<String, Object> getUpcomingMovies(
-            int page) {
-
-
-        if (page < 1) {
-            page = 1;
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> request(UriComponentsBuilder builder) {
+        URI uri = builder.build().encode().toUri();
+        synchronized (cache) {
+            CachedResponse cached = cache.get(uri);
+            if (cached != null && cached.expiresAt() > System.currentTimeMillis()) return cached.value();
         }
-
-
-        LocalDate today =
-                LocalDate.now();
-
-
-        List<Map<String, Object>> filteredResults =
-                new ArrayList<>();
-
-
-        /*
-         * 화면 한 페이지에 20개 정도를 채우기 위해
-         * TMDB Upcoming 여러 페이지를 확인
-         */
-        int startApiPage =
-                ((page - 1) * 3) + 1;
-
-
-        int lastCheckedApiPage =
-                startApiPage;
-
-
-        for (
-            int apiPage = startApiPage;
-            apiPage < startApiPage + 3;
-            apiPage++
-        ) {
-
-
-            lastCheckedApiPage =
-                    apiPage;
-
-
-            URI uri =
-                    UriComponentsBuilder
-                            .fromUriString(
-                                    baseUrl
-                                    + "/movie/upcoming"
-                            )
-                            .queryParam(
-                                    "api_key",
-                                    apiKey
-                            )
-                            .queryParam(
-                                    "language",
-                                    "ko-KR"
-                            )
-                            .queryParam(
-                                    "region",
-                                    "KR"
-                            )
-                            .queryParam(
-                                    "page",
-                                    apiPage
-                            )
-                            .build()
-                            .encode()
-                            .toUri();
-
-
-            Map<String, Object> response =
-                    restTemplate.getForObject(
-                            uri,
-                            Map.class
-                    );
-
-
-            if (response == null) {
-                continue;
-            }
-
-
-            Object resultsObject =
-                    response.get(
-                            "results"
-                    );
-
-
-            if (!(resultsObject instanceof List<?>)) {
-                continue;
-            }
-
-
-            List<?> results =
-                    (List<?>) resultsObject;
-
-
-            for (Object item : results) {
-
-
-                if (!(item instanceof Map<?, ?>)) {
-                    continue;
-                }
-
-
-                Map<?, ?> movie =
-                        (Map<?, ?>) item;
-
-
-                // ==========================================
-                // 포스터 없는 영화 제외
-                // ==========================================
-
-                Object posterPath =
-                        movie.get(
-                                "poster_path"
-                        );
-
-
-                if (
-                    posterPath == null ||
-                    posterPath.toString().isBlank()
-                ) {
-
-                    continue;
-                }
-
-
-                // ==========================================
-                // 개봉일 없는 영화 제외
-                // ==========================================
-
-                Object releaseDateObject =
-                        movie.get(
-                                "release_date"
-                        );
-
-
-                if (
-                    releaseDateObject == null ||
-                    releaseDateObject.toString().isBlank()
-                ) {
-
-                    continue;
-                }
-
-
-                try {
-
-
-                    LocalDate releaseDate =
-                            LocalDate.parse(
-                                    releaseDateObject
-                                            .toString()
-                            );
-
-
-                    // 오늘보다 이전이면 제외
-                    if (
-                        releaseDate.isBefore(
-                                today
-                        )
-                    ) {
-
-                        continue;
-                    }
-
-
-                } catch (Exception e) {
-
-                    continue;
-                }
-
-
-                // ==========================================
-                // 조건 통과 영화 추가
-                // ==========================================
-
-                Map<String, Object> movieMap =
-                        new HashMap<>();
-
-
-                for (
-                    Map.Entry<?, ?> entry
-                    : movie.entrySet()
-                ) {
-
-
-                    if (entry.getKey() != null) {
-
-                        movieMap.put(
-                                entry.getKey()
-                                        .toString(),
-
-                                entry.getValue()
-                        );
-                    }
-                }
-
-
-                filteredResults.add(
-                        movieMap
-                );
-
-
-                /*
-                 * 한 페이지에 최대 20개
-                 */
-                if (
-                    filteredResults.size()
-                    >= 20
-                ) {
-
-                    break;
-                }
-
-            }
-
-
-            if (
-                filteredResults.size()
-                >= 20
-            ) {
-
+        Map<String, Object> value = restTemplate.getForObject(uri, Map.class);
+        if (value == null) throw new ResourceAccessException("영화 응답이 비어 있습니다.");
+        synchronized (cache) {
+            // 영화 목록/상세만 5분 캐시. 회원 활동은 캐시하지 않습니다.
+            cache.put(uri, new CachedResponse(System.currentTimeMillis() + 300_000, value));
+            while (cache.size() > 200) cache.remove(cache.keySet().iterator().next());
+        }
+        return value;
+    }
+
+    public Map<String, Object> getPopularMovies(int page) {
+        return request(endpoint("/movie/popular").queryParam("page", page(page)));
+    }
+    public Map<String, Object> searchMovies(String query, int page) {
+        return request(endpoint("/search/movie").queryParam("query", query)
+                .queryParam("include_adult", false).queryParam("page", page(page)));
+    }
+    public Map<String, Object> getMoviesByGenre(int genreId, int page) {
+        return getFilteredMovies(genreId, null, null, null, page);
+    }
+    public Map<String, Object> getOttMovies(Integer provider, int page) {
+        UriComponentsBuilder builder = endpoint("/discover/movie").queryParam("watch_region", "KR")
+                .queryParam("with_watch_monetization_types", "flatrate")
+                .queryParam("include_adult", false).queryParam("sort_by", "popularity.desc")
+                .queryParam("page", page(page));
+        if (provider != null) builder.queryParam("with_watch_providers", provider);
+        return request(builder);
+    }
+    public Map<String, Object> getFilteredMovies(Integer genre, Double minRating, Integer year, Integer provider, int page) {
+        UriComponentsBuilder builder = endpoint("/discover/movie").queryParam("include_adult", false)
+                .queryParam("sort_by", "popularity.desc").queryParam("page", page(page));
+        if (genre != null) builder.queryParam("with_genres", genre);
+        if (minRating != null && minRating > 0) builder.queryParam("vote_average.gte", minRating).queryParam("vote_count.gte", 50);
+        if (year != null) builder.queryParam("primary_release_year", year);
+        if (provider != null) builder.queryParam("watch_region", "KR").queryParam("with_watch_providers", provider)
+                .queryParam("with_watch_monetization_types", "flatrate");
+        return request(builder);
+    }
+    public Map<String, Object> getTopRatedMovies(int page) {
+        return request(endpoint("/movie/top_rated").queryParam("region", "KR").queryParam("page", page(page)));
+    }
+    public Map<String, Object> getUpcomingMovies(int page) {
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+        // 한국 극장 개봉일이 내일~6개월 뒤인 영화. API의 실제 페이지 수를 그대로 사용합니다.
+        return request(endpoint("/discover/movie").queryParam("region", "KR")
+                .queryParam("with_release_type", "3|2").queryParam("include_adult", false)
+                .queryParam("release_date.gte", today.plusDays(1))
+                .queryParam("release_date.lte", today.plusMonths(6))
+                .queryParam("sort_by", "popularity.desc").queryParam("page", page(page)));
+    }
+
+    public List<MovieDto> convertToMovieList(Map<String, Object> response) {
+        List<MovieDto> result = new ArrayList<>();
+        if (response == null) return result;
+        for (Map<?, ?> movie : objects(response.get("results"))) {
+            if (!(movie.get("id") instanceof Number id)) continue;
+            MovieDto dto = new MovieDto();
+            dto.setId(id.longValue());
+            dto.setTitle(text(movie, "title", "제목 정보 없음"));
+            dto.setOverview(text(movie, "overview", ""));
+            dto.setPosterPath(text(movie, "poster_path", ""));
+            dto.setBackdropPath(text(movie, "backdrop_path", ""));
+            dto.setReleaseDate(text(movie, "release_date", ""));
+            dto.setVoteAverage(number(movie, "vote_average").doubleValue());
+            List<Integer> genres = new ArrayList<>();
+            if (movie.get("genre_ids") instanceof List<?> ids)
+                for (Object genre : ids) if (genre instanceof Number n) genres.add(n.intValue());
+            dto.setGenreIds(genres);
+            dto.setOttProviders(new ArrayList<>());
+            result.add(dto);
+        }
+        return result;
+    }
+
+    public MovieDetailDto getMovieDetail(Long movieId) {
+        if (movieId == null || movieId <= 0) throw new IllegalArgumentException("영화 정보가 올바르지 않습니다.");
+        Map<String, Object> movie = request(endpoint("/movie/" + movieId)
+                .queryParam("append_to_response", "credits,release_dates,watch/providers"));
+        MovieDetailDto dto = new MovieDetailDto();
+        dto.setId(movieId);
+        dto.setTitle(text(movie, "title", "제목 정보 없음"));
+        dto.setOriginalTitle(text(movie, "original_title", ""));
+        dto.setOverview(text(movie, "overview", ""));
+        dto.setPosterPath(text(movie, "poster_path", ""));
+        dto.setBackdropPath(text(movie, "backdrop_path", ""));
+        dto.setReleaseDate(text(movie, "release_date", ""));
+        dto.setVoteAverage(number(movie, "vote_average").doubleValue());
+        dto.setRuntime(number(movie, "runtime").intValue());
+        dto.setGenres(names(movie.get("genres")));
+        List<String> countries = new ArrayList<>();
+        for (Map<?, ?> country : objects(movie.get("production_countries"))) {
+            String code = text(country, "iso_3166_1", "");
+            countries.add(code.isBlank() ? text(country, "name", "정보 없음")
+                    : new Locale("", code).getDisplayCountry(Locale.KOREAN));
+        }
+        dto.setProductionCountries(countries);
+        Map<?, ?> credits = map(movie.get("credits"));
+        dto.setCast(names(credits.get("cast")).stream().limit(8).toList());
+        dto.setDirector(objects(credits.get("crew")).stream()
+                .filter(c -> "Director".equals(c.get("job"))).map(c -> text(c, "name", ""))
+                .findFirst().orElse("정보 없음"));
+        String certification = "정보 없음";
+        for (Map<?, ?> release : objects(map(movie.get("release_dates")).get("results"))) {
+            if (!"KR".equals(release.get("iso_3166_1"))) continue;
+            for (Map<?, ?> date : objects(release.get("release_dates"))) {
+                String value = text(date, "certification", "");
+                if (value.isBlank()) continue;
+                certification = switch (value) {
+                    case "ALL", "0" -> "전체 관람가";
+                    case "12" -> "12세 이상 관람가";
+                    case "15" -> "15세 이상 관람가";
+                    case "18", "19" -> "청소년 관람불가";
+                    default -> value;
+                };
                 break;
             }
-
         }
-
-
-        // ==========================================
-        // Controller가 기존 방식 그대로 쓸 수 있도록
-        // TMDB 응답 형태와 비슷하게 반환
-        // ==========================================
-
-        Map<String, Object> filteredResponse =
-                new HashMap<>();
-
-
-        filteredResponse.put(
-                "page",
-                page
-        );
-
-
-        filteredResponse.put(
-                "results",
-                filteredResults
-        );
-
-
-        /*
-         * 실제 TMDB 페이지 수와 완벽히 동일한
-         * 필터 페이지 계산은 아니지만,
-         * 기존 페이지 UI가 동작할 수 있도록 설정
-         */
-        filteredResponse.put(
-                "total_pages",
-                Math.max(
-                        page,
-                        lastCheckedApiPage
-                )
-        );
-
-
-        filteredResponse.put(
-                "total_results",
-                filteredResults.size()
-        );
-
-
-        return filteredResponse;
+        dto.setCertification(certification);
+        dto.setOttProviders(providerNames(movie.get("watch/providers")));
+        return dto;
     }
 
-
-
-    // ==========================================
-    // 영화 제목 검색
-    // ==========================================
-    public Map<String, Object> searchMovies(
-            String query,
-            int page) {
-
-
-        URI uri =
-                UriComponentsBuilder
-                        .fromUriString(
-                                baseUrl
-                                + "/search/movie"
-                        )
-                        .queryParam(
-                                "api_key",
-                                apiKey
-                        )
-                        .queryParam(
-                                "language",
-                                "ko-KR"
-                        )
-                        .queryParam(
-                                "query",
-                                query
-                        )
-                        .queryParam(
-                                "page",
-                                page
-                        )
-                        .queryParam(
-                                "include_adult",
-                                false
-                        )
-                        .build()
-                        .encode()
-                        .toUri();
-
-
-        return restTemplate.getForObject(
-                uri,
-                Map.class
-        );
+    public List<String> getOttProviders(Long movieId) {
+        return providerNames(request(endpoint("/movie/" + movieId + "/watch/providers")));
     }
-
-
-
-    // ==========================================
-    // 장르별 영화 조회
-    // ==========================================
-    public Map<String, Object> getMoviesByGenre(
-            int genreId,
-            int page) {
-
-
-        URI uri =
-                UriComponentsBuilder
-                        .fromUriString(
-                                baseUrl
-                                + "/discover/movie"
-                        )
-                        .queryParam(
-                                "api_key",
-                                apiKey
-                        )
-                        .queryParam(
-                                "language",
-                                "ko-KR"
-                        )
-                        .queryParam(
-                                "with_genres",
-                                genreId
-                        )
-                        .queryParam(
-                                "sort_by",
-                                "popularity.desc"
-                        )
-                        .queryParam(
-                                "include_adult",
-                                false
-                        )
-                        .queryParam(
-                                "page",
-                                page
-                        )
-                        .build()
-                        .encode()
-                        .toUri();
-
-
-        return restTemplate.getForObject(
-                uri,
-                Map.class
-        );
+    public Integer getMovieProviderId(String providerName) {
+        for (Map<?, ?> provider : objects(request(endpoint("/watch/providers/movie")
+                .queryParam("watch_region", "KR")).get("results"))) {
+            if (providerName.equalsIgnoreCase(text(provider, "provider_name", ""))
+                    && provider.get("provider_id") instanceof Number id) return id.intValue();
+        }
+        return null;
     }
-
-
-
-    // ==========================================
-    // 복합 필터 영화 조회
-    // 장르 + 최소평점 + 개봉연도 + OTT
-    // ==========================================
-    public Map<String, Object> getFilteredMovies(
-
-            Integer genre,
-            Double minRating,
-            Integer year,
-            Integer provider,
-            int page) {
-
-
-        UriComponentsBuilder builder =
-                UriComponentsBuilder
-                        .fromUriString(
-                                baseUrl
-                                + "/discover/movie"
-                        )
-                        .queryParam(
-                                "api_key",
-                                apiKey
-                        )
-                        .queryParam(
-                                "language",
-                                "ko-KR"
-                        )
-                        .queryParam(
-                                "include_adult",
-                                false
-                        )
-                        .queryParam(
-                                "sort_by",
-                                "popularity.desc"
-                        )
-                        .queryParam(
-                                "page",
-                                page
-                        );
-
-
-        if (genre != null) {
-
-            builder.queryParam(
-                    "with_genres",
-                    genre
-            );
+    private List<String> providerNames(Object value) {
+        Map<?, ?> kr = map(map(map(value).get("results")).get("KR"));
+        List<String> result = new ArrayList<>();
+        for (String kind : List.of("flatrate", "rent", "buy")) {
+            for (Map<?, ?> provider : objects(kr.get(kind))) {
+                String name = text(provider, "provider_name", "");
+                if (!name.isBlank() && !result.contains(name)) result.add(name);
+            }
         }
-
-
-        if (
-            minRating != null &&
-            minRating > 0
-        ) {
-
-            builder.queryParam(
-                    "vote_average.gte",
-                    minRating
-            );
-        }
-
-
-        if (year != null) {
-
-            builder.queryParam(
-                    "primary_release_date.gte",
-                    year + "-01-01"
-            );
-
-
-            builder.queryParam(
-                    "primary_release_date.lte",
-                    year + "-12-31"
-            );
-        }
-
-
-        if (provider != null) {
-
-            builder.queryParam(
-                    "watch_region",
-                    "KR"
-            );
-
-
-            builder.queryParam(
-                    "with_watch_providers",
-                    provider
-            );
-
-
-            builder.queryParam(
-                    "with_watch_monetization_types",
-                    "flatrate"
-            );
-        }
-
-
-        URI uri =
-                builder
-                        .build()
-                        .encode()
-                        .toUri();
-
-
-        return restTemplate.getForObject(
-                uri,
-                Map.class
-        );
+        return result;
     }
-
-
-
-    // ==========================================
-    // TMDB 응답 → MovieDto 목록
-    // ==========================================
-    public List<MovieDto> convertToMovieList(
-            Map<String, Object> response) {
-
-
-        List<MovieDto> movieList =
-                new ArrayList<>();
-
-
-        if (response == null) {
-            return movieList;
-        }
-
-
-        Object resultObject =
-                response.get(
-                        "results"
-                );
-
-
-        if (!(resultObject instanceof List<?>)) {
-            return movieList;
-        }
-
-
-        List<?> results =
-                (List<?>) resultObject;
-
-
-        for (Object object : results) {
-
-
-            if (!(object instanceof Map<?, ?>)) {
-                continue;
-            }
-
-
-            Map<?, ?> movie =
-                    (Map<?, ?>) object;
-
-
-            MovieDto movieDto =
-                    new MovieDto();
-
-
-            Object id =
-                    movie.get(
-                            "id"
-                    );
-
-
-            if (id instanceof Number) {
-
-                movieDto.setId(
-                        ((Number) id)
-                                .longValue()
-                );
-            }
-
-
-            Object title =
-                    movie.get(
-                            "title"
-                    );
-
-
-            if (title != null) {
-
-                movieDto.setTitle(
-                        title.toString()
-                );
-            }
-
-
-            Object overview =
-                    movie.get(
-                            "overview"
-                    );
-
-
-            if (overview != null) {
-
-                movieDto.setOverview(
-                        overview.toString()
-                );
-            }
-
-
-            Object posterPath =
-                    movie.get(
-                            "poster_path"
-                    );
-
-
-            if (posterPath != null) {
-
-                movieDto.setPosterPath(
-                        posterPath.toString()
-                );
-            }
-
-
-            Object releaseDate =
-                    movie.get(
-                            "release_date"
-                    );
-
-
-            if (releaseDate != null) {
-
-                movieDto.setReleaseDate(
-                        releaseDate.toString()
-                );
-            }
-
-
-            Object voteAverage =
-                    movie.get(
-                            "vote_average"
-                    );
-
-
-            if (voteAverage instanceof Number) {
-
-                movieDto.setVoteAverage(
-                        ((Number) voteAverage)
-                                .doubleValue()
-                );
-            }
-
-
-            List<Integer> genreIds =
-                    new ArrayList<>();
-
-
-            Object genreObject =
-                    movie.get(
-                            "genre_ids"
-                    );
-
-
-            if (genreObject instanceof List<?>) {
-
-
-                List<?> genres =
-                        (List<?>) genreObject;
-
-
-                for (Object genre : genres) {
-
-
-                    if (genre instanceof Number) {
-
-                        genreIds.add(
-                                ((Number) genre)
-                                        .intValue()
-                        );
-                    }
-                }
-            }
-
-
-            movieDto.setGenreIds(
-                    genreIds
-            );
-
-
-            movieList.add(
-                    movieDto
-            );
-        }
-
-
-        return movieList;
+    private Map<?, ?> map(Object value) { return value instanceof Map<?, ?> m ? m : Map.of(); }
+    private List<Map<?, ?>> objects(Object value) {
+        List<Map<?, ?>> result = new ArrayList<>();
+        if (value instanceof List<?> list) for (Object item : list) if (item instanceof Map<?, ?> m) result.add(m);
+        return result;
     }
-
-
-
-    // ==========================================
-    // 영화 상세정보 조회
-    // ==========================================
-    public MovieDetailDto getMovieDetail(
-            Long movieId) {
-
-
-        MovieDetailDto detail =
-                new MovieDetailDto();
-
-
-        URI detailUri =
-                UriComponentsBuilder
-                        .fromUriString(
-                                baseUrl
-                                + "/movie/"
-                                + movieId
-                        )
-                        .queryParam(
-                                "api_key",
-                                apiKey
-                        )
-                        .queryParam(
-                                "language",
-                                "ko-KR"
-                        )
-                        .build()
-                        .encode()
-                        .toUri();
-
-
-        Map<String, Object> movie =
-                restTemplate.getForObject(
-                        detailUri,
-                        Map.class
-                );
-
-
-        if (movie == null) {
-            return detail;
-        }
-
-
-        detail.setId(
-                movieId
-        );
-
-
-        Object title =
-                movie.get(
-                        "title"
-                );
-
-
-        if (title != null) {
-
-            detail.setTitle(
-                    title.toString()
-            );
-        }
-
-
-        Object originalTitle =
-                movie.get(
-                        "original_title"
-                );
-
-
-        if (originalTitle != null) {
-
-            detail.setOriginalTitle(
-                    originalTitle.toString()
-            );
-        }
-
-
-        Object overview =
-                movie.get(
-                        "overview"
-                );
-
-
-        if (overview != null) {
-
-            detail.setOverview(
-                    overview.toString()
-            );
-        }
-
-
-        Object posterPath =
-                movie.get(
-                        "poster_path"
-                );
-
-
-        if (posterPath != null) {
-
-            detail.setPosterPath(
-                    posterPath.toString()
-            );
-        }
-
-
-        Object backdropPath =
-                movie.get(
-                        "backdrop_path"
-                );
-
-
-        if (backdropPath != null) {
-
-            detail.setBackdropPath(
-                    backdropPath.toString()
-            );
-        }
-
-
-        Object releaseDate =
-                movie.get(
-                        "release_date"
-                );
-
-
-        if (releaseDate != null) {
-
-            detail.setReleaseDate(
-                    releaseDate.toString()
-            );
-        }
-
-
-        Object voteAverage =
-                movie.get(
-                        "vote_average"
-                );
-
-
-        if (voteAverage instanceof Number) {
-
-            detail.setVoteAverage(
-                    ((Number) voteAverage)
-                            .doubleValue()
-            );
-        }
-
-
-        Object runtime =
-                movie.get(
-                        "runtime"
-                );
-
-
-        if (runtime instanceof Number) {
-
-            detail.setRuntime(
-                    ((Number) runtime)
-                            .intValue()
-            );
-        }
-
-
-
-        // ==========================================
-        // 장르
-        // ==========================================
-
-        List<String> genreNames =
-                new ArrayList<>();
-
-
-        Object genresObject =
-                movie.get(
-                        "genres"
-                );
-
-
-        if (genresObject instanceof List<?>) {
-
-
-            List<?> genres =
-                    (List<?>) genresObject;
-
-
-            for (Object genreObject : genres) {
-
-
-                if (genreObject instanceof Map<?, ?>) {
-
-
-                    Map<?, ?> genre =
-                            (Map<?, ?>) genreObject;
-
-
-                    Object genreName =
-                            genre.get(
-                                    "name"
-                            );
-
-
-                    if (genreName != null) {
-
-                        genreNames.add(
-                                genreName.toString()
-                        );
-                    }
-                }
-            }
-        }
-
-
-        detail.setGenres(
-                genreNames
-        );
-
-
-
-        // ==========================================
-        // 제작 국가
-        // ==========================================
-
-        List<String> productionCountries =
-                new ArrayList<>();
-
-
-        Object countryObject =
-                movie.get(
-                        "production_countries"
-                );
-
-
-        if (countryObject instanceof List<?>) {
-
-
-            List<?> countries =
-                    (List<?>) countryObject;
-
-
-            for (Object countryItem : countries) {
-
-
-                if (countryItem instanceof Map<?, ?>) {
-
-
-                    Map<?, ?> country =
-                            (Map<?, ?>) countryItem;
-
-
-                    Object countryName =
-                            country.get(
-                                    "name"
-                            );
-
-
-                    if (countryName != null) {
-
-                        productionCountries.add(
-                                countryName.toString()
-                        );
-                    }
-                }
-            }
-        }
-
-
-        detail.setProductionCountries(
-                productionCountries
-        );
-
-
-
-        // ==========================================
-        // 출연진 / 감독
-        // ==========================================
-
-        URI creditUri =
-                UriComponentsBuilder
-                        .fromUriString(
-                                baseUrl
-                                + "/movie/"
-                                + movieId
-                                + "/credits"
-                        )
-                        .queryParam(
-                                "api_key",
-                                apiKey
-                        )
-                        .queryParam(
-                                "language",
-                                "ko-KR"
-                        )
-                        .build()
-                        .encode()
-                        .toUri();
-
-
-        Map<String, Object> creditResponse =
-                restTemplate.getForObject(
-                        creditUri,
-                        Map.class
-                );
-
-
-        List<String> castList =
-                new ArrayList<>();
-
-
-        if (creditResponse != null) {
-
-
-            Object castObject =
-                    creditResponse.get(
-                            "cast"
-                    );
-
-
-            if (castObject instanceof List<?>) {
-
-
-                List<?> casts =
-                        (List<?>) castObject;
-
-
-                int count = 0;
-
-
-                for (Object castItem : casts) {
-
-
-                    if (count >= 8) {
-                        break;
-                    }
-
-
-                    if (castItem instanceof Map<?, ?>) {
-
-
-                        Map<?, ?> cast =
-                                (Map<?, ?>) castItem;
-
-
-                        Object castName =
-                                cast.get(
-                                        "name"
-                                );
-
-
-                        if (castName != null) {
-
-                            castList.add(
-                                    castName.toString()
-                            );
-
-
-                            count++;
-                        }
-                    }
-                }
-            }
-        }
-
-
-        detail.setCast(
-                castList
-        );
-
-
-
-        String director =
-                null;
-
-
-        if (creditResponse != null) {
-
-
-            Object crewObject =
-                    creditResponse.get(
-                            "crew"
-                    );
-
-
-            if (crewObject instanceof List<?>) {
-
-
-                List<?> crewList =
-                        (List<?>) crewObject;
-
-
-                for (Object crewItem : crewList) {
-
-
-                    if (crewItem instanceof Map<?, ?>) {
-
-
-                        Map<?, ?> crew =
-                                (Map<?, ?>) crewItem;
-
-
-                        Object job =
-                                crew.get(
-                                        "job"
-                                );
-
-
-                        Object name =
-                                crew.get(
-                                        "name"
-                                );
-
-
-                        if (
-                            job != null &&
-                            "Director".equals(
-                                    job.toString()
-                            ) &&
-                            name != null
-                        ) {
-
-                            director =
-                                    name.toString();
-
-
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-
-        detail.setDirector(
-                director
-        );
-
-
-
-        // ==========================================
-        // 대한민국 관람등급
-        // ==========================================
-
-        URI releaseUri =
-                UriComponentsBuilder
-                        .fromUriString(
-                                baseUrl
-                                + "/movie/"
-                                + movieId
-                                + "/release_dates"
-                        )
-                        .queryParam(
-                                "api_key",
-                                apiKey
-                        )
-                        .build()
-                        .encode()
-                        .toUri();
-
-
-        Map<String, Object> releaseResponse =
-                restTemplate.getForObject(
-                        releaseUri,
-                        Map.class
-                );
-
-
-        String certification =
-                null;
-
-
-        if (releaseResponse != null) {
-
-
-            Object releaseResultsObject =
-                    releaseResponse.get(
-                            "results"
-                    );
-
-
-            if (
-                releaseResultsObject
-                instanceof List<?>
-            ) {
-
-
-                List<?> releaseResults =
-                        (List<?>)
-                        releaseResultsObject;
-
-
-                for (
-                    Object releaseResultItem
-                    : releaseResults
-                ) {
-
-
-                    if (
-                        releaseResultItem
-                        instanceof Map<?, ?>
-                    ) {
-
-
-                        Map<?, ?> releaseResult =
-                                (Map<?, ?>)
-                                releaseResultItem;
-
-
-                        Object isoCountry =
-                                releaseResult.get(
-                                        "iso_3166_1"
-                                );
-
-
-                        if (
-                            isoCountry != null &&
-                            "KR".equals(
-                                    isoCountry.toString()
-                            )
-                        ) {
-
-
-                            Object releaseDatesObject =
-                                    releaseResult.get(
-                                            "release_dates"
-                                    );
-
-
-                            if (
-                                releaseDatesObject
-                                instanceof List<?>
-                            ) {
-
-
-                                List<?> releaseDates =
-                                        (List<?>)
-                                        releaseDatesObject;
-
-
-                                for (
-                                    Object releaseDateItem
-                                    : releaseDates
-                                ) {
-
-
-                                    if (
-                                        releaseDateItem
-                                        instanceof Map<?, ?>
-                                    ) {
-
-
-                                        Map<?, ?> releaseDateMap =
-                                                (Map<?, ?>)
-                                                releaseDateItem;
-
-
-                                        Object certificationObject =
-                                                releaseDateMap.get(
-                                                        "certification"
-                                                );
-
-
-                                        if (
-                                            certificationObject != null &&
-                                            !certificationObject
-                                                    .toString()
-                                                    .isBlank()
-                                        ) {
-
-
-                                            certification =
-                                                    certificationObject
-                                                            .toString();
-
-
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-
-
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-
-        if (certification == null) {
-
-            detail.setCertification(
-                    "정보 없음"
-            );
-
-        } else {
-
-
-            switch (certification) {
-
-                case "ALL":
-
-                    detail.setCertification(
-                            "전체 관람가"
-                    );
-
-                    break;
-
-
-                case "12":
-
-                    detail.setCertification(
-                            "12세 이상 관람가"
-                    );
-
-                    break;
-
-
-                case "15":
-
-                    detail.setCertification(
-                            "15세 이상 관람가"
-                    );
-
-                    break;
-
-
-                case "18":
-                case "19":
-
-                    detail.setCertification(
-                            "청소년 관람불가"
-                    );
-
-                    break;
-
-
-                default:
-
-                    detail.setCertification(
-                            certification
-                    );
-
-                    break;
-            }
-        }
-
-
-
-        // ==========================================
-        // 한국 OTT
-        // ==========================================
-
-        URI providerUri =
-                UriComponentsBuilder
-                        .fromUriString(
-                                baseUrl
-                                + "/movie/"
-                                + movieId
-                                + "/watch/providers"
-                        )
-                        .queryParam(
-                                "api_key",
-                                apiKey
-                        )
-                        .build()
-                        .encode()
-                        .toUri();
-
-
-        Map<String, Object> providerResponse =
-                restTemplate.getForObject(
-                        providerUri,
-                        Map.class
-                );
-
-
-        List<String> providers =
-                new ArrayList<>();
-
-
-        if (providerResponse != null) {
-
-
-            Object resultsObject =
-                    providerResponse.get(
-                            "results"
-                    );
-
-
-            if (resultsObject instanceof Map<?, ?>) {
-
-
-                Map<?, ?> results =
-                        (Map<?, ?>) resultsObject;
-
-
-                Object krObject =
-                        results.get(
-                                "KR"
-                        );
-
-
-                if (krObject instanceof Map<?, ?>) {
-
-
-                    Map<?, ?> kr =
-                            (Map<?, ?>) krObject;
-
-
-                    addProviders(
-                            kr.get(
-                                    "flatrate"
-                            ),
-                            providers
-                    );
-
-
-                    addProviders(
-                            kr.get(
-                                    "rent"
-                            ),
-                            providers
-                    );
-
-
-                    addProviders(
-                            kr.get(
-                                    "buy"
-                            ),
-                            providers
-                    );
-                }
-            }
-        }
-
-
-        detail.setOttProviders(
-                providers
-        );
-
-
-        return detail;
+    private List<String> names(Object value) {
+        return objects(value).stream().map(m -> text(m, "name", "")).filter(n -> !n.isBlank()).toList();
     }
-
-
-
-    // ==========================================
-    // OTT 제공처 이름 중복 없이 추가
-    // ==========================================
-    private void addProviders(
-
-            Object providerObject,
-
-            List<String> providers) {
-
-
-        if (!(providerObject instanceof List<?>)) {
-            return;
-        }
-
-
-        List<?> providerList =
-                (List<?>) providerObject;
-
-
-        for (Object item : providerList) {
-
-
-            if (item instanceof Map<?, ?>) {
-
-
-                Map<?, ?> provider =
-                        (Map<?, ?>) item;
-
-
-                Object providerName =
-                        provider.get(
-                                "provider_name"
-                        );
-
-
-                if (providerName != null) {
-
-
-                    String name =
-                            providerName.toString();
-
-
-                    if (
-                        !providers.contains(
-                                name
-                        )
-                    ) {
-
-                        providers.add(
-                                name
-                        );
-                    }
-                }
-            }
-        }
+    private String text(Map<?, ?> map, String key, String fallback) {
+        Object value = map.get(key);
+        return value == null || value.toString().isBlank() ? fallback : value.toString();
     }
-
+    private Number number(Map<?, ?> map, String key) { return map.get(key) instanceof Number n ? n : 0; }
 }

@@ -64,7 +64,7 @@ public class MovieDetailDto {
             posterPath.isBlank()
         ) {
 
-            return "/poster/no-poster.png";
+            return "/poster/no-poster.svg";
 
         }
 
@@ -88,7 +88,7 @@ public class MovieDetailDto {
         }
 
 
-        return "https://image.tmdb.org/t/p/original"
+        return "https://image.tmdb.org/t/p/w1280"
                 + backdropPath;
 
     }

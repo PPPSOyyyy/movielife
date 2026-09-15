@@ -1,39 +1,54 @@
 <!DOCTYPE html>
-<html lang="ko">
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>인기영화 | movieLife</title>
-
-    <!--
-        기존 /popular 주소로 접속해도
-        실제 TMDB 인기 영화 화면으로 이동
-    -->
-    <meta
-        http-equiv="refresh"
-        content="0; url=/movies/popular"
-    >
-
-    <script>
-        window.location.replace("/movies/popular");
-    </script>
-
-</head>
-
-
-<body>
-
-    <p>
-        인기 영화 페이지로 이동 중입니다.
-    </p>
-
-</body>
-
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragments/layout :: head('인기영화')}">
+    </head>
+    <body class="ml-app">
+        <th:block th:replace="~{fragments/layout :: header}">
+        </th:block>
+        <main id="main" class="shell page">
+            <div class="page-heading">
+                <p class="eyebrow">
+                    MOVIE CHART
+                </p>
+                <h1>
+                    지금 주목받는 영화
+                </h1>
+                <p class="muted">
+                    관객들의 관심을 받는 영화들을 만나 보세요.
+                </p>
+            </div>
+            <nav class="tabs">
+                <a href="/popular" th:classappend="${activeTab == 'popular'} ? 'active'">
+                    인기순
+                </a>
+                <a
+                    href="/popular?tab=topRated"
+                    th:classappend="${activeTab == 'topRated'} ? 'active'"
+                >
+                    평점순
+                </a>
+            </nav>
+            <div class="movie-grid">
+                <th:block th:each="movie : ${rankingMovies}">
+                    <article th:replace="~{fragments/layout :: card(${movie})}">
+                    </article>
+                </th:block>
+            </div>
+            <div class="empty-state" th:if="${#lists.isEmpty(rankingMovies)}">
+                <h3>
+                    영화를 불러오지 못했습니다
+                </h3>
+                <p>
+                    잠시 후 다시 확인해 주세요.
+                </p>
+                <button class="btn" data-reload>
+                    다시 시도
+                </button>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}">
+        </footer>
+        <script src="/js/auth-header.js?v=20260915-3">
+        </script>
+    </body>
 </html>

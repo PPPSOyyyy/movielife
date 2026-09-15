@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head th:fragment="head(title)">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#0b0c10">
+        <title th:text="${title} + ' | movieLife'">
+            movieLife
+        </title>
+        <link rel="stylesheet" href="/css/app.css">
+    </head>
+    <body>
+        <th:block th:fragment="header">
+            <a class="ml-skip" href="#main">
+                본문으로 이동
+            </a>
+            <header class="ml-header">
+                <div class="ml-header-inner">
+                    <a
+                        href="/"
+                        class="ml-brand"
+                        aria-label="movieLife 홈"
+                    >
+                        <img
+                            src="/images/logo.png"
+                            alt="movieLife"
+                            width="158"
+                            height="57"
+                        >
+                    </a>
+                    <nav class="ml-nav" aria-label="주 메뉴">
+                        <a href="/" data-nav="home">
+                            홈
+                        </a>
+                        <a href="/movies" data-nav="movies">
+                            영화
+                        </a>
+                        <a href="/movies/domestic" data-nav="domestic">
+                            국내영화
+                        </a>
+                        <a href="/movies/foreign" data-nav="foreign">
+                            해외영화
+                        </a>
+                        <a href="/recommend" data-nav="recommend">
+                            영화추천
+                        </a>
+                        <a href="/ott" data-nav="ott">
+                            OTT
+                        </a>
+                        <a href="/mypage" data-nav="mypage">
+                            마이페이지
+                        </a>
+                    </nav>
+                    <form
+                        class="ml-search"
+                        action="/movies"
+                        method="get"
+                        role="search"
+                    >
+                        <input
+                            type="search"
+                            name="query"
+                            placeholder="영화 제목을 검색해 보세요"
+                            aria-label="영화 제목 검색"
+                            maxlength="100"
+                            required
+                            th:value="${query}"
+                        >
+                        <button type="submit" aria-label="검색">
+                            <svg
+                                width="17"
+                                height="17"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                aria-hidden="true"
+                            >
+                                <circle
+                                    cx="10.5"
+                                    cy="10.5"
+                                    r="6.5"
+                                />
+                                <path d="m16 16 5 5"/>
+                            </svg>
+                        </button>
+                    </form>
+                    <div class="ml-auth">
+                        <a href="/login" data-login-link>
+                            로그인
+                        </a>
+                        <a href="/signup" class="signup-link">
+                            회원가입
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </th:block>
+        <footer class="ml-footer" th:fragment="footer">
+            <div class="shell footer-inner">
+                <div>
+                    <a href="/" class="footer-brand">
+                        movie
+                        <span>
+                            Life
+                        </span>
+                    </a>
+                    <p>
+                        영화를 발견하고, 나만의 감상을 기록하는 공간.
+                    </p>
+                </div>
+                <div class="footer-meta">
+                    <p>
+                        영화 정보 · TMDB / 시청 정보 · JustWatch
+                    </p>
+                    <p>
+                        This product uses the TMDB API but is not endorsed or certified by TMDB.
+                    </p>
+                    <p>
+                        © movieLife · Team Project
+                    </p>
+                </div>
+            </div>
+        </footer>
+        <article class="movie-card" th:fragment="card(movie)">
+            <div class="poster-wrap">
+                <a
+                    th:href="@{/movies/{id}(id=${movie.id})}"
+                    th:aria-label="${movie.title} + ' 상세 보기'"
+                >
+                    <img
+                        th:src="${movie.posterUrl}"
+                        th:alt="${movie.title} + ' 포스터'"
+                        loading="lazy"
+                        width="240"
+                        height="360"
+                        data-poster
+                    >
+                </a>
+                <span class="rating-badge">
+                    ★
+                    <span
+                        th:text="${movie.voteAverage != null ? #numbers.formatDecimal(movie.voteAverage, 1, 1) : '—'}"
+                    >
+                        —
+                    </span>
+                </span>
+                <button
+                    type="button"
+                    class="favorite-toggle"
+                    th:data-favorite="${movie.id}"
+                    th:data-title="${movie.title}"
+                    aria-label="찜하기"
+                    aria-pressed="false"
+                >
+                    ♡
+                </button>
+            </div>
+            <div class="movie-info">
+                <h3>
+                    <a th:href="@{/movies/{id}(id=${movie.id})}" th:text="${movie.title}">
+                        영화 제목
+                    </a>
+                </h3>
+                <p
+                    th:text="${#strings.isEmpty(movie.releaseDate) ? '개봉일 정보 없음' : movie.releaseDate}"
+                >
+                    개봉일
+                </p>
+            </div>
+        </article>
+    </body>
+</html>

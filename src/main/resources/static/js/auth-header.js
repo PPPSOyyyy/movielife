@@ -1,1010 +1,288 @@
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
-
-        updateAuthHeader();
-
-    }
-);
-
-
-
-/* =========================================
-   로그인 상태 확인 및 헤더 변경
-========================================= */
-
-async function updateAuthHeader() {
-
-
-    const currentUrl =
-
-        window.location.pathname
-
-        + window.location.search
-
-        + window.location.hash;
-
-
-    const headerRightList =
-
-        document.querySelectorAll(
-            ".header-right"
-        );
-
-
+/* 모든 화면의 공통 로그인/메뉴/찜/안내창. 기존 팀원 화면에서도 사용 가능합니다. */
+(() => {
+  'use strict';
+  if (window.ML?.ready) return;
+  const ML = window.ML = {};
+  ML.member = null;
+  ML.favorites = new Set();
+  const pendingFavorites = new Set();
+  let favoriteLoad = null;
+  let favoritesLoaded = false;
+  let authFailure = false;
+  const protectedPaths = ['/mypage', '/profile', '/favorite-movies', '/my-reviews', '/review'];
+  const currentPath = () => location.pathname + location.search + location.hash;
+  ML.safeReturn = (value, fallback = '/') => {
     try {
-
-
-        const response = await fetch(
-
-            "/api/members/me",
-
-            {
-
-                headers: {
-
-                    "Accept":
-                        "application/json"
-
-                }
-
-            }
-
-        );
-
-
-        /* =========================================
-           로그인하지 않은 상태
-        ========================================= */
-
-        if (!response.ok) {
-
-
-            /*
-             * 일반 로그인 버튼
-             * 로그인 성공 후 현재 페이지로 돌아오기
-             */
-
-            document
-
-                .querySelectorAll(
-                    "a.login-button"
-                )
-
-                .forEach(loginLink => {
-
-
-                    loginLink.href =
-
-                        "/login?returnUrl="
-
-                        + encodeURIComponent(
-                            currentUrl
-                        );
-
-                });
-
-
-            /*
-             * 회원 전용 메뉴에 접근 제한 적용
-             */
-
-            setupLoginRequiredLinks();
-
-
-            return;
-
-        }
-
-
-
-        /* =========================================
-           로그인 상태
-        ========================================= */
-
-        const member =
-
-            await response.json();
-
-
-        addAuthHeaderStyle();
-
-
-        headerRightList.forEach(
-
-            headerRight => {
-
-
-                headerRight.replaceChildren();
-
-
-                headerRight.style.display =
-                    "flex";
-
-
-                const nickname =
-
-                    document.createElement(
-                        "span"
-                    );
-
-
-                nickname.className =
-                    "auth-nickname";
-
-
-                nickname.textContent =
-
-                    member.nickname
-                    + "님";
-
-
-                const logoutButton =
-
-                    document.createElement(
-                        "button"
-                    );
-
-
-                logoutButton.type =
-                    "button";
-
-
-                logoutButton.className =
-                    "auth-logout-button";
-
-
-                logoutButton.textContent =
-                    "로그아웃";
-
-
-                logoutButton.addEventListener(
-
-                    "click",
-
-                    logoutFromHeader
-
-                );
-
-
-                headerRight.append(
-
-                    nickname,
-
-                    logoutButton
-
-                );
-
-            }
-
-        );
-
-
-    } catch (error) {
-
-
-        console.error(
-
-            "로그인 상태 확인 실패",
-
-            error
-
-        );
-
+      if (!value || !value.startsWith('/') || value.startsWith('//') || /[\\\u0000-\u001f]/.test(value)) return fallback;
+      const url = new URL(value, location.origin);
+      if (url.origin !== location.origin || ['/login', '/signup'].includes(url.pathname)) return fallback;
+      return url.pathname + url.search + url.hash;
+    } catch { return fallback;
     }
-
-}
-
-
-
-/* =========================================
-   비회원 회원전용 기능 접근 제한
-========================================= */
-
-function setupLoginRequiredLinks() {
-
-
-    /*
-     * 마이페이지
-     */
-
-    document
-
-        .querySelectorAll(
-            'a[href="/mypage"]'
-        )
-
-        .forEach(link => {
-
-
-            link.addEventListener(
-
-                "click",
-
-                function (event) {
-
-
-                    event.preventDefault();
-
-
-                    openLoginRequiredModal(
-                        "/mypage"
-                    );
-
-                }
-
-            );
-
-        });
-
-
-
-    /*
-     * 찜한 영화 페이지
-     */
-
-    document
-
-        .querySelectorAll(
-            'a[href="/favorite-movies"]'
-        )
-
-        .forEach(link => {
-
-
-            link.addEventListener(
-
-                "click",
-
-                function (event) {
-
-
-                    event.preventDefault();
-
-
-                    openLoginRequiredModal(
-                        "/favorite-movies"
-                    );
-
-                }
-
-            );
-
-        });
-
-
-
-    /*
-     * 작성한 리뷰 보기
-     */
-
-    document
-
-        .querySelectorAll(
-            'a[href="/my-reviews"]'
-        )
-
-        .forEach(link => {
-
-
-            link.addEventListener(
-
-                "click",
-
-                function (event) {
-
-
-                    event.preventDefault();
-
-
-                    openLoginRequiredModal(
-                        "/my-reviews"
-                    );
-
-                }
-
-            );
-
-        });
-
-
-
-    /*
-     * 리뷰 작성
-     */
-
-    document
-
-        .querySelectorAll(
-            'a[href="/review"]'
-        )
-
-        .forEach(link => {
-
-
-            link.addEventListener(
-
-                "click",
-
-                function (event) {
-
-
-                    event.preventDefault();
-
-
-                    openLoginRequiredModal(
-                        "/review"
-                    );
-
-                }
-
-            );
-
-        });
-
-}
-
-
-
-/* =========================================
-   로그인 필요 모달 열기
-========================================= */
-
-function openLoginRequiredModal(returnUrl) {
-
-
-    addLoginRequiredModalStyle();
-
-
-    let modal =
-
-        document.getElementById(
-            "loginRequiredModal"
-        );
-
-
-    /*
-     * 모달이 아직 없으면 생성
-     */
-
-    if (!modal) {
-
-
-        modal =
-
-            document.createElement(
-                "div"
-            );
-
-
-        modal.id =
-            "loginRequiredModal";
-
-
-        modal.className =
-            "login-required-overlay";
-
-
-        modal.innerHTML = `
-
-            <div class="login-required-modal">
-
-                <div class="login-required-icon">
-                    🔒
-                </div>
-
-
-                <div class="login-required-small">
-                    LOGIN REQUIRED
-                </div>
-
-
-                <h2>
-                    로그인이 필요합니다
-                </h2>
-
-
-                <p>
-                    회원 전용 기능입니다.<br>
-                    로그인 후 이용해 주세요.
-                </p>
-
-
-                <div class="login-required-buttons">
-
-
-                    <button
-                        type="button"
-                        class="login-required-cancel"
-                        id="loginRequiredCancel"
-                    >
-                        취소
-                    </button>
-
-
-                    <button
-                        type="button"
-                        class="login-required-login"
-                        id="loginRequiredLogin"
-                    >
-                        로그인
-                    </button>
-
-
-                </div>
-
-            </div>
-
-        `;
-
-
-        document.body.appendChild(
-            modal
-        );
-
-
-        /*
-         * 배경 클릭하면 닫기
-         */
-
-        modal.addEventListener(
-
-            "click",
-
-            function (event) {
-
-
-                if (
-                    event.target === modal
-                ) {
-
-                    closeLoginRequiredModal();
-
-                }
-
-            }
-
-        );
-
-
-        /*
-         * 취소
-         */
-
-        document
-
-            .getElementById(
-                "loginRequiredCancel"
-            )
-
-            .addEventListener(
-
-                "click",
-
-                closeLoginRequiredModal
-
-            );
-
-    }
-
-
-
-    /*
-     * 로그인 버튼 클릭 시
-     * 원래 가려던 주소로 돌아오도록 설정
-     */
-
-    const loginButton =
-
-        document.getElementById(
-            "loginRequiredLogin"
-        );
-
-
-    loginButton.onclick =
-
-        function () {
-
-
-            window.location.href =
-
-                "/login?returnUrl="
-
-                + encodeURIComponent(
-                    returnUrl
-                );
-
-        };
-
-
-    modal.classList.add(
-        "show"
-    );
-
-
-    document.body.style.overflow =
-        "hidden";
-
-}
-
-
-
-/* =========================================
-   로그인 필요 모달 닫기
-========================================= */
-
-function closeLoginRequiredModal() {
-
-
-    const modal =
-
-        document.getElementById(
-            "loginRequiredModal"
-        );
-
-
-    if (modal) {
-
-        modal.classList.remove(
-            "show"
-        );
-
-    }
-
-
-    document.body.style.overflow =
-        "";
-
-}
-
-
-
-/* =========================================
-   로그인 필요 모달 스타일
-========================================= */
-
-function addLoginRequiredModalStyle() {
-
-
-    if (
-
-        document.getElementById(
-            "login-required-style"
-        )
-
-    ) {
-
-        return;
-
-    }
-
-
-    const style =
-
-        document.createElement(
-            "style"
-        );
-
-
-    style.id =
-        "login-required-style";
-
-
-    style.textContent = `
-
-
-        .login-required-overlay {
-
-            position: fixed;
-
-            inset: 0;
-
-            z-index: 99999;
-
-            display: none;
-
-            align-items: center;
-
-            justify-content: center;
-
-            padding: 20px;
-
-            background:
-                rgba(0, 0, 0, 0.78);
-
-            backdrop-filter:
-                blur(5px);
-
-        }
-
-
-        .login-required-overlay.show {
-
-            display: flex;
-
-        }
-
-
-        .login-required-modal {
-
-            width: 100%;
-
-            max-width: 390px;
-
-            padding:
-                34px 30px 30px;
-
-            border:
-                1px solid #303030;
-
-            border-radius: 10px;
-
-            background:
-                #111111;
-
-            color:
-                #ffffff;
-
-            text-align:
-                center;
-
-            box-shadow:
-                0 25px 80px
-                rgba(0,0,0,0.65);
-
-        }
-
-
-        .login-required-icon {
-
-            margin-bottom:
-                14px;
-
-            font-size:
-                30px;
-
-        }
-
-
-        .login-required-small {
-
-            margin-bottom:
-                8px;
-
-            color:
-                #D92234;
-
-            font-size:
-                10px;
-
-            font-weight:
-                700;
-
-            letter-spacing:
-                1.8px;
-
-        }
-
-
-        .login-required-modal h2 {
-
-            margin-bottom:
-                12px;
-
-            font-size:
-                23px;
-
-            letter-spacing:
-                -1px;
-
-        }
-
-
-        .login-required-modal p {
-
-            margin-bottom:
-                27px;
-
-            color:
-                #777777;
-
-            font-size:
-                12px;
-
-            line-height:
-                1.7;
-
-        }
-
-
-        .login-required-buttons {
-
-            display:
-                flex;
-
-            gap:
-                10px;
-
-        }
-
-
-        .login-required-buttons button {
-
-            flex:
-                1;
-
-            height:
-                44px;
-
-            border-radius:
-                5px;
-
-            font-family:
-                inherit;
-
-            font-size:
-                12px;
-
-            font-weight:
-                700;
-
-            cursor:
-                pointer;
-
-        }
-
-
-        .login-required-cancel {
-
-            border:
-                1px solid #333333;
-
-            background:
-                transparent;
-
-            color:
-                #999999;
-
-        }
-
-
-        .login-required-cancel:hover {
-
-            border-color:
-                #555555;
-
-            color:
-                #ffffff;
-
-        }
-
-
-        .login-required-login {
-
-            border:
-                1px solid #D92234;
-
-            background:
-                #D92234;
-
-            color:
-                #ffffff;
-
-        }
-
-
-        .login-required-login:hover {
-
-            background:
-                #ed3043;
-
-            border-color:
-                #ed3043;
-
-        }
-
-    `;
-
-
-    document.head.appendChild(
-        style
-    );
-
-}
-
-
-
-/* =========================================
-   로그인된 헤더 스타일
-========================================= */
-
-function addAuthHeaderStyle() {
-
-
-    if (
-
-        document.getElementById(
-            "auth-header-style"
-        )
-
-    ) {
-
-        return;
-
-    }
-
-
-    const style =
-
-        document.createElement(
-            "style"
-        );
-
-
-    style.id =
-        "auth-header-style";
-
-
-    style.textContent = `
-
-
-        .auth-nickname {
-
-            color:
-                #ffffff;
-
-            font-size:
-                13px;
-
-            font-weight:
-                600;
-
-            white-space:
-                nowrap;
-
-        }
-
-
-        .auth-logout-button {
-
-            padding:
-                9px 18px;
-
-            border:
-                1px solid #444444;
-
-            border-radius:
-                5px;
-
-            background:
-                transparent;
-
-            color:
-                #ffffff;
-
-            font:
-                inherit;
-
-            font-size:
-                12px;
-
-            cursor:
-                pointer;
-
-            transition:
-                0.2s;
-
-        }
-
-
-        .auth-logout-button:hover {
-
-            border-color:
-                #D92234;
-
-            color:
-                #D92234;
-
-        }
-
-    `;
-
-
-    document.head.appendChild(
-        style
-    );
-
-}
-
-
-
-/* =========================================
-   로그아웃
-========================================= */
-
-async function logoutFromHeader() {
-
-
+  };
+  ML.returnUrl = () => ML.safeReturn(new URLSearchParams(location.search).get('returnUrl'));
+  ML.el = (tag, className, text) => {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    if (text !== undefined && text !== null) element.textContent = text;
+    return element;
+  };
+  ML.request = async (url, options = {}) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 18000);
     try {
-
-
-        const currentUrl =
-
-            window.location.pathname
-
-            + window.location.search
-
-            + window.location.hash;
-
-
-        const response = await fetch(
-
-            "/api/members/logout",
-
-            {
-
-                method:
-                    "POST"
-
-            }
-
-        );
-
-
-        if (!response.ok) {
-
-
-            alert(
-                "로그아웃 처리 중 오류가 발생했습니다."
-            );
-
-
-            return;
-
-        }
-
-
-        /*
-         * 로그아웃 후
-         * 현재 페이지 유지
-         */
-
-        window.location.href =
-            currentUrl;
-
-
+      const response = await fetch(url, {credentials: 'same-origin', cache: 'no-store', ...options, signal: options.signal || controller.signal});
+      const text = await response.text();
+      let body = text;
+      try { body = text ? JSON.parse(text) : null;
+      } catch { /* 기존 API의 문자열 응답도 지원 */ }
+      if (!response.ok) {
+        const message = typeof body === 'object' && body ? body.message : (typeof body === 'string' && !body.includes('<') ? body : null);
+        const error = new Error(message || (response.status === 401 ? '로그인이 필요합니다.' : '요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.'));
+        error.status = response.status;
+        throw error;
+      }
+      if (typeof body === 'string' && /^\s*</.test(body)) throw new Error('API 대신 HTML 화면이 응답했습니다. 실행 중인 서버와 요청 경로를 확인해 주세요.');
+      return body;
     } catch (error) {
-
-
-        alert(
-            "로그아웃 처리 중 오류가 발생했습니다."
-        );
-
+      if (error.name === 'AbortError') throw new Error('응답이 지연되고 있습니다. 잠시 후 다시 시도해 주세요.');
+      if (error instanceof TypeError) throw new Error('연결을 확인한 뒤 다시 시도해 주세요.');
+      throw error;
+    } finally { clearTimeout(timer);
     }
-
-}
-
-
-
-/* =========================================
-   ESC 키로 로그인 필요 모달 닫기
-========================================= */
-
-document.addEventListener(
-
-    "keydown",
-
-    function (event) {
-
-
-        if (
-            event.key === "Escape"
-        ) {
-
-            closeLoginRequiredModal();
-
-        }
-
+  };
+  ML.json = (method, body) => ({method, headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+  ML.toast = (message, error = false) => {
+    let host = document.querySelector('.toast-container');
+    if (!host) { host = ML.el('div','toast-container');
+    host.setAttribute('role','status');
+    host.setAttribute('aria-live','polite');
+    document.body.append(host);
     }
-
-);
+    host.replaceChildren(ML.el('div', 'toast' + (error ? ' error' : ''), message));
+    clearTimeout(ML.toastTimer);
+    ML.toastTimer = setTimeout(() => host.replaceChildren(), 4000);
+  };
+  let activeDialog = null;
+  ML.dialog = ({title = '안내', message = '', confirm = '확인', cancel = null} = {}) => new Promise(resolve => {
+    if (activeDialog) activeDialog.close();
+    const previous = document.activeElement;
+    const dialog = ML.el('dialog','ml-dialog');
+    activeDialog = dialog;
+    const heading = ML.el('h2','',title);
+    heading.id = 'mlDialogTitle';
+    const copy = ML.el('p','',message);
+    copy.id = 'mlDialogDescription';
+    dialog.setAttribute('aria-labelledby', heading.id);
+    dialog.setAttribute('aria-describedby', copy.id);
+    const actions = ML.el('div','actions');
+    if (cancel) { const button = ML.el('button','btn',cancel);
+    button.type='button';
+    button.addEventListener('click',()=>dialog.close('cancel'));
+    actions.append(button);
+    }
+    const button = ML.el('button','btn btn-primary',confirm);
+    button.type='button';
+    button.addEventListener('click',()=>dialog.close('confirm'));
+    actions.append(button);
+    dialog.append(heading,copy,actions);
+    document.body.append(dialog);
+    dialog.addEventListener('cancel',event=>{if(!cancel)event.preventDefault();});
+    dialog.addEventListener('close',()=>{ const accepted = dialog.returnValue === 'confirm'; dialog.remove(); if (activeDialog === dialog) activeDialog=null; previous?.focus(); resolve(accepted); },{once:true});
+    dialog.showModal();
+  });
+  ML.requireLogin = async (returnUrl = currentPath()) => {
+    const ok = await ML.dialog({title:'로그인이 필요합니다',message:'로그인하고 나만의 영화와 감상을 기록해 보세요.',confirm:'로그인',cancel:'취소'});
+    if (ok) location.href = '/login?returnUrl=' + encodeURIComponent(ML.safeReturn(returnUrl));
+  };
+  window.openLoginRequiredModal = ML.requireLogin;
+  window.closeLoginRequiredModal = () => activeDialog?.close();
+  ML.handleError = error => error.status === 401 ? ML.requireLogin() : ML.toast(error.message, true);
+  ML.poster = image => {
+    image.addEventListener('error', () => {
+      if (image.dataset.fallback) return;
+      image.dataset.fallback = 'true';
+      image.src = '/poster/no-poster.svg';
+    });
+    if (image.complete && image.naturalWidth === 0) { image.dataset.fallback='true';
+    image.src='/poster/no-poster.svg';
+    }
+  };
+  const updateNav = () => {
+    const path = location.pathname;
+    let active = path === '/' ? 'home' : 'movies';
+    if (path === '/movies/domestic') active = 'domestic';
+    else if (path === '/movies/foreign') active = 'foreign';
+    else if (['/recommend','/movie-recommend'].includes(path)) active = 'recommend';
+    else if (path === '/ott') active = 'ott';
+    else if (protectedPaths.includes(path) && path !== '/review') active = 'mypage';
+    else if (['/login','/signup'].includes(path)) active = '';
+    document.querySelectorAll('[data-nav]').forEach(link => {
+      const selected = link.dataset.nav === active;
+      link.classList.toggle('active', selected);
+      if (selected) link.setAttribute('aria-current','page');
+      else link.removeAttribute('aria-current');
+    });
+    document.querySelectorAll('[data-login-link]').forEach(a => { a.href='/login?returnUrl='+encodeURIComponent(ML.safeReturn(currentPath())); });
+  };
+  const updateHeader = () => {
+    document.querySelectorAll('.ml-auth, .header-right').forEach(host => {
+      if (!ML.member) return;
+      const profile = ML.el('a','auth-nickname',ML.member.nickname + '님');
+      profile.href='/mypage';
+      profile.title=ML.member.nickname;
+      const logout = ML.el('button','','로그아웃');
+      logout.type='button';
+      logout.addEventListener('click',()=>ML.logout(logout));
+      host.replaceChildren(profile,logout);
+    });
+  };
+  ML.logout = async button => {
+    if (button) button.disabled=true;
+    try {
+      await ML.request('/api/members/logout',{method:'POST'});
+      location.href = protectedPaths.includes(location.pathname) ? '/' : currentPath();
+    } catch (error) { ML.handleError(error);
+    if(button)button.disabled=false;
+    }
+  };
+  window.logoutFromHeader = ML.logout;
+  ML.syncFavorites = () => {
+    document.querySelectorAll('[data-favorite]').forEach(button => {
+      const selected = ML.favorites.has(Number(button.dataset.favorite));
+      button.setAttribute('aria-pressed',String(selected));
+      button.setAttribute('aria-label',(button.dataset.title ? button.dataset.title + ' ' : '') + (selected ? '찜 취소' : '찜하기'));
+      button.textContent = button.hasAttribute('data-full-label') ? (selected ? '♥ 찜한 영화' : '♡ 찜하기') : selected ? '♥' : '♡';
+      button.disabled = pendingFavorites.has(Number(button.dataset.favorite));
+    });
+  };
+  ML.loadFavorites = async () => {
+    if (!ML.member) return;
+    if (favoriteLoad) return favoriteLoad;
+    favoriteLoad = ML.request('/api/favorites/my').then(list => {
+      ML.favorites = new Set(list.map(item => Number(item.movieId)));
+      favoritesLoaded = true;
+      ML.syncFavorites();
+    }).finally(()=>{favoriteLoad=null;});
+    return favoriteLoad;
+  };
+  const toggleFavorite = async button => {
+    await ML.ready;
+    if (authFailure) { ML.toast('로그인 상태를 확인하지 못했습니다. 새로고침 후 다시 시도해 주세요.',true);
+    return;
+    }
+    if (!ML.member) { await ML.requireLogin();
+    return;
+    }
+    const id = Number(button.dataset.favorite);
+    if (!Number.isSafeInteger(id) || id<=0 || pendingFavorites.has(id)) return;
+    pendingFavorites.add(id);
+    ML.syncFavorites();
+    try {
+      if (!favoritesLoaded) await ML.loadFavorites();
+      const remove = ML.favorites.has(id);
+      await ML.request(remove ? '/api/favorites/'+id : '/api/favorites?movieId='+id,{method:remove?'DELETE':'POST'});
+      if (remove) ML.favorites.delete(id);
+      else ML.favorites.add(id);
+      ML.toast(remove ? '찜한 영화에서 삭제했습니다.' : '찜한 영화에 담았습니다.');
+      if (remove && document.querySelector('[data-favorite-page]')) {
+        button.closest('.movie-card')?.remove();
+        const count=document.querySelectorAll('#favoritesGrid .movie-card').length;
+        document.querySelector('[data-favorite-count]').textContent=String(count);
+        document.querySelector('#favoritesEmpty').hidden=count>0;
+      }
+      try { localStorage.setItem('movielife:activity',String(Date.now()));
+      } catch { /* 저장소 차단 시에도 찜은 정상 처리 */ }
+      document.dispatchEvent(new CustomEvent('ml:favorite-changed',{detail:{id,selected:!remove}}));
+    } catch(error) { ML.handleError(error);
+    }
+    finally { pendingFavorites.delete(id);
+    ML.syncFavorites();
+    }
+  };
+  ML.card = movie => {
+    const card=ML.el('article','movie-card'), poster=ML.el('div','poster-wrap');
+    const link=ML.el('a');
+    link.href='/movies/'+Number(movie.id);
+    link.setAttribute('aria-label',movie.title+' 상세 보기');
+    const image=ML.el('img');
+    image.alt=(movie.title || '영화')+' 포스터';
+    image.loading='lazy';
+    image.width=240;
+    image.height=360;
+    image.src=movie.posterUrl || '/poster/no-poster.svg';
+    ML.poster(image);
+    link.append(image);
+    const rating=ML.el('span','rating-badge','★ '+(Number.isFinite(Number(movie.voteAverage)) ? Number(movie.voteAverage).toFixed(1) : '—'));
+    const favorite=ML.el('button','favorite-toggle','♡');
+    favorite.type='button';
+    favorite.dataset.favorite=movie.id;
+    favorite.dataset.title=movie.title||'';
+    favorite.setAttribute('aria-pressed','false');
+    favorite.setAttribute('aria-label','찜하기');
+    poster.append(link,rating,favorite);
+    const info=ML.el('div','movie-info'), heading=ML.el('h3'), title=ML.el('a','',movie.title || '제목 정보 없음');
+    title.href=link.href;
+    heading.append(title);
+    info.append(heading,ML.el('p','',movie.releaseDate||'개봉일 정보 없음'));
+    card.append(poster,info);
+    return card;
+  };
+  ML.empty = (title,message,href,label) => {
+    const block=ML.el('div','empty-state');
+    block.style.gridColumn='1 / -1';
+    block.append(ML.el('h3','',title),ML.el('p','',message));
+    if(href){const link=ML.el('a','btn',label);
+    link.href=href;
+    block.append(link);
+    }return block;
+  };
+  ML.init = () => {
+    updateNav();
+    document.querySelectorAll('img[data-poster]').forEach(ML.poster);
+    document.querySelectorAll('form[role=search]').forEach(form=>form.addEventListener('submit',event=>{
+      const input=form.querySelector('input[name=query]');
+      input.value=input.value.trim();
+      if(!input.value){event.preventDefault();
+      input.setCustomValidity('영화 제목을 입력해 주세요.');
+      input.reportValidity();
+      }
+    }));
+    document.querySelectorAll('form[role=search] input').forEach(input=>input.addEventListener('input',()=>input.setCustomValidity('')));
+    document.addEventListener('click',async event=>{
+      const button=event.target.closest('[data-favorite]');
+      if(button){event.preventDefault();
+      await toggleFavorite(button);
+      return;
+      }
+      if(event.target.closest('[data-reload]')){location.reload();
+      return;
+      }
+      const link=event.target.closest('a[href]');
+      if(!link || event.ctrlKey || event.metaKey || event.shiftKey || event.button>0) return;
+      const url=new URL(link.href,location.origin);
+      if(url.origin!==location.origin || !protectedPaths.includes(url.pathname)) return;
+      event.preventDefault();
+      await ML.ready;
+      if(authFailure){ML.toast('로그인 상태를 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.',true);
+      return;
+      }
+      if(ML.member) location.href=url.pathname+url.search+url.hash;
+      else await ML.requireLogin(url.pathname+url.search+url.hash);
+    });
+    window.addEventListener('storage', event=>{if(event.key==='movielife:activity' && ML.member)ML.loadFavorites().catch(()=>{});});
+  };
+  ML.init();
+  ML.ready = (async()=>{
+    try { ML.member=await ML.request('/api/members/me');
+    updateHeader();
+    }
+    catch(error){if(error.status!==401)authFailure=true;
+    }
+    if(ML.member && document.querySelector('[data-favorite]')) {
+      try { await ML.loadFavorites();
+      } catch { /* 클릭 시 재조회하여 잘못된 상태로 추가하지 않습니다. */ }
+    }
+    return ML.member;
+  })();
+})();

@@ -109,6 +109,12 @@ public class ReviewPageController {
             return "redirect:/movies?reviewRequired=true";
         }
 
+        // 같은 영화에 남긴 리뷰가 있으면 수정 화면으로 연결합니다.
+        Review existing = reviewService.getMyReviews(userId).stream()
+                .filter(item -> movieId.equals(item.getMovieId()))
+                .findFirst().orElse(null);
+        if (existing != null) return "redirect:/review?reviewId=" + existing.getId();
+
         MovieDetailDto movie =
                 movieService.getMovieDetail(
                         movieId

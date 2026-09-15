@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragments/layout :: head('안내')}">
+    </head>
+    <body class="ml-app">
+        <th:block th:replace="~{fragments/layout :: header}">
+        </th:block>
+        <main id="main" class="shell page ml-team-placeholder">
+            <div class="empty-state">
+                <p class="eyebrow">
+                    MOVIELIFE
+                </p>
+                <h1 th:text="${errorTitle != null ? errorTitle : '요청하신 화면을 열 수 없습니다'}">
+                    요청하신 화면을 열 수 없습니다
+                </h1>
+                <p
+                    th:text="${errorDescription != null ? errorDescription : '주소를 확인하거나 잠시 후 다시 시도해 주세요.'}"
+                >
+                </p>
+                <div class="actions" style="justify-content:center">
+                    <a class="btn btn-primary" href="/movies">
+                        영화 둘러보기
+                    </a>
+                    <a class="btn" href="/">
+                        홈으로
+                    </a>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}">
+        </footer>
+        <script src="/js/auth-header.js?v=20260915-3">
+        </script>
+    </body>
+</html>

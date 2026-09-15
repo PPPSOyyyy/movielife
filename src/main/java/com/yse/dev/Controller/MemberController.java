@@ -20,6 +20,7 @@ import com.yse.dev.Entity.Member;
 import com.yse.dev.Service.MemberService;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 
@@ -71,7 +72,7 @@ public class MemberController {
     @PostMapping("/login")
     public ResponseEntity<String> login(
             @RequestBody LoginDto loginDto,
-            HttpSession session) {
+            HttpSession session, HttpServletRequest request) {
 
         try {
 
@@ -81,35 +82,12 @@ public class MemberController {
                     );
 
 
+            request.changeSessionId();
+
             // 로그인 회원 아이디 세션 저장
             session.setAttribute(
                     "loginUserId",
                     member.getUserId()
-            );
-
-
-            System.out.println(
-                    "================================"
-            );
-
-            System.out.println(
-                    "로그인 성공"
-            );
-
-            System.out.println(
-                    "세션 ID : "
-                    + session.getId()
-            );
-
-            System.out.println(
-                    "로그인 회원 아이디 : "
-                    + session.getAttribute(
-                            "loginUserId"
-                    )
-            );
-
-            System.out.println(
-                    "================================"
             );
 
 
@@ -144,29 +122,6 @@ public class MemberController {
                 (String) session.getAttribute(
                         "loginUserId"
                 );
-
-
-        System.out.println(
-                "================================"
-        );
-
-        System.out.println(
-                "/me 요청"
-        );
-
-        System.out.println(
-                "현재 세션 ID : "
-                + session.getId()
-        );
-
-        System.out.println(
-                "세션 로그인 아이디 : "
-                + userId
-        );
-
-        System.out.println(
-                "================================"
-        );
 
 
         if (userId == null) {
@@ -211,14 +166,6 @@ public class MemberController {
     @PostMapping("/logout")
     public ResponseEntity<String> logout(
             HttpSession session) {
-
-
-        System.out.println(
-                "로그아웃 회원 : "
-                + session.getAttribute(
-                        "loginUserId"
-                )
-        );
 
 
         session.invalidate();

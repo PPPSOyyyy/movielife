@@ -39,4 +39,6 @@ public interface ReviewRepository
             Long movieId
     );
 
+    List<Review> findByUserIdOrderByCreatedAtDesc(String userId);
+    void deleteByUserId(String userId);
 }

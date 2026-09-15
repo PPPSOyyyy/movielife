@@ -1,509 +1,102 @@
 package com.yse.dev.Service;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.yse.dev.DTO.LoginDto;
 import com.yse.dev.DTO.MemberDto;
 import com.yse.dev.DTO.ProfileDto;
 import com.yse.dev.Entity.Member;
+import com.yse.dev.Repository.FavoriteRepository;
 import com.yse.dev.Repository.MemberRepository;
-
+import com.yse.dev.Repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
-
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
-
-
     private final MemberRepository memberRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final ReviewRepository reviewRepository;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-
-    // BCrypt 비밀번호 암호화
-    private final BCryptPasswordEncoder passwordEncoder =
-            new BCryptPasswordEncoder();
-
-
-
-    // ==========================================
-    // 회원가입
-    // ==========================================
     @Transactional
-    public void signup(
-            MemberDto memberDto) {
-
-
-        if (
-            isUserIdDuplicate(
-                    memberDto.getUserId()
-            )
-        ) {
-
-            throw new IllegalArgumentException(
-                    "이미 사용 중인 아이디입니다."
-            );
-
-        }
-
-
-        if (
-            isNicknameDuplicate(
-                    memberDto.getNickname()
-            )
-        ) {
-
-            throw new IllegalArgumentException(
-                    "이미 사용 중인 닉네임입니다."
-            );
-
-        }
-
-
-        Member member =
-                Member.toEntity(
-                        memberDto
-                );
-
-
-        String encodedPassword =
-                passwordEncoder.encode(
-                        memberDto.getPassword()
-                );
-
-
-        member.setPassword(
-                encodedPassword
-        );
-
-
-        memberRepository.save(
-                member
-        );
-
+    public void signup(MemberDto dto) {
+        String userId = MemberValidation.userId(dto.getUserId());
+        String nickname = MemberValidation.nickname(dto.getNickname());
+        MemberValidation.password(dto.getPassword());
+        if (memberRepository.existsByUserId(userId)) throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
+        if (memberRepository.existsByNickname(nickname)) throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+        Member member = new Member();
+        member.setUserId(userId);
+        member.setNickname(nickname);
+        member.setPassword(passwordEncoder.encode(dto.getPassword()));
+        memberRepository.saveAndFlush(member);
     }
 
-
-
-    // ==========================================
-    // 로그인
-    // ==========================================
     @Transactional
-    public Member login(
-            LoginDto loginDto) {
-
-
-        Member member =
-                memberRepository
-                        .findByUserId(
-                                loginDto.getUserId()
-                        )
-                        .orElseThrow(() ->
-
-                                new IllegalArgumentException(
-                                        "아이디 또는 비밀번호가 올바르지 않습니다."
-                                )
-
-                        );
-
-
-        String savedPassword =
-                member.getPassword();
-
-
-        String inputPassword =
-                loginDto.getPassword();
-
-
-        boolean passwordMatches;
-
-
-
-        // BCrypt 저장 회원
-        if (
-            savedPassword != null &&
-            (
-                savedPassword.startsWith("$2a$") ||
-                savedPassword.startsWith("$2b$") ||
-                savedPassword.startsWith("$2y$")
-            )
-        ) {
-
-
-            passwordMatches =
-                    passwordEncoder.matches(
-                            inputPassword,
-                            savedPassword
-                    );
-
-
-        } else {
-
-
-            // 기존 평문 회원
-            passwordMatches =
-                    savedPassword != null &&
-                    savedPassword.equals(
-                            inputPassword
-                    );
-
-
-            // 기존 평문 회원은 로그인 성공 시 BCrypt로 변환
-            if (passwordMatches) {
-
-
-                member.setPassword(
-
-                        passwordEncoder.encode(
-                                inputPassword
-                        )
-
-                );
-
-
-                memberRepository.save(
-                        member
-                );
-
-            }
-
+    public Member login(LoginDto dto) {
+        String userId = dto.getUserId() == null ? "" : dto.getUserId().trim();
+        Member member = memberRepository.findByUserId(userId).orElseThrow(this::invalidLogin);
+        if (!matches(dto.getPassword(), member.getPassword())) throw invalidLogin();
+        // 기존 평문 계정은 첫 로그인 때 암호화하여 이전 회원도 계속 사용할 수 있습니다.
+        if (!isEncoded(member.getPassword())) {
+            member.setPassword(passwordEncoder.encode(dto.getPassword()));
+            memberRepository.save(member);
         }
-
-
-        if (!passwordMatches) {
-
-            throw new IllegalArgumentException(
-                    "아이디 또는 비밀번호가 올바르지 않습니다."
-            );
-
-        }
-
-
         return member;
-
     }
 
-
-
-    // ==========================================
-    // 회원 정보 조회
-    // ==========================================
     @Transactional(readOnly = true)
-    public Member getMemberByUserId(
-            String userId) {
-
-
-        return memberRepository
-                .findByUserId(
-                        userId
-                )
-                .orElseThrow(() ->
-
-                        new IllegalArgumentException(
-                                "회원 정보를 찾을 수 없습니다."
-                        )
-
-                );
-
+    public Member getMemberByUserId(String userId) {
+        return memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
     }
 
-
-
-    // ==========================================
-    // 프로필 수정
-    // ==========================================
     @Transactional
-    public void updateProfile(
-            String userId,
-            ProfileDto profileDto) {
-
-
-        Member member =
-                memberRepository
-                        .findByUserId(
-                                userId
-                        )
-                        .orElseThrow(() ->
-
-                                new IllegalArgumentException(
-                                        "회원 정보를 찾을 수 없습니다."
-                                )
-
-                        );
-
-
-        // ==========================================
-        // 닉네임 변경
-        // ==========================================
-
-        if (
-            profileDto.getNickname() != null &&
-            !profileDto.getNickname()
-                    .trim()
-                    .isEmpty()
-        ) {
-
-
-            String newNickname =
-                    profileDto
-                            .getNickname()
-                            .trim();
-
-
-            if (
-                !newNickname.equals(
-                        member.getNickname()
-                )
-            ) {
-
-
-                if (
-                    memberRepository
-                            .existsByNickname(
-                                    newNickname
-                            )
-                ) {
-
-                    throw new IllegalArgumentException(
-                            "이미 사용 중인 닉네임입니다."
-                    );
-
-                }
-
-
-                member.setNickname(
-                        newNickname
-                );
-
-            }
-
+    public void updateProfile(String userId, ProfileDto dto) {
+        Member member = memberRepository.findByUserIdForUpdate(userId)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+        String nickname = dto.getNickname() == null ? member.getNickname() : MemberValidation.nickname(dto.getNickname());
+        if (!nickname.equals(member.getNickname()) && memberRepository.existsByNickname(nickname))
+            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            if (!matches(dto.getCurrentPassword(), member.getPassword()))
+                throw new IllegalArgumentException("현재 비밀번호가 올바르지 않습니다.");
+            MemberValidation.password(dto.getPassword());
+            member.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
-
-
-
-        // ==========================================
-        // 비밀번호 변경
-        // ==========================================
-
-        if (
-            profileDto.getPassword() != null &&
-            !profileDto.getPassword()
-                    .isBlank()
-        ) {
-
-
-            String currentPassword =
-                    profileDto.getCurrentPassword();
-
-
-            // 현재 비밀번호 입력 확인
-            if (
-                currentPassword == null ||
-                currentPassword.isBlank()
-            ) {
-
-                throw new IllegalArgumentException(
-                        "현재 비밀번호를 입력해 주세요."
-                );
-
-            }
-
-
-            String savedPassword =
-                    member.getPassword();
-
-
-            boolean passwordMatches;
-
-
-
-            // BCrypt 회원
-            if (
-                savedPassword != null &&
-                (
-                    savedPassword.startsWith("$2a$") ||
-                    savedPassword.startsWith("$2b$") ||
-                    savedPassword.startsWith("$2y$")
-                )
-            ) {
-
-
-                passwordMatches =
-                        passwordEncoder.matches(
-                                currentPassword,
-                                savedPassword
-                        );
-
-
-            } else {
-
-
-                // 기존 평문 회원
-                passwordMatches =
-                        savedPassword != null &&
-                        savedPassword.equals(
-                                currentPassword
-                        );
-
-            }
-
-
-
-            // 현재 비밀번호 틀림
-            if (!passwordMatches) {
-
-                throw new IllegalArgumentException(
-                        "현재 비밀번호가 올바르지 않습니다."
-                );
-
-            }
-
-
-
-            // 새 비밀번호 BCrypt 암호화
-            String encodedPassword =
-                    passwordEncoder.encode(
-                            profileDto.getPassword()
-                    );
-
-
-            member.setPassword(
-                    encodedPassword
-            );
-
-        }
-
-
-        memberRepository.save(
-                member
-        );
-
+        member.setNickname(nickname);
+        memberRepository.saveAndFlush(member);
     }
 
-
-
-    // ==========================================
-    // 회원 탈퇴
-    // ==========================================
     @Transactional
-    public void withdraw(
-            String userId,
-            String password) {
-
-
-        Member member =
-                memberRepository
-                        .findByUserId(
-                                userId
-                        )
-                        .orElseThrow(() ->
-
-                                new IllegalArgumentException(
-                                        "회원 정보를 찾을 수 없습니다."
-                                )
-
-                        );
-
-
-        if (
-            password == null ||
-            password.isBlank()
-        ) {
-
-            throw new IllegalArgumentException(
-                    "비밀번호를 입력해 주세요."
-            );
-
-        }
-
-
-        String savedPassword =
-                member.getPassword();
-
-
-        boolean passwordMatches;
-
-
-
-        // BCrypt 회원
-        if (
-            savedPassword != null &&
-            (
-                savedPassword.startsWith("$2a$") ||
-                savedPassword.startsWith("$2b$") ||
-                savedPassword.startsWith("$2y$")
-            )
-        ) {
-
-
-            passwordMatches =
-                    passwordEncoder.matches(
-                            password,
-                            savedPassword
-                    );
-
-
-        } else {
-
-
-            // 기존 평문 회원
-            passwordMatches =
-                    savedPassword != null &&
-                    savedPassword.equals(
-                            password
-                    );
-
-        }
-
-
-        if (!passwordMatches) {
-
-            throw new IllegalArgumentException(
-                    "비밀번호가 올바르지 않습니다."
-            );
-
-        }
-
-
-        memberRepository.delete(
-                member
-        );
-
+    public void withdraw(String userId, String password) {
+        Member member = memberRepository.findByUserIdForUpdate(userId)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+        if (!matches(password, member.getPassword())) throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
+        // 같은 아이디로 재가입해도 이전 찜/리뷰가 노출되지 않도록 함께 삭제합니다.
+        favoriteRepository.deleteByUserId(userId);
+        reviewRepository.deleteByUserId(userId);
+        memberRepository.delete(member);
     }
 
-
-
-    // ==========================================
-    // 아이디 중복확인
-    // ==========================================
     @Transactional(readOnly = true)
-    public boolean isUserIdDuplicate(
-            String userId) {
-
-
-        return memberRepository
-                .existsByUserId(
-                        userId
-                );
-
+    public boolean isUserIdDuplicate(String value) {
+        return memberRepository.existsByUserId(MemberValidation.userId(value));
     }
-
-
-
-    // ==========================================
-    // 닉네임 중복확인
-    // ==========================================
     @Transactional(readOnly = true)
-    public boolean isNicknameDuplicate(
-            String nickname) {
-
-
-        return memberRepository
-                .existsByNickname(
-                        nickname
-                );
-
+    public boolean isNicknameDuplicate(String value) {
+        return memberRepository.existsByNickname(MemberValidation.nickname(value));
     }
-
+    private boolean matches(String input, String saved) {
+        if (input == null || input.isEmpty() || saved == null) return false;
+        return isEncoded(saved) ? passwordEncoder.matches(input, saved) : saved.equals(input);
+    }
+    private boolean isEncoded(String value) {
+        return value != null && value.matches("^\\$2[aby]\\$.*");
+    }
+    private IllegalArgumentException invalidLogin() {
+        return new IllegalArgumentException("아이디 또는 비밀번호가 올바르지 않습니다. 입력한 정보를 다시 확인해 주세요.");
+    }
 }
