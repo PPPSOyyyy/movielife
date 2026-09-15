@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MovieDetailDto {
 
-    // 영화 기본 정보
+
     private Long id;
 
     private String title;
@@ -31,32 +31,23 @@ public class MovieDetailDto {
 
     private Integer runtime;
 
-
-    // 장르 이름
     private List<String> genres;
 
-
-    // 제작 국가
     private List<String> productionCountries;
 
-
-    // 감독
     private String director;
 
-
-    // 관람등급
     private String certification;
 
-
-    // 출연진
     private List<String> cast;
 
+    private List<CastMember> castMembers;
 
-    // OTT 제공처
     private List<String> ottProviders;
 
+    private String trailerKey;
 
-    // 포스터 전체 주소
+
     public String getPosterUrl() {
 
         if (
@@ -65,17 +56,14 @@ public class MovieDetailDto {
         ) {
 
             return "/poster/no-poster.svg";
-
         }
 
 
         return "https://image.tmdb.org/t/p/w500"
                 + posterPath;
-
     }
 
 
-    // 배경 이미지 전체 주소
     public String getBackdropUrl() {
 
         if (
@@ -84,13 +72,58 @@ public class MovieDetailDto {
         ) {
 
             return "";
-
         }
 
 
         return "https://image.tmdb.org/t/p/w1280"
                 + backdropPath;
-
     }
 
+
+    public String getTrailerUrl() {
+
+        if (
+            trailerKey == null ||
+            trailerKey.isBlank()
+        ) {
+
+            return "";
+        }
+
+
+        return "https://www.youtube.com/watch?v="
+                + trailerKey;
+    }
+
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CastMember {
+
+
+        private Long id;
+
+        private String name;
+
+        private String character;
+
+        private String profilePath;
+
+
+        public String getProfileUrl() {
+
+            if (
+                profilePath == null ||
+                profilePath.isBlank()
+            ) {
+
+                return "/poster/no-poster.svg";
+            }
+
+
+            return "https://image.tmdb.org/t/p/w185"
+                    + profilePath;
+        }
+    }
 }

@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+
+<html
+    lang="ko"
+    xmlns:th="http://www.thymeleaf.org"
+>
+
+<head
+    th:replace="~{fragments/layout :: head(${pageTitle})}"
+>
+</head>
+
+
+<body class="ml-app ml-country-page">
+
+
+<th:block
+    th:replace="~{fragments/layout :: header}"
+>
+</th:block>
+
+
+<main
+    id="main"
+    class="shell country-main"
+>
+
+
+    <!-- =====================================================
+         페이지 제목
+    ====================================================== -->
+
+    <section class="country-page-header">
+
+        <p
+            class="eyebrow"
+            th:text="${eyebrow}"
+        >
+            KOREAN CINEMA
+        </p>
+
+
+        <h1
+            th:text="${pageTitle}"
+        >
+            국내영화
+        </h1>
+
+
+        <p
+            class="country-page-description"
+            th:text="${pageDescription}"
+        >
+            한국 영화의 다양한 이야기를 만나보세요.
+        </p>
+
+    </section>
+
+
+    <!-- =====================================================
+         필터
+    ====================================================== -->
+
+    <form
+        class="filter-form country-filter-form"
+        method="get"
+        th:action="${basePath}"
+    >
+
+
+        <!-- 해외영화에서만 국가 표시 -->
+
+        <label
+            class="field"
+            th:if="${foreignPage}"
+        >
+
+            <span>
+                국가
+            </span>
+
+
+            <select name="country">
+
+                <option
+                    th:each="country : ${countries}"
+                    th:value="${country.key}"
+                    th:text="${country.value}"
+                    th:selected="${country.key == selectedCountry}"
+                >
+                    미국
+                </option>
+
+            </select>
+
+        </label>
+
+
+        <!-- 장르 -->
+
+        <label class="field">
+
+            <span>
+                장르
+            </span>
+
+
+            <select name="genre">
+
+                <option value="">
+                    전체 장르
+                </option>
+
+
+                <option
+                    value="28"
+                    th:selected="${selectedGenre == 28}"
+                >
+                    액션
+                </option>
+
+
+                <option
+                    value="12"
+                    th:selected="${selectedGenre == 12}"
+                >
+                    모험
+                </option>
+
+
+                <option
+                    value="16"
+                    th:selected="${selectedGenre == 16}"
+                >
+                    애니메이션
+                </option>
+
+
+                <option
+                    value="35"
+                    th:selected="${selectedGenre == 35}"
+                >
+                    코미디
+                </option>
+
+
+                <option
+                    value="80"
+                    th:selected="${selectedGenre == 80}"
+                >
+                    범죄
+                </option>
+
+
+                <option
+                    value="18"
+                    th:selected="${selectedGenre == 18}"
+                >
+                    드라마
+                </option>
+
+
+                <option
+                    value="10751"
+                    th:selected="${selectedGenre == 10751}"
+                >
+                    가족
+                </option>
+
+
+                <option
+                    value="14"
+                    th:selected="${selectedGenre == 14}"
+                >
+                    판타지
+                </option>
+
+
+                <option
+                    value="27"
+                    th:selected="${selectedGenre == 27}"
+                >
+                    공포
+                </option>
+
+
+                <option
+                    value="10749"
+                    th:selected="${selectedGenre == 10749}"
+                >
+                    로맨스
+                </option>
+
+
+                <option
+                    value="878"
+                    th:selected="${selectedGenre == 878}"
+                >
+                    SF
+                </option>
+
+
+                <option
+                    value="53"
+                    th:selected="${selectedGenre == 53}"
+                >
+                    스릴러
+                </option>
+
+
+                <option
+                    value="99"
+                    th:selected="${selectedGenre == 99}"
+                >
+                    다큐멘터리
+                </option>
+
+
+                <option
+                    value="36"
+                    th:selected="${selectedGenre == 36}"
+                >
+                    역사
+                </option>
+
+
+                <option
+                    value="10402"
+                    th:selected="${selectedGenre == 10402}"
+                >
+                    음악
+                </option>
+
+
+                <option
+                    value="9648"
+                    th:selected="${selectedGenre == 9648}"
+                >
+                    미스터리
+                </option>
+
+
+                <option
+                    value="10752"
+                    th:selected="${selectedGenre == 10752}"
+                >
+                    전쟁
+                </option>
+
+
+                <option
+                    value="37"
+                    th:selected="${selectedGenre == 37}"
+                >
+                    서부
+                </option>
+
+            </select>
+
+        </label>
+
+
+        <!-- 평점 -->
+
+        <label class="field">
+
+            <span>
+                TMDB 평점
+            </span>
+
+
+            <select name="minRating">
+
+                <option value="">
+                    전체 평점
+                </option>
+
+
+                <option
+                    value="6"
+                    th:selected="${selectedMinRating != null and selectedMinRating == 6}"
+                >
+                    6점 이상
+                </option>
+
+
+                <option
+                    value="7"
+                    th:selected="${selectedMinRating != null and selectedMinRating == 7}"
+                >
+                    7점 이상
+                </option>
+
+
+                <option
+                    value="8"
+                    th:selected="${selectedMinRating != null and selectedMinRating == 8}"
+                >
+                    8점 이상
+                </option>
+
+
+                <option
+                    value="9"
+                    th:selected="${selectedMinRating != null and selectedMinRating == 9}"
+                >
+                    9점 이상
+                </option>
+
+            </select>
+
+        </label>
+
+
+        <!-- 개봉 연도 -->
+
+        <label class="field">
+
+            <span>
+                개봉 연도
+            </span>
+
+
+            <select name="year">
+
+                <option value="">
+                    전체 연도
+                </option>
+
+
+                <option
+                    th:each="y : ${#numbers.sequence(currentYear, 1980, -1)}"
+                    th:value="${y}"
+                    th:text="${y} + '년'"
+                    th:selected="${selectedYear != null and selectedYear == y}"
+                >
+                    2026년
+                </option>
+
+            </select>
+
+        </label>
+
+
+        <!-- OTT -->
+
+        <label class="field">
+
+            <span>
+                구독 중인 OTT
+            </span>
+
+
+            <select name="provider">
+
+                <option value="">
+                    전체 서비스
+                </option>
+
+
+                <option
+                    value="8"
+                    th:selected="${selectedProvider == 8}"
+                >
+                    Netflix
+                </option>
+
+
+                <option
+                    value="337"
+                    th:selected="${selectedProvider == 337}"
+                >
+                    Disney+
+                </option>
+
+
+                <option
+                    value="97"
+                    th:selected="${selectedProvider == 97}"
+                >
+                    Watcha
+                </option>
+
+
+                <option
+                    value="309"
+                    th:selected="${selectedProvider == 309}"
+                >
+                    Wavve
+                </option>
+
+
+                <option
+                    value="356"
+                    th:selected="${selectedProvider == 356}"
+                >
+                    TVING
+                </option>
+
+            </select>
+
+        </label>
+
+
+        <!-- 버튼 -->
+
+        <div class="filter-actions">
+
+            <a
+                class="btn btn-ghost"
+                th:href="${basePath}"
+            >
+                초기화
+            </a>
+
+
+            <button
+                class="btn btn-primary"
+                type="submit"
+            >
+                필터 적용
+            </button>
+
+        </div>
+
+    </form>
+
+
+    <!-- =====================================================
+         결과 정보
+    ====================================================== -->
+
+    <div class="result-bar">
+
+
+        <div>
+
+            <span th:if="${foreignPage}">
+
+                <strong
+                    th:text="${countryName}"
+                >
+                    미국
+                </strong>
+
+                영화 ·
+
+            </span>
+
+
+            총
+
+            <strong
+                th:text="${#numbers.formatInteger(totalResults, 1, 'COMMA')}"
+            >
+                0
+            </strong>
+
+            편
+
+        </div>
+
+
+        <span>
+            인기순 · TMDB 기준
+        </span>
+
+    </div>
+
+
+    <!-- =====================================================
+         API 오류
+    ====================================================== -->
+
+    <div
+        class="empty-state"
+        th:if="${catalogError != null}"
+    >
+
+        <h3>
+            잠시 연결이 원활하지 않습니다
+        </h3>
+
+
+        <p
+            th:text="${catalogError}"
+        >
+            영화 정보를 불러오지 못했습니다.
+        </p>
+
+
+        <button
+            class="btn"
+            data-reload
+        >
+            다시 시도
+        </button>
+
+    </div>
+
+
+    <!-- =====================================================
+         영화 목록
+    ====================================================== -->
+
+    <div
+        class="movie-grid"
+        th:if="${catalogError == null and !#lists.isEmpty(movies)}"
+    >
+
+
+        <th:block
+            th:each="movie : ${movies}"
+        >
+
+            <article
+                th:replace="~{fragments/layout :: card(${movie})}"
+            >
+            </article>
+
+        </th:block>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         결과 없음
+    ====================================================== -->
+
+    <div
+        class="empty-state"
+        th:if="${catalogError == null and #lists.isEmpty(movies)}"
+    >
+
+
+        <div class="empty-icon">
+            ⌕
+        </div>
+
+
+        <h3>
+            조건에 맞는 영화가 없습니다
+        </h3>
+
+
+        <p>
+            다른 조건으로 검색해 보세요.
+        </p>
+
+
+        <a
+            class="btn"
+            th:href="${basePath}"
+        >
+            필터 초기화
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         페이지 이동
+    ====================================================== -->
+
+    <nav
+        class="pagination"
+        aria-label="페이지 이동"
+        th:if="${totalPages > 1 and !#lists.isEmpty(movies)}"
+    >
+
+
+        <!-- 이전 -->
+
+
+        <a
+            th:if="${currentPage > 1 and foreignPage}"
+            th:href="@{/movies/foreign(
+                country=${selectedCountry},
+                genre=${selectedGenre},
+                minRating=${selectedMinRating},
+                year=${selectedYear},
+                provider=${selectedProvider},
+                page=${currentPage - 1}
+            )}"
+        >
+            이전
+        </a>
+
+
+        <a
+            th:if="${currentPage > 1 and !foreignPage}"
+            th:href="@{/movies/domestic(
+                genre=${selectedGenre},
+                minRating=${selectedMinRating},
+                year=${selectedYear},
+                provider=${selectedProvider},
+                page=${currentPage - 1}
+            )}"
+        >
+            이전
+        </a>
+
+
+        <span
+            class="disabled"
+            th:if="${currentPage == 1}"
+        >
+            이전
+        </span>
+
+
+        <!-- 페이지 번호 -->
+
+
+        <th:block
+            th:each="p : ${#numbers.sequence(startPage, endPage)}"
+        >
+
+
+            <a
+                th:if="${foreignPage}"
+                th:href="@{/movies/foreign(
+                    country=${selectedCountry},
+                    genre=${selectedGenre},
+                    minRating=${selectedMinRating},
+                    year=${selectedYear},
+                    provider=${selectedProvider},
+                    page=${p}
+                )}"
+                th:text="${p}"
+                th:classappend="${p == currentPage} ? 'active'"
+            >
+                1
+            </a>
+
+
+            <a
+                th:if="${!foreignPage}"
+                th:href="@{/movies/domestic(
+                    genre=${selectedGenre},
+                    minRating=${selectedMinRating},
+                    year=${selectedYear},
+                    provider=${selectedProvider},
+                    page=${p}
+                )}"
+                th:text="${p}"
+                th:classappend="${p == currentPage} ? 'active'"
+            >
+                1
+            </a>
+
+
+        </th:block>
+
+
+        <!-- 다음 -->
+
+
+        <a
+            th:if="${currentPage < totalPages and foreignPage}"
+            th:href="@{/movies/foreign(
+                country=${selectedCountry},
+                genre=${selectedGenre},
+                minRating=${selectedMinRating},
+                year=${selectedYear},
+                provider=${selectedProvider},
+                page=${currentPage + 1}
+            )}"
+        >
+            다음
+        </a>
+
+
+        <a
+            th:if="${currentPage < totalPages and !foreignPage}"
+            th:href="@{/movies/domestic(
+                genre=${selectedGenre},
+                minRating=${selectedMinRating},
+                year=${selectedYear},
+                provider=${selectedProvider},
+                page=${currentPage + 1}
+            )}"
+        >
+            다음
+        </a>
+
+
+        <span
+            class="disabled"
+            th:if="${currentPage == totalPages}"
+        >
+            다음
+        </span>
+
+
+    </nav>
+
+
+</main>
+
+
+<footer
+    th:replace="~{fragments/layout :: footer}"
+>
+</footer>
+
+
+<script src="/js/auth-header.js?v=20260915-3">
+</script>
+
+
+</body>
+
+</html>

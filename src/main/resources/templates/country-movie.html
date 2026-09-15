@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragments/layout :: head(${pageTitle})}"></head>
+    <body class="ml-app ml-country-page">
+        <th:block th:replace="~{fragments/layout :: header}"></th:block>
+        <main id="main" class="shell country-main">
+            <div class="country-heading">
+                <div>
+                    <p class="eyebrow" th:text="${foreignPage ? 'WORLD CINEMA' : 'KOREAN CINEMA'}">KOREAN CINEMA</p>
+                    <h1 th:text="${pageTitle}">국내영화</h1>
+                    <p class="muted" th:text="${pageDescription}"></p>
+                </div>
+                <span class="country-label" th:text="${countryName} + ' 영화 컬렉션'">한국 영화 컬렉션</span>
+            </div>
+
+            <section class="hero country-hero" th:if="${overviewPage}" aria-label="대표 영화">
+                <img class="hero-backdrop"
+                     th:if="${heroMovie != null and !#strings.isEmpty(heroMovie.backdropUrl)}"
+                     th:src="${heroMovie.backdropUrl}" alt="">
+                <div class="country-hero-copy" th:if="${heroMovie != null}">
+                    <p class="eyebrow" th:text="${foreignPage ? countryName + ' 영화, 이 한 편부터' : '한국영화, 이 한 편부터'}"></p>
+                    <h2 th:text="${heroMovie.title}">대표 영화</h2>
+                    <div class="country-hero-meta">
+                        <span class="gold" th:if="${heroMovie.voteAverage != null}">
+                            ★ <span th:text="${#numbers.formatDecimal(heroMovie.voteAverage, 1, 1)}">0.0</span> <small>TMDB</small>
+                        </span>
+                        <span th:if="${!#strings.isEmpty(heroMovie.releaseDate)}" th:text="${heroMovie.releaseDate}"></span>
+                        <span th:if="${!#lists.isEmpty(heroMovie.genreNames)}"
+                              th:text="${#strings.listJoin(heroMovie.genreNames, ' · ')}"></span>
+                    </div>
+                    <p class="country-overview"
+                       th:text="${#strings.isEmpty(heroMovie.overview) ? '이 영화의 이야기가 궁금하다면, 상세 화면에서 더 만나보세요.' : heroMovie.overview}"></p>
+                    <div class="actions">
+                        <a class="btn btn-primary" th:href="@{/movies/{id}(id=${heroMovie.id})}">상세 보기 <span aria-hidden="true">↗</span></a>
+                        <button class="btn btn-ghost" type="button"
+                                th:data-favorite="${heroMovie.id}" th:data-title="${heroMovie.title}"
+                                data-full-label aria-label="찜하기" aria-pressed="false">♡ 찜하기</button>
+                    </div>
+                </div>
+                <a class="country-hero-poster" th:if="${heroMovie != null}"
+                   th:href="@{/movies/{id}(id=${heroMovie.id})}" th:aria-label="${heroMovie.title} + ' 상세 보기'">
+                    <img th:src="${heroMovie.posterUrl}" th:alt="${heroMovie.title} + ' 포스터'" data-poster width="184" height="276">
+                </a>
+                <div class="country-hero-copy" th:if="${heroMovie == null}">
+                    <p class="eyebrow" th:text="${countryName} + ' 영화 컬렉션'"></p>
+                    <h2>다음에 만날 한 편.</h2>
+                    <p class="country-overview">대표 영화를 준비하지 못했습니다. 아래 목록을 확인하거나 잠시 후 다시 시도해 주세요.</p>
+                    <button class="btn btn-ghost" type="button" data-reload>다시 시도</button>
+                </div>
+            </section>
+
+            <div class="country-discovery" th:if="${foreignPage}">
+                <div class="country-filter-title">
+                    <strong>어느 나라 영화를 만나볼까요?</strong>
+                    <span class="muted small">국가를 선택하면 영화 목록이 바뀝니다.</span>
+                </div>
+                <div class="country-filter-controls">
+                    <nav class="country-pills" aria-label="영화 국가 선택">
+                        <a class="country-pill" th:each="code : ${primaryCountries}"
+                           th:href="@{${basePath}(country=${code},section=${overviewPage ? null : selectedSection})}"
+                           th:classappend="${selectedCountry == code} ? 'is-active'"
+                           th:attr="aria-current=${selectedCountry == code ? 'page' : null}">
+                            <span class="country-code" th:text="${code}"></span>
+                            <span th:text="${countries[code]}"></span>
+                        </a>
+                    </nav>
+                    <form class="country-other" th:action="${basePath}" method="get">
+                        <input type="hidden" name="section" th:if="${!overviewPage}" th:value="${selectedSection}">
+                        <select name="country" aria-label="다른 국가 선택" required>
+                            <option value="" disabled th:selected="${#lists.contains(primaryCountries, selectedCountry)}">다른 국가</option>
+                            <option th:each="option : ${countries}"
+                                    th:if="${!#lists.contains(primaryCountries, option.key)}"
+                                    th:value="${option.key}" th:text="${option.value}"
+                                    th:selected="${selectedCountry == option.key}"></option>
+                        </select>
+                        <button class="btn btn-sm" type="submit">보기</button>
+                    </form>
+                </div>
+            </div>
+
+            <nav class="country-jumps" th:if="${overviewPage and !foreignPage}" aria-label="국내영화 목록 바로가기">
+                <a href="#country-latest"><span>01</span> 최신 국내영화 <span aria-hidden="true">↓</span></a>
+                <a href="#country-topRated"><span>02</span> 평점 높은 국내영화 <span aria-hidden="true">↓</span></a>
+                <a href="#country-popular"><span>03</span> 국내 인기작 <span aria-hidden="true">↓</span></a>
+            </nav>
+
+            <th:block th:if="${overviewPage}">
+                <section class="section country-section" th:each="section : ${catalogSections}" th:id="'country-' + ${section.key}">
+                    <div class="section-head">
+                        <div>
+                            <p class="eyebrow" th:text="${section.eyebrow}"></p>
+                            <h2 th:text="${section.title}"></h2>
+                            <p class="muted small" th:text="${section.description}"></p>
+                        </div>
+                        <a class="text-link" th:if="${!#lists.isEmpty(section.movies)}"
+                           th:href="@{${basePath}(country=${foreignPage ? selectedCountry : null},section=${section.key})}"
+                           th:aria-label="${section.title} + ' 더보기'">더보기 <span aria-hidden="true">→</span></a>
+                    </div>
+                    <div class="movie-grid compact" th:if="${!#lists.isEmpty(section.movies)}">
+                        <th:block th:each="movie : ${section.movies}">
+                            <article th:replace="~{fragments/layout :: card(${movie})}"></article>
+                        </th:block>
+                    </div>
+                    <div class="empty-state" th:if="${!#strings.isEmpty(section.error)}">
+                        <h3>영화를 불러오지 못했습니다</h3>
+                        <p th:text="${section.error}"></p>
+                        <button class="btn btn-sm" type="button" data-reload>다시 시도</button>
+                    </div>
+                    <div class="empty-state" th:if="${#lists.isEmpty(section.movies) and #strings.isEmpty(section.error)}">
+                        <h3>조건에 맞는 영화가 없습니다</h3>
+                        <p>다른 목록을 둘러보시거나 다른 국가를 선택해 보세요.</p>
+                    </div>
+                </section>
+            </th:block>
+
+            <section class="country-list" th:if="${!overviewPage}">
+                <a class="text-link country-back" th:href="@{${basePath}(country=${foreignPage ? selectedCountry : null})}"
+                   th:text="'← ' + ${pageTitle} + ' 둘러보기'"></a>
+                <div class="section-head">
+                    <div>
+                        <h2 th:text="${sectionTitle}"></h2>
+                        <p class="muted small" th:text="${sectionDescription}"></p>
+                    </div>
+                </div>
+                <nav class="tabs" aria-label="영화 정렬 기준">
+                    <a th:href="@{${basePath}(country=${foreignPage ? selectedCountry : null},section='latest')}"
+                       th:classappend="${selectedSection == 'latest'} ? 'active'"
+                       th:attr="aria-current=${selectedSection == 'latest' ? 'page' : null}">최신순</a>
+                    <a th:href="@{${basePath}(country=${foreignPage ? selectedCountry : null},section='topRated')}"
+                       th:classappend="${selectedSection == 'topRated'} ? 'active'"
+                       th:attr="aria-current=${selectedSection == 'topRated' ? 'page' : null}">평점순</a>
+                    <a th:href="@{${basePath}(country=${foreignPage ? selectedCountry : null},section='popular')}"
+                       th:classappend="${selectedSection == 'popular'} ? 'active'"
+                       th:attr="aria-current=${selectedSection == 'popular' ? 'page' : null}">인기순</a>
+                </nav>
+                <div class="result-bar" th:if="${#strings.isEmpty(catalogError)}">
+                    <span>총 <strong th:text="${#numbers.formatInteger(totalResults, 1, 'COMMA')}">0</strong>편</span>
+                    <span>TMDB 10점 기준</span>
+                </div>
+                <div class="movie-grid" th:if="${!#lists.isEmpty(movies)}">
+                    <th:block th:each="movie : ${movies}">
+                        <article th:replace="~{fragments/layout :: card(${movie})}"></article>
+                    </th:block>
+                </div>
+                <div class="empty-state" th:if="${!#strings.isEmpty(catalogError)}">
+                    <h3>잠시 연결이 원활하지 않습니다</h3>
+                    <p th:text="${catalogError}"></p>
+                    <button class="btn" type="button" data-reload>다시 시도</button>
+                </div>
+                <div class="empty-state" th:if="${#lists.isEmpty(movies) and #strings.isEmpty(catalogError)}">
+                    <h3>조건에 맞는 영화가 없습니다</h3>
+                    <p>정렬 기준을 바꾸거나 다른 국가를 선택해 보세요.</p>
+                </div>
+                <nav class="pagination" aria-label="페이지 이동" th:if="${totalPages > 1 and !#lists.isEmpty(movies)}">
+                    <a th:if="${currentPage > 1}"
+                       th:href="@{${basePath}(country=${foreignPage ? selectedCountry : null},section=${selectedSection},page=${currentPage - 1})}">이전</a>
+                    <span class="disabled" th:if="${currentPage == 1}">이전</span>
+                    <a th:each="p : ${#numbers.sequence(startPage, endPage)}"
+                       th:href="@{${basePath}(country=${foreignPage ? selectedCountry : null},section=${selectedSection},page=${p})}"
+                       th:text="${p}" th:classappend="${p == currentPage} ? 'active'"
+                       th:attr="aria-current=${p == currentPage ? 'page' : null}"></a>
+                    <a th:if="${currentPage < totalPages}"
+                       th:href="@{${basePath}(country=${foreignPage ? selectedCountry : null},section=${selectedSection},page=${currentPage + 1})}">다음</a>
+                    <span class="disabled" th:if="${currentPage == totalPages}">다음</span>
+                </nav>
+            </section>
+
+            <p class="country-note">TMDB 국가 정보 기준 · 공동제작 작품은 여러 국가에 포함될 수 있습니다. 최신순은 TMDB 기본 개봉일 기준입니다.</p>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}"></footer>
+        <script src="/js/auth-header.js?v=20260915-3"></script>
+    </body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html
+    lang="ko"
+    xmlns:th="http://www.thymeleaf.org"
+>
+
+<head
+    th:replace="~{fragments/layout :: head('배우 상세')}"
+>
+</head>
+
+<body class="ml-app person-detail-page">
+
+
+<th:block
+    th:replace="~{fragments/layout :: header}"
+>
+</th:block>
+
+
+<main
+    id="main"
+    class="shell person-main"
+>
+
+
+    <!-- =====================================================
+         뒤로가기
+    ====================================================== -->
+
+    <div class="person-back">
+
+        <a href="javascript:history.back()">
+            ← 영화로 돌아가기
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         배우 기본 정보
+    ====================================================== -->
+
+    <section class="person-hero">
+
+
+        <div class="person-profile-column">
+
+            <img
+                class="person-profile-image"
+                th:src="${person.profileUrl}"
+                th:alt="${person.name}"
+            >
+
+        </div>
+
+
+        <div class="person-info-column">
+
+
+            <p class="eyebrow">
+                ACTOR PROFILE
+            </p>
+
+
+            <h1
+                th:text="${person.name}"
+            >
+                배우 이름
+            </h1>
+
+
+            <p
+                class="person-original-name"
+                th:if="${person.originalName != null
+                    and !person.originalName.isBlank()
+                    and person.originalName != person.name}"
+                th:text="${person.originalName}"
+            >
+                Original Name
+            </p>
+
+
+            <div class="person-facts">
+
+
+                <div class="person-fact">
+
+                    <span>
+                        분야
+                    </span>
+
+                    <strong
+                        th:text="${person.departmentName}"
+                    >
+                        배우
+                    </strong>
+
+                </div>
+
+
+                <div class="person-fact">
+
+                    <span>
+                        출생
+                    </span>
+
+                    <strong
+                        th:text="${person.birthday != null
+                            and !person.birthday.isBlank()
+                            ? person.birthday
+                            : '정보 없음'}"
+                    >
+                        정보 없음
+                    </strong>
+
+                </div>
+
+
+                <div class="person-fact person-fact-wide">
+
+                    <span>
+                        출생지
+                    </span>
+
+                    <strong
+                        th:text="${person.placeOfBirth != null
+                            and !person.placeOfBirth.isBlank()
+                            ? person.placeOfBirth
+                            : '정보 없음'}"
+                    >
+                        정보 없음
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="person-biography">
+
+
+                <h2>
+                    배우 소개
+                </h2>
+
+
+                <p
+                    th:if="${person.biography != null
+                        and !person.biography.isBlank()}"
+                    th:text="${person.biography}"
+                >
+                    배우 소개
+                </p>
+
+
+                <p
+                    class="muted"
+                    th:if="${person.biography == null
+                        or person.biography.isBlank()}"
+                >
+                    등록된 배우 소개가 없습니다.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         주요 출연작
+    ====================================================== -->
+
+    <section class="person-movies-section">
+
+
+        <div class="person-section-head">
+
+
+            <div>
+
+                <p class="eyebrow">
+                    FILMOGRAPHY
+                </p>
+
+
+                <h2>
+                    주요 출연작
+                </h2>
+
+
+                <p class="person-section-description">
+                    관객 평가와 인지도를 기준으로 대표 작품을 모았습니다.
+                </p>
+
+            </div>
+
+
+            <span
+                class="person-work-count"
+                th:if="${person.movies != null
+                    and !person.movies.isEmpty()}"
+            >
+
+                <strong
+                    th:text="${person.movies.size()}"
+                >
+                    18
+                </strong>
+
+                작품
+
+            </span>
+
+        </div>
+
+
+        <div
+            class="person-movie-grid"
+            th:if="${person.movies != null
+                and !person.movies.isEmpty()}"
+        >
+
+
+            <a
+                class="person-movie-card"
+                th:each="movie : ${person.movies}"
+                th:href="@{/movies/{movieId}(movieId=${movie.id})}"
+            >
+
+
+                <!-- 포스터 -->
+
+                <div class="person-movie-poster-wrap">
+
+
+                    <img
+                        th:src="${movie.posterUrl}"
+                        th:alt="${movie.title}"
+                        loading="lazy"
+                    >
+
+
+                    <div
+                        class="person-movie-rating"
+                        th:if="${movie.voteAverage != null and movie.voteAverage > 0}"
+                    >
+
+                        <span>
+                            ★
+                        </span>
+
+
+                        <strong
+                            th:text="${#numbers.formatDecimal(movie.voteAverage, 1, 1)}"
+                        >
+                            8.0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- 제목 -->
+
+                <h3
+                    th:text="${movie.title}"
+                >
+                    영화 제목
+                </h3>
+
+
+                <!-- 연도 / 평점 -->
+
+                <div class="person-movie-info">
+
+
+                    <span
+                        th:text="${movie.releaseYear}"
+                    >
+                        2020
+                    </span>
+
+
+                    <span
+                        th:if="${movie.voteAverage != null and movie.voteAverage > 0}"
+                    >
+                        ·
+                    </span>
+
+
+                    <span
+                        class="person-inline-rating"
+                        th:if="${movie.voteAverage != null and movie.voteAverage > 0}"
+                    >
+
+                        ★
+
+                        <span
+                            th:text="${#numbers.formatDecimal(movie.voteAverage, 1, 1)}"
+                        >
+                            8.0
+                        </span>
+
+                    </span>
+
+                </div>
+
+
+                <!-- 배역 -->
+
+                <p
+                    class="person-movie-character"
+                    th:if="${movie.character != null and !movie.character.isBlank()}"
+                    th:text="${movie.character}"
+                    th:title="${movie.character}"
+                >
+                    Tony Stark
+                </p>
+
+            </a>
+
+        </div>
+
+
+        <div
+            class="empty-state"
+            th:if="${person.movies == null
+                or person.movies.isEmpty()}"
+        >
+
+            <h3>
+                출연작 정보가 없습니다
+            </h3>
+
+            <p>
+                TMDB에 등록된 영화 출연 정보가 없습니다.
+            </p>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+<footer
+    th:replace="~{fragments/layout :: footer}"
+>
+</footer>
+
+
+<script src="/js/auth-header.js?v=20260915-3">
+</script>
+
+
+</body>
+
+</html>
