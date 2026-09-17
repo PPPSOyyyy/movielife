@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('영화추천')}"></head>
+
+<body class="ml-app mint-recommend">
+
+<th:block th:replace="~{fragments/layout :: header}"></th:block>
+
+<main class="shell page" id="main">
+
+    <section class="page-header">
+        <div class="page-label">FOR YOU</div>
+        <h1>점점 나를 닮아가는 영화 추천</h1>
+        <p>
+            처음에는 가입할 때 고른 취향을 중심으로 추천하고,<br>
+            이후에는 찜·별점·자주 본 영화를 함께 학습해 추천을 바꿉니다.
+        </p>
+    </section>
+
+    <section class="recommend-box auto-recommend-box">
+
+        <div class="recommend-overview">
+
+            <div>
+                <p class="eyebrow">PERSONALIZED RECOMMENDATION</p>
+                <h2 id="recommendStage">취향을 분석하고 있어요.</h2>
+                <p class="recommend-copy" id="recommendMessage">
+                    추천 데이터를 준비하고 있습니다.
+                </p>
+            </div>
+
+            <div class="recommend-actions">
+                <a class="btn btn-ghost" href="/preferences/setup?next=/recommend">
+                    취향 다시 설정
+                </a>
+
+                <button
+                    type="button"
+                    class="recommend-button"
+                    id="recommendButton"
+                >
+                    🎬 다시 추천받기
+                </button>
+            </div>
+
+        </div>
+
+
+        <div class="recommend-weight-box">
+            <div class="recommend-weight-title">현재 추천 반영 비율</div>
+
+            <div class="recommend-weight-grid">
+                <div><span>초기 취향</span><strong id="weightPreference">-</strong></div>
+                <div><span>별점</span><strong id="weightRating">-</strong></div>
+                <div><span>찜</span><strong id="weightFavorite">-</strong></div>
+                <div><span>상세 조회</span><strong id="weightView">-</strong></div>
+                <div><span>TMDB 보정</span><strong id="weightTmdb">-</strong></div>
+            </div>
+        </div>
+
+        <div class="learning-flow">
+            <div>
+                <strong>가입 취향</strong>
+                <span>처음 추천의 기준</span>
+            </div>
+            <div class="learning-arrow">→</div>
+            <div>
+                <strong>찜 · 별점</strong>
+                <span>좋아하는 작품 학습</span>
+            </div>
+            <div class="learning-arrow">→</div>
+            <div>
+                <strong>상세 조회</strong>
+                <span>자주 찾는 작품 학습</span>
+            </div>
+            <div class="learning-arrow">→</div>
+            <div>
+                <strong>개인화 추천</strong>
+                <span>사용할수록 변화</span>
+            </div>
+        </div>
+
+    </section>
+
+    <section class="result-section" id="recommendationResult">
+
+        <div class="result-header">
+            <div>
+                <div class="result-label">RECOMMENDED FOR YOU</div>
+                <h2>추천 영화</h2>
+            </div>
+
+            <p>
+                추천 결과는 회원 활동에 따라 계속 달라질 수 있습니다.
+            </p>
+        </div>
+
+        <div class="recommend-loading" id="recommendLoading">
+            <div class="recommend-spinner"></div>
+            <p>내 취향에 맞는 영화를 고르고 있습니다...</p>
+        </div>
+
+        <div
+            class="movie-grid recommendation-list"
+            id="recommendationList"
+            aria-live="polite"
+        ></div>
+
+    </section>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<style>
+    .auto-recommend-box {
+        padding: 32px;
+    }
+
+    .recommend-overview {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 30px;
+    }
+
+    .recommend-overview h2 {
+        margin: 0 0 10px;
+        font-size: 28px;
+    }
+
+    .recommend-copy {
+        max-width: 760px;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.75;
+    }
+
+    .recommend-actions {
+        display: flex;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    .recommend-button {
+        min-height: 46px;
+        padding: 10px 20px;
+        border: 1px solid var(--red);
+        border-radius: 9px;
+        background: var(--red);
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .recommend-button:hover {
+        background: var(--red-hover);
+        border-color: var(--red-hover);
+    }
+
+    .recommend-button:disabled {
+        opacity: 0.55;
+        cursor: wait;
+    }
+
+
+    .recommend-weight-box {
+        margin-top: 24px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--panel-2);
+    }
+
+    .recommend-weight-title {
+        margin-bottom: 12px;
+        color: var(--text);
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+    .recommend-weight-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .recommend-weight-grid > div {
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: var(--panel);
+    }
+
+    .recommend-weight-grid span,
+    .recommend-weight-grid strong {
+        display: block;
+    }
+
+    .recommend-weight-grid span {
+        color: var(--muted);
+        font-size: 12px;
+    }
+
+    .recommend-weight-grid strong {
+        margin-top: 5px;
+        color: var(--red);
+        font-size: 20px;
+    }
+
+    .learning-flow {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+        align-items: center;
+        gap: 12px;
+        margin-top: 28px;
+        padding-top: 24px;
+        border-top: 1px solid var(--line);
+    }
+
+    .learning-flow > div:not(.learning-arrow) {
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--panel-2);
+    }
+
+    .learning-flow strong,
+    .learning-flow span {
+        display: block;
+    }
+
+    .learning-flow strong {
+        color: var(--text);
+        font-size: 15px;
+    }
+
+    .learning-flow span {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+    }
+
+    .learning-arrow {
+        color: var(--red);
+        font-size: 20px;
+        font-weight: 800;
+    }
+
+    .result-section {
+        margin-top: 46px;
+    }
+
+    .recommend-loading {
+        display: flex;
+        min-height: 250px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted);
+    }
+
+    .recommend-spinner {
+        width: 42px;
+        height: 42px;
+        margin-bottom: 16px;
+        border: 4px solid var(--line);
+        border-top-color: var(--red);
+        border-radius: 50%;
+        animation: recommend-spin 0.9s linear infinite;
+    }
+
+    @keyframes recommend-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .recommend-member-rating {
+        margin-top: 5px !important;
+        color: var(--red) !important;
+        font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+        .recommend-overview {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .recommend-actions {
+            flex-wrap: wrap;
+        }
+
+    
+    .recommend-weight-box {
+        margin-top: 24px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--panel-2);
+    }
+
+    .recommend-weight-title {
+        margin-bottom: 12px;
+        color: var(--text);
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+    .recommend-weight-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .recommend-weight-grid > div {
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: var(--panel);
+    }
+
+    .recommend-weight-grid span,
+    .recommend-weight-grid strong {
+        display: block;
+    }
+
+    .recommend-weight-grid span {
+        color: var(--muted);
+        font-size: 12px;
+    }
+
+    .recommend-weight-grid strong {
+        margin-top: 5px;
+        color: var(--red);
+        font-size: 20px;
+    }
+
+    .learning-flow {
+            grid-template-columns: 1fr;
+        }
+
+        .learning-arrow {
+            display: none;
+        }
+    }
+</style>
+
+<script src="/js/recommendations.js?v=learning-0917"></script>
+<script src="/js/auth-header.js?v=learning-0917" defer></script>
+
+</body>
+</html>

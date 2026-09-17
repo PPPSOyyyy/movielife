@@ -1,0 +1,47 @@
+<!DOCTYPE html><html lang="ko" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments/layout :: head('회원정보 관리')}"></head><body class="ml-app"><th:block th:replace="~{fragments/layout :: header}"></th:block><main id="main" class="shell page settings-page"><h1>회원정보 관리</h1><nav class="account-tabs"><a class="btn" href="#personal">개인정보 수정</a><a class="btn" href="#password">비밀번호 변경</a><a class="btn" href="#withdraw">회원탈퇴</a></nav>
+<section id="personal" class="panel"><h2>개인정보 수정</h2><p>닉네임만 변경할 때는 비밀번호가 필요하지 않습니다.</p><form id="personalForm" class="form-stack">
+<label class="field">아이디<input id="accountUserId" readonly></label><label class="field">이름<input name="name" maxlength="80"></label><label class="field">닉네임<input name="nickname" maxlength="20" required></label><label class="field">이메일<input name="email" type="email" maxlength="254"></label>
+<details><summary>보안 질문 등록·변경</summary><p>기존 회원은 복구 정보를 등록해야 비밀번호 찾기를 사용할 수 있습니다.</p><label class="field">보안 질문<select name="securityQuestion" data-security-questions><option value="">질문 선택</option></select></label><label class="field">새 답변<input name="securityAnswer" type="password" maxlength="200" autocomplete="off"></label></details>
+<label class="field">현재 비밀번호<input name="currentPassword" type="password" autocomplete="current-password"><small>이메일·보안 답변을 변경할 때만 입력하세요.</small></label><p role="status" data-status></p><button class="btn btn-primary">개인정보 저장</button></form></section>
+<section id="password" class="panel"><h2>비밀번호 변경</h2><form id="passwordForm" class="form-stack"><label class="field">현재 비밀번호<input name="currentPassword" type="password" autocomplete="current-password" required></label><label class="field">새 비밀번호<input name="password" type="password" minlength="8" maxlength="50" autocomplete="new-password" required></label><label class="field">새 비밀번호 확인<input name="passwordConfirm" type="password" minlength="8" maxlength="50" autocomplete="new-password" required></label><p>영문·숫자·특수문자 포함 8~50자, 공백 제외, 최대 72바이트</p><p role="status" data-status></p><button class="btn btn-primary">비밀번호 변경</button></form></section>
+<section id="withdraw" class="panel"><h2>회원탈퇴</h2><p>비밀번호 확인 후 찜과 리뷰를 포함한 회원정보를 삭제합니다.</p><button id="withdrawOpen" class="btn" type="button">회원탈퇴</button></section><dialog class="ml-dialog" id="withdrawDialog">
+                <h2>
+                    회원탈퇴
+                </h2>
+                <p>
+                    계정과 영화 활동 기록이 모두 삭제됩니다.
+                    <br>
+                    계속하시려면 현재 비밀번호를 입력해 주세요.
+                </p>
+                <form id="withdrawForm">
+                    <label class="field">
+                        <span>
+                            현재 비밀번호
+                        </span>
+                        <input
+                            type="password"
+                            id="withdrawPassword"
+                            autocomplete="current-password"
+                            required
+                        >
+                    </label>
+                    <p
+                        class="error-text"
+                        id="withdrawError"
+                        role="alert"
+                    >
+                    </p>
+                    <div class="actions">
+                        <button
+                            type="button"
+                            class="btn"
+                            data-close-dialog
+                        >
+                            취소
+                        </button>
+                        <button type="submit" class="btn btn-danger">
+                            탈퇴하기
+                        </button>
+                    </div>
+                </form>
+            </dialog></main><footer th:replace="~{fragments/layout :: footer}"></footer><script src="/js/auth-header.js"></script><script src="/js/account.js?v=upgrade20"></script><script src="/js/account-management.js?v=upgrade20"></script></body></html>

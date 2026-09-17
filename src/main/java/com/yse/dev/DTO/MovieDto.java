@@ -1,0 +1,160 @@
+package com.yse.dev.DTO;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class MovieDto {
+
+    // TMDB 영화 고유 번호
+    private Long id;
+
+    // 영화 제목
+    private String title;
+
+    // 줄거리
+    private String overview;
+
+    // 포스터 경로
+    private String posterPath;
+
+    private String backdropPath;
+
+    // 개봉일
+    private String releaseDate;
+
+    // 평점
+    private Double voteAverage;
+
+    // TMDB 평가 참여 수
+    private Integer voteCount;
+
+    // TMDB 인기도
+    private Double popularity;
+
+    // MovieLife 회원 평균 별점 (10점 만점)
+    private Double memberRatingAverage;
+
+    // MovieLife 회원 별점 참여 수
+    private Long memberRatingCount;
+
+    // 장르 번호 목록
+    private List<Integer> genreIds;
+
+    // OTT 제공처
+    private List<String> ottProviders;
+
+
+    // ==========================================
+    // TMDB 장르 ID → 한글 장르명
+    // ==========================================
+
+    private static final Map<Integer, String>
+            GENRE_MAP = Map.ofEntries(
+
+            Map.entry(28, "액션"),
+            Map.entry(12, "모험"),
+            Map.entry(16, "애니메이션"),
+            Map.entry(35, "코미디"),
+            Map.entry(80, "범죄"),
+            Map.entry(99, "다큐멘터리"),
+            Map.entry(18, "드라마"),
+            Map.entry(10751, "가족"),
+            Map.entry(14, "판타지"),
+            Map.entry(36, "역사"),
+            Map.entry(27, "공포"),
+            Map.entry(10402, "음악"),
+            Map.entry(9648, "미스터리"),
+            Map.entry(10749, "로맨스"),
+            Map.entry(878, "SF"),
+            Map.entry(10770, "TV 영화"),
+            Map.entry(53, "스릴러"),
+            Map.entry(10752, "전쟁"),
+            Map.entry(37, "서부")
+
+    );
+
+
+    // ==========================================
+    // 장르 ID를 한글 장르명 목록으로 변환
+    // ==========================================
+
+    public List<String> getGenreNames() {
+
+        List<String> genreNames =
+                new ArrayList<>();
+
+        if (
+            genreIds == null ||
+            genreIds.isEmpty()
+        ) {
+
+            return genreNames;
+
+        }
+
+        for (Integer genreId : genreIds) {
+
+            String genreName =
+                    GENRE_MAP.get(genreId);
+
+            if (genreName != null) {
+
+                genreNames.add(
+                        genreName
+                );
+
+            }
+
+        }
+
+        return genreNames;
+
+    }
+
+
+    // ==========================================
+    // 실제 포스터 이미지 주소
+    // ==========================================
+
+    public String getPosterUrl() {
+
+        if (
+            posterPath == null ||
+            posterPath.isBlank()
+        ) {
+
+            return "/poster/no-poster.svg";
+        }
+
+        return "https://image.tmdb.org/t/p/w500"
+                + posterPath;
+    }
+
+
+    public String getBackdropUrl() {
+        return backdropPath == null || backdropPath.isBlank() ? "" : "https://image.tmdb.org/t/p/w1280" + backdropPath;
+    }
+
+    // TMDB adult 플래그 (목록에서는 항상 제외됨)
+    private boolean adult;
+
+    // 한국 관람등급 코드 (ALL / 12 / 15 / 19 / RESTRICTED / UNKNOWN)
+    private String certificationCode = "UNKNOWN";
+
+    // 한국 관람등급을 실제로 확인했는지 여부.
+    // false 이면 UNKNOWN 은 "아직 확인 안 됨"을 뜻하므로 카드에 '정보 없음'을 표시하지 않습니다.
+    private boolean certificationChecked;
+
+    public boolean isAdultsOnly(){ return "19".equals(certificationCode); }
+    public String getCertificationLabel(){ return com.yse.dev.Service.KoreanCertification.label(certificationCode); }
+
+}

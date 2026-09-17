@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragments/layout :: head('내가 찜한 영화')}">
+    </head>
+    <body class="ml-app">
+        <th:block th:replace="~{fragments/layout :: header}">
+        </th:block>
+        <main
+            id="main"
+            class="shell page"
+            data-favorite-page
+        >
+            <div class="page-heading">
+                <p class="eyebrow">
+                    MY COLLECTION
+                </p>
+                <h1>
+                    내가 찜한 영화
+                </h1>
+                <p class="muted">
+                    보고 싶은 영화, 잊지 않고 모아 두세요.
+                </p>
+            </div>
+            <div class="result-bar">
+                <span>
+                    총
+                    <strong data-favorite-count th:text="${#lists.size(favoriteMovies)}">
+                        0
+                    </strong>
+                    편 · 최근 찜한 순
+                </span>
+                <a href="/mypage">
+                    마이페이지 →
+                </a>
+            </div>
+            <div class="movie-grid" id="favoritesGrid">
+                <th:block th:each="movie : ${favoriteMovies}">
+                    <article th:replace="~{fragments/layout :: card(${movie})}">
+                    </article>
+                </th:block>
+            </div>
+            <div
+                class="empty-state"
+                id="favoritesEmpty"
+                th:hidden="${!#lists.isEmpty(favoriteMovies)}"
+            >
+                <div class="empty-icon">
+                    ♡
+                </div>
+                <h3>
+                    아직 찜한 영화가 없습니다
+                </h3>
+                <p>
+                    영화 카드의 하트를 누르면 여기에 모아 드립니다.
+                </p>
+                <a class="btn btn-primary" href="/movies">
+                    영화 둘러보기
+                </a>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}">
+        </footer>
+        <script src="/js/auth-header.js?v=upgrade20">
+        </script>
+    </body>
+</html>

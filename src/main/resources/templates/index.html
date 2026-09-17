@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragments/layout :: head('당신의 인생작품을 찾아보세요')}">
+    </head>
+    <body class="ml-app">
+        <th:block th:replace="~{fragments/layout :: header}">
+        </th:block>
+        <main id="main" class="shell home-main">
+            <section class="hero">
+                <img
+                    class="hero-backdrop"
+                    th:if="${bestMovie != null and !#strings.isEmpty(bestMovie.backdropUrl)}"
+                    th:src="${bestMovie.backdropUrl}"
+                    alt=""
+                >
+                <div>
+                    <p class="eyebrow">
+                        발견하고, 기록하는 나의 영화 취향
+                    </p>
+                    <h1>
+                        오늘의 영화가,
+                        <br>
+                        내일의
+                        <span>
+                            인생작품.
+                        </span>
+                    </h1>
+                    <p class="hero-description">
+                        취향에 맞는 영화를 발견하고,
+                        <br>
+                        별점과 리뷰로 감상을 남겨보세요.
+                    </p>
+                    <div class="actions">
+                        <a class="btn btn-primary" href="/movies">
+                            영화 둘러보기
+                            <span aria-hidden="true">
+                                ↗
+                            </span>
+                        </a>
+                        <a class="btn btn-ghost" href="/favorite-movies">
+                            내가 찜한 영화
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-pick" th:if="${bestMovie != null}">
+                    <div class="hero-pick-info">
+                        <span class="badge">
+                            오늘의 발견
+                        </span>
+                        <h2 th:text="${bestMovie.title}">
+                            오늘의 영화
+                        </h2>
+                        <p class="small muted">
+                            <span class="gold">
+                                ★
+                                <span
+                                    th:text="${#numbers.formatDecimal(bestMovie.voteAverage,1,1)}"
+                                >
+                                    0.0
+                                </span>
+                            </span>
+                            · TMDB
+                        </p>
+                    <a class="text-link hero-detail" th:href="@{/movies/{id}(id=${bestMovie.id})}">상세보기 →</a></div>
+                    <a th:href="@{/movies/{id}(id=${bestMovie.id})}">
+                        <img
+                            class="hero-poster"
+                            th:src="${bestMovie.posterUrl}"
+                            th:alt="${bestMovie.title} + ' 포스터'"
+                            data-poster
+                        >
+                    </a>
+                </div>
+                <div class="hero-pick" th:if="${bestMovie == null}">
+                    <div class="hero-fallback">
+                        <p class="eyebrow">
+                            MY MOVIE JOURNAL
+                        </p>
+                        <h2>
+                            좋아하는 영화가
+                            <br>
+                            취향이 되는 곳.
+                        </h2>
+                    </div>
+                </div>
+            </section>
+            <div class="quick-bar">
+                <a href="/movies?tab=topRated">
+                    <div>
+                        <strong>
+                            평점 높은 영화
+                        </strong>
+                        <span>
+                            많은 관객이 선택한 작품
+                        </span>
+                    </div>
+                    <span class="quick-arrow">
+                        ↗
+                    </span>
+                </a>
+                <a href="/movies?tab=upcoming">
+                    <div>
+                        <strong>
+                            개봉 예정 영화
+                        </strong>
+                        <span>
+                            곧 극장에서 만날 이야기
+                        </span>
+                    </div>
+                    <span class="quick-arrow">
+                        ↗
+                    </span>
+                </a>
+                <a href="/ott">
+                    <div>
+                        <strong>
+                            OTT에서 찾아보기
+                        </strong>
+                        <span>
+                            오늘, 집에서 즐기는 영화
+                        </span>
+                    </div>
+                    <span class="quick-arrow">
+                        ↗
+                    </span>
+                </a>
+            </div>
+            <section class="section">
+                <div class="section-head">
+                    <div>
+                        <p class="eyebrow">
+                            지금, 영화 한 편
+                        </p>
+                        <h2>
+                            지금 주목받는 영화
+                        </h2>
+                    </div>
+                    <a class="text-link" href="/movies">
+                        전체 보기 →
+                    </a>
+                </div>
+                <div
+                    class="movie-grid compact"
+                    th:if="${!#lists.isEmpty(popularMovies)}"
+                >
+                    <th:block th:each="movie : ${popularMovies}">
+                        <article th:replace="~{fragments/layout :: card(${movie})}">
+                        </article>
+                    </th:block>
+                </div>
+                <div
+                    class="empty-state"
+                    th:if="${#lists.isEmpty(popularMovies)}"
+                >
+                    <h3>
+                        영화를 불러오지 못했습니다
+                    </h3>
+                    <p>
+                        잠시 후 다시 확인해 주세요.
+                    </p>
+                    <button class="btn" data-reload>
+                        다시 시도
+                    </button>
+                </div>
+            </section>
+            <section class="section two-panels">
+                <article class="panel feature-panel">
+                    <div>
+                        <span class="feature-label">
+                            오늘의 영화
+                        </span>
+                        <h2>
+                            한 편의 좋은 영화.
+                        </h2>
+                        <p
+                            th:text="${bestMovie != null ? bestMovie.title : '좋은 영화와 만나는 새로운 방법'}"
+                        >
+                            베스트 영화
+                        </p>
+                        <a class="btn btn-sm" href="/movies?tab=topRated">
+                            평점 높은 영화 보기 →
+                        </a>
+                    </div>
+                    <img
+                        class="feature-poster"
+                        th:if="${bestMovie != null}"
+                        th:src="${bestMovie.posterUrl}"
+                        th:alt="${bestMovie.title}"
+                        data-poster
+                    >
+                </article>
+                <article class="panel feature-panel" id="homeFavorite" th:data-logged-in="${userLoggedIn}"><span id="homeFavoriteBadge" class="age-badge" th:hidden="${myMovie == null or !myMovie.adultsOnly}">19</span>
+                    <div>
+                        <span class="feature-label">
+                            나의 찜 목록
+                        </span>
+                        <h2>
+                            다음에 보고 싶은 영화.
+                        </h2>
+                        <p
+                            id="homeFavoriteTitle" th:text="${myMovie != null ? myMovie.title : (userLoggedIn ? '마음에 드는 영화의 하트를 눌러 담아 보세요.' : '로그인하고 나만의 영화 목록을 만들어 보세요.')}"
+                        >
+                            내가 찜한 영화
+                        </p>
+                        <a class="btn btn-sm" href="/favorite-movies">
+                            내가 찜한 영화 →
+                        </a>
+                    <div class="actions"><a id="homeFavoriteLink" class="text-link" th:href="${myMovie != null ? '/movies/'+myMovie.id : '/favorite-movies'}">영화 상세 →</a><button type="button" class="btn btn-sm" id="favoriteNext" hidden>다음</button><button type="button" class="btn btn-sm" id="favoritePause" hidden>자동 전환 정지</button></div></div>
+                    <img
+                        id="homeFavoritePoster" class="feature-poster"
+                        th:hidden="${myMovie == null}"
+                        th:src="${myMovie != null ? myMovie.posterUrl : '/poster/no-poster.svg'}"
+                        th:alt="${myMovie != null ? myMovie.title : '찜한 영화'}"
+                        data-poster
+                    >
+                </article>
+            </section>
+            <section
+                class="section"
+                data-ott-section
+                data-limit="5"
+            >
+                <div class="section-head">
+                    <div>
+                        <p class="eyebrow">
+                            내 OTT에서 찾기
+                        </p>
+                        <h2>
+                            OTT에서 지금 볼 수 있는 영화
+                        </h2>
+                    </div>
+                    <a
+                        href="/ott?provider=8"
+                        class="text-link"
+                        data-ott-all
+                    >
+                        전체 보기 →
+                    </a>
+                </div>
+                <div th:replace="~{ott :: providers}">
+                </div>
+                <div
+                    class="movie-grid compact"
+                    data-ott-results
+                    aria-live="polite"
+                >
+                    <p class="loading">
+                        영화를 불러오는 중입니다.
+                    </p>
+                </div>
+            </section>
+            <section class="section cta-panel">
+                <div>
+                    <h2>
+                        당신의 영화 취향을 남겨 주세요.
+                    </h2>
+                    <p>
+                        별점과 리뷰로, 나만의 인생작품을 기록해 보세요.
+                    </p>
+                </div>
+                <a class="btn btn-primary" href="/review">
+                    영화 리뷰 쓰기 ↗
+                </a>
+            </section>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}">
+        </footer>
+        <script src="/js/auth-header.js?v=upgrade20">
+        </script>
+        <script src="/js/catalog.js?v=upgrade20">
+        </script>
+    </body>
+</html>

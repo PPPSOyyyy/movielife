@@ -1,0 +1,963 @@
+/* Shared light (white · black text · red accent) and dark (black · red accent) tokens. Loaded after existing styles on all pages. */
+:root,html[data-theme="light"] {
+    color-scheme:light;
+    --bg:#f7f7f7;
+    --background:#f7f7f7;
+    --sidebar:#fff;
+    --panel:#fff;
+    --panel-2:#efefef;
+    --panel2:#efefef;
+    --line:#dddddd;
+    --border:#dddddd;
+    --border-soft:#e8e8e8;
+    --text:#000000;
+    --muted:#5c5c5c;
+    --red:#d92234;
+    --red-hover:#b81b2b;
+    --red-soft:#fbe6e8;
+    --green:#d92234;
+    --gold:#88631b;
+    --yellow:#88631b;
+    --black:#000000;
+    --white:#fff;
+    --card:#fff;
+    --width:1760px;
+    --action-ink:#fff;
+    --focus:#d92234;
+    --shadow:0 12px 32px #0000000b
+}
+
+html[data-theme="dark"] {
+    color-scheme:dark;
+    --bg:#000000;
+    --background:#000000;
+    --sidebar:#0d0d0d;
+    --panel:#121212;
+    --panel-2:#1c1c1c;
+    --panel2:#1c1c1c;
+    --line:#333333;
+    --border:#333333;
+    --border-soft:#262626;
+    --text:#ffffff;
+    --muted:#b0b0b0;
+    --red:#d92234;
+    --red-hover:#ff4b5c;
+    --red-soft:#3a0f15;
+    --green:#d92234;
+    --gold:#e5cc85;
+    --yellow:#e5cc85;
+    --black:#000000;
+    --white:#ffffff;
+    --card:#121212;
+    --action-ink:#ffffff;
+    --focus:#ff5c6b;
+    --shadow:0 12px 32px #0002
+}
+
+body.ml-app,body.mint-admin {
+    background:var(--bg);
+    color:var(--text);
+    font-size:16px
+}
+
+[hidden] {
+    display:none!important
+}
+
+.ml-app .shell,.ml-app .ml-header-inner {
+    width:min(calc(100% - clamp(32px,5vw,112px)),var(--width));
+    max-width:var(--width)
+}
+
+.ml-app .ml-header,.mint-admin .topbar {
+    background:var(--panel);
+    border-color:var(--line)
+}
+
+.ml-app .ml-search,.ml-app input,.ml-app select,.ml-app textarea,.mint-admin input,.mint-admin select {
+    background:var(--panel-2);
+    color:var(--text);
+    border-color:var(--line);
+    font:inherit;
+    min-width:0
+}
+
+.ml-app input::placeholder,.ml-app textarea::placeholder {
+    color:var(--muted)
+}
+
+.ml-app .panel,.ml-app .auth-card,.ml-app .empty-state,.ml-app .review-item,.ml-app .person-fact,.ml-app .cinema-side-card,.ml-app .cinema-review-toolbar,.ml-app .cinema-review-summary,.ml-app .cinema-review-list,.ml-app .review-form,.ml-app .stat-card,.ml-app .recommend-box {
+    background:var(--panel);
+    color:var(--text);
+    border-color:var(--line)
+}
+
+.ml-app .btn-primary,.ml-app .mint-signup .btn-primary,.ml-app.mint-signup .btn-primary,.ml-app .recommend-button,.ml-app .choice.selected,.ml-app .pagination .active,.ml-app .favorite-toggle[aria-pressed=true] {
+    background:var(--red)!important;
+    color:var(--action-ink)!important;
+    border-color:var(--red)!important
+}
+
+.ml-app .btn-primary:hover {
+    background:var(--red-hover)!important
+}
+
+.ml-app .btn,.ml-app .btn-ghost,.ml-app .choice,.ml-app .quick-bar,.ml-app .provider-tabs button,.ml-app .account-tabs {
+    color:var(--text);
+    border-color:var(--line)
+}
+
+.ml-app .btn-ghost,.ml-app .choice {
+    background:var(--panel-2)
+}
+
+.ml-app .provider-tabs button[aria-pressed=true],.ml-app .browse-nav>a.active {
+    color:var(--red);
+    background:var(--red-soft)
+}
+
+.ml-app .cta-panel {
+    background:var(--red-soft);
+    border-color:var(--line)
+}
+
+.ml-app .cinema-title,.ml-app .cinema-original-title,.ml-app .cinema-overview h2,.ml-app .cinema-overview p,.ml-app .cinema-meta,.ml-app .cinema-section-title h2,.ml-app .cinema-fact strong,.ml-app .person-info-column h1,.ml-app .person-biography h2,.ml-app .person-biography p,.ml-app .person-movie-card h3,.ml-app .cinema-cast-card strong,.ml-app .person-fact strong {
+    color:var(--text)
+}
+
+.ml-app .cinema-fact-label,.ml-app .cinema-cast-card span,.ml-app .person-original-name,.ml-app .person-fact>span,.ml-app .person-section-description,.ml-app .person-movie-info,.ml-app .person-movie-character {
+    color:var(--muted)
+}
+
+.ml-app .cinema-ott-chip {
+    background:var(--red-soft);
+    color:var(--red);
+    border-color:var(--line)
+}
+
+.ml-app .cinema-review-section,.ml-app .person-hero,.ml-app .cinema-cast-photo-wrap {
+    border-color:var(--line)
+}
+
+.ml-app .error-text {
+    color:#bd3047
+}
+
+.ml-app .success-text {
+    color:var(--red)
+}
+
+.ml-app .rating-badge {
+    color:#ffc1c7;
+    background:#000000ed
+}
+
+.ml-app .favorite-toggle {
+    color:#fff
+}
+
+.ml-app .favorite-full {
+    color:var(--text);
+    background:var(--panel-2)
+}
+
+.ml-app .hero {
+    background:var(--panel);
+    color:var(--text);
+    box-shadow:var(--shadow)
+}
+
+.ml-app .hero-description {
+    color:var(--muted)
+}
+
+html[data-theme="light"] .hero:after {
+    background:linear-gradient(90deg,#fffffff5 10%,#ffffffec 45%,#ffffffb3)
+}
+
+html[data-theme="light"] .hero .badge {
+    background:var(--red-soft);
+    color:var(--red);
+    border-color:var(--line)
+}
+
+html[data-theme="light"] .cinema-detail-overlay {
+    background:linear-gradient(90deg,#f7f7f7f5,#f7f7f7e0),linear-gradient(0deg,#f7f7f7,transparent)
+}
+
+html[data-theme="dark"] .cinema-detail-overlay {
+    background:linear-gradient(90deg,#000000f5,#000000c7),linear-gradient(0deg,#000000,transparent)
+}
+
+.ml-app .cinema-detail-hero {
+    background:var(--bg)
+}
+
+.ml-app .cinema-detail-backdrop {
+    opacity:.3
+}
+
+.ml-app .cinema-main-poster,.ml-app .person-profile-image {
+    border-color:var(--line);
+    box-shadow:var(--shadow)
+}
+
+.ml-app .movie-grid,.ml-app .movie-grid.compact,.ml-app .browse-content .movie-grid,.ml-app .person-movie-grid {
+    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+    gap:28px 22px
+}
+
+.ml-app .movie-grid>.movie-card {
+    min-width:0;
+    max-width:250px
+}
+
+.ml-app .movie-info h3 {
+    font-size:18px
+}
+
+.provider-tabs {
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr))
+}
+
+.theme-control {
+    display:flex;
+    align-items:center;
+    gap:3px;
+    color:var(--muted);
+    font-size:13px;
+    white-space:nowrap
+}
+
+.theme-control select {
+    max-width:94px;
+    min-height:34px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    padding:5px;
+    background:var(--panel);
+    color:var(--text);
+    font-size:13px
+}
+
+.ml-header-inner>.theme-control {
+    grid-column:3;
+    grid-row:2;
+    justify-self:end;
+    align-self:center
+}
+
+.ml-app .ml-search {
+    max-width:calc(100% - 120px)
+}
+
+.age-badge {
+    position:absolute;
+    right:10px;
+    top:10px;
+    z-index:3;
+    display:grid;
+    place-items:center;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    background:#d92035;
+    color:#fff!important;
+    font-size:17px;
+    font-weight:800;
+    border:2px solid #fff;
+    line-height:1
+}
+
+.poster-wrap:has(.age-badge) .favorite-toggle {
+    top:auto;
+    bottom:10px
+}
+
+.cinema-poster-column,.person-movie-poster-wrap {
+    position:relative
+}
+
+.ml-app .cinema-cast-list {
+    display:flex;
+    overflow-x:auto;
+    gap:18px;
+    scroll-snap-type:x proximity;
+    overscroll-behavior-x:contain;
+    padding:12px 0 20px;
+    touch-action:pan-x pan-y;
+    cursor:grab
+}
+
+.ml-app .cinema-cast-card {
+    flex:0 0 132px;
+    min-width:0;
+    scroll-snap-align:start;
+    user-select:none
+}
+
+.ml-app .cinema-cast-photo-wrap {
+    width:132px;
+    height:176px
+}
+
+.ml-app .cinema-cast-photo {
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    pointer-events:none
+}
+
+.person-search-grid {
+    display:flex;
+    gap:18px;
+    overflow:auto;
+    padding:16px 0
+}
+
+.person-search-card {
+    flex:0 0 120px;
+    display:grid;
+    gap:8px
+}
+
+.person-search-card img {
+    width:120px;
+    height:160px;
+    object-fit:cover;
+    border-radius:9px
+}
+
+.person-search-card small {
+    color:var(--muted)
+}
+
+.settings-page>.panel {
+    max-width:760px;
+    padding:28px;
+    margin:24px 0
+}
+
+.account-tabs {
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin:22px 0
+}
+
+.settings-page h2 {
+    margin-bottom:16px
+}
+
+.settings-page form {
+    margin-top:18px
+}
+
+.settings-page select,.settings-page input {
+    width:100%;
+    padding:12px;
+    border:1px solid var(--line);
+    border-radius:8px
+}
+
+.settings-page [data-status] {
+    color:var(--red)
+}
+
+#homeFavorite .actions {
+    margin-top:12px;
+    gap:6px;
+    flex-wrap:wrap
+}
+
+.mint-admin .sidebar,.mint-admin .table-card,.mint-admin .stat-card,.mint-admin .quick-box {
+    background:var(--panel);
+    border-color:var(--line)
+}
+
+.mint-admin table,.mint-admin th,.mint-admin td {
+    border-color:var(--line)
+}
+
+.mint-admin tbody tr:hover {
+    background:var(--panel-2)
+}
+
+.mint-admin .page-header h1,.mint-admin .table-title,.mint-admin .table-title h2,.mint-admin .topbar strong {
+    color:var(--text)
+}
+
+.mint-admin .delete-button {
+    background:var(--panel-2);
+    color:#bd3047;
+    border-color:var(--line)
+}
+
+.ml-core-dialog {
+    background:var(--panel)!important;
+    color:var(--text)!important;
+    border-color:var(--line)!important
+}
+
+.ml-core-dialog p {
+    color:var(--muted)!important
+}
+
+.ml-core-ok {
+    background:var(--red)!important;
+    color:var(--action-ink)!important
+}
+
+.ml-core-cancel {
+    background:var(--panel-2)!important;
+    color:var(--text)!important
+}
+
+:focus-visible {
+    outline:2px solid var(--focus);
+    outline-offset:3px
+}
+
+@media(min-width:1650px) {
+    .ml-header-inner>.theme-control {
+        grid-row:2;
+        grid-column:4
+    }
+
+    .ml-app .ml-search {
+        max-width:340px
+    }
+
+}
+
+@media(max-width:800px) {
+    .ml-app .shell,.ml-app .ml-header-inner {
+        width:calc(100% - 32px)
+    }
+
+    .ml-header-inner>.theme-control {
+        grid-row:3;
+        grid-column:2;
+        z-index:2
+    }
+
+    .ml-app .ml-search {
+        grid-row:3;
+        grid-column:1/-1;
+        max-width:calc(100% - 112px)
+    }
+
+    .ml-app .movie-grid,.ml-app .movie-grid.compact,.ml-app .browse-content .movie-grid,.ml-app .person-movie-grid {
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:22px 14px
+    }
+
+    .theme-control>span {
+        display:none
+    }
+
+}
+
+@media(max-width:520px) {
+    .ml-app .movie-grid,.ml-app .movie-grid.compact,.ml-app .browse-content .movie-grid,.ml-app .person-movie-grid {
+        grid-template-columns:repeat(2,minmax(0,1fr))
+    }
+
+    .settings-page>.panel {
+        padding:20px
+    }
+
+    .browse-sidebar .filter-form {
+        grid-template-columns:1fr!important
+    }
+
+    .ml-app .cinema-cast-card {
+        flex-basis:110px
+    }
+
+    .ml-app .cinema-cast-photo-wrap {
+        width:110px;
+        height:147px
+    }
+
+    .mint-admin .topbar {
+        flex-wrap:wrap
+    }
+
+    .age-badge {
+        width:30px;
+        height:30px;
+        font-size:15px
+    }
+
+}
+
+.ml-app .rating-options {
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:8px
+}
+
+.ml-app .rating-option {
+    min-width:0
+}
+
+.ml-app .rating-option span {
+    font-size:16px
+}
+
+.ml-app .rating-option input:checked+span {
+    color:var(--red);
+    border-color:var(--red);
+    background:var(--red-soft)
+}
+
+/* Detail/person pages used literal dark colors in the original stylesheet. */
+.ml-app .person-hero {
+    background:var(--panel);
+    box-shadow:var(--shadow)
+}
+
+.ml-app .person-section-head h2,.ml-app .person-work-count strong,.ml-app .cinema-section-head h2,.ml-app .cinema-rating-main strong,.ml-app .cinema-rating-user strong,.ml-app .cinema-review-score strong {
+    color:var(--text)
+}
+
+.ml-app .person-back a,.ml-app .person-work-count,.ml-app .person-movie-year,.ml-app .person-movie-character span,.ml-app .person-movie-character strong,.ml-app .cinema-detail-breadcrumb a,.ml-app .cinema-rating-main small,.ml-app .cinema-rating-user small,.ml-app .cinema-review-score small,.ml-app .cinema-review-count,.ml-app .cinema-review-sort {
+    color:var(--muted)
+}
+
+.ml-app .person-info-column .eyebrow,.ml-app .person-section-head .eyebrow,.ml-app .person-movie-card:hover h3,.ml-app .cinema-cast-link:hover strong {
+    color:var(--red)
+}
+
+.ml-app .person-movie-poster-wrap,.ml-app.movie-detail-page .cinema-review-list .review-item {
+    background:var(--panel)
+}
+
+.ml-app .person-inline-rating,.ml-app .cinema-star,.ml-app .cinema-review-score span {
+    color:var(--gold)
+}
+
+.ml-app .cinema-rating-divider,.ml-app .cinema-section-title::after,.ml-app .cinema-meta span:not(:last-child)::after {
+    background:var(--line)
+}
+
+.ml-app .cinema-actions .favorite-toggle {
+    background:var(--panel-2);
+    color:var(--text)
+}
+
+.ml-app.mint-signup .auth-intro h1 span,.ml-app.mint-signup .eyebrow,.ml-app.mint-signup .auth-bottom a {
+    color:var(--red)!important
+}
+
+.ml-app.mint-signup .field-row .btn {
+    background:var(--red-soft);
+    color:var(--red);
+    border-color:var(--line)
+}
+
+.ml-app .rating-picker {
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:8px
+}
+
+@media(min-width:1650px) {
+    .ml-app .ml-header-inner {
+        grid-template-columns:auto 1fr 300px auto auto
+    }
+
+    .ml-app .ml-search {
+        width:300px
+    }
+
+    .ml-header-inner>.theme-control {
+        grid-column:5;
+        grid-row:1
+    }
+
+}
+
+#homeFavorite {
+    position:relative
+}
+
+/* Red accent applies consistently to controls and account/admin feedback. */
+.brand-reel g {
+    fill:var(--panel)
+}
+
+.ml-app .field input:focus,.ml-app .field select:focus,.ml-app .field textarea:focus {
+    box-shadow:0 0 0 3px var(--red-soft)
+}
+
+.ml-app .mint-account .avatar-large,.ml-app.mint-account .profile-panel .avatar-large {
+    background:var(--red-soft);
+    color:var(--red)
+}
+
+.ml-app .ml-skip,.mint-admin .home-button:hover,.mint-admin .logout-button:hover {
+    color:var(--action-ink);
+    background:var(--red)
+}
+
+.mint-admin .toast {
+    background:var(--red-soft);
+    color:var(--text);
+    border-color:var(--red)
+}
+
+.recommend-scores {
+    display:grid;
+    gap:5px;
+    margin-top:10px
+}
+
+.recommend-scores span:first-child {
+    color:var(--red);
+    font-weight:700
+}
+
+.catalog-sort {
+    display:flex;
+    gap:8px;
+    align-items:center;
+    flex-wrap:wrap
+}
+
+.catalog-sort>span {
+    font-size:14px;
+    color:var(--muted)
+}
+
+.catalog-sort button {
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    color:var(--text);
+    border-radius:8px;
+    padding:9px 14px;
+    font:inherit;
+    cursor:pointer
+}
+
+.catalog-sort button.active {
+    background:var(--red);
+    color:var(--action-ink);
+    border-color:var(--red);
+    font-weight:700
+}
+
+.catalog-sort button:disabled {
+    opacity:.5;
+    cursor:default
+}
+
+/* Compact account layout and consistent light controls. */
+.ml-app .auth-page {
+    width:min(calc(100% - 40px),1000px);
+    max-width:1000px;
+    grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);
+    gap:48px;
+    align-items:start;
+    min-height:0;
+    padding-block:36px
+}
+
+.ml-app .auth-intro {
+    padding-top:38px;
+    align-self:start
+}
+
+.ml-app .auth-card {
+    width:100%;
+    max-width:none;
+    padding:28px
+}
+
+.ml-app .ml-auth>a:not(.signup-link) {
+    color:var(--text)!important
+}
+
+.ml-app .country-filter-form select,.ml-app .filter-form select {
+    background:var(--panel-2)!important;
+    color:var(--text)!important;
+    border-color:var(--line)!important
+}
+
+.ml-app .provider-tabs {
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px
+}
+
+.ml-app .provider-tabs button {
+    flex:1 1 140px;
+    min-height:64px;
+    max-width:none;
+    font-size:17px;
+    padding:12px
+}
+
+.ml-app .movie-grid,.ml-app .person-movie-grid {
+    grid-template-columns:repeat(var(--balanced-cols,5),minmax(0,1fr))!important
+}
+
+.ml-app .movie-grid>.movie-card {
+    max-width:none
+}
+
+.ml-app .poster-wrap img {
+    width:100%;
+    height:100%;
+    object-fit:cover
+}
+
+@media(max-width:720px) {
+    .ml-app .auth-page {
+        max-width:580px;
+        grid-template-columns:1fr;
+        gap:20px
+    }
+
+    .ml-app .auth-intro {
+        padding:0
+    }
+
+    .ml-app .auth-intro h1 {
+        font-size:28px
+    }
+
+    .ml-app .auth-intro .auth-note {
+        display:none
+    }
+
+    .ml-app .auth-card {
+        padding:22px
+    }
+
+}
+
+/* Fixed five-column layout, independent of sort/filter result count. */
+.ml-app .movie-grid,.ml-app .movie-grid.compact,.ml-app .browse-content .movie-grid,.ml-app .person-movie-grid {
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:28px 22px
+}
+
+.movie-tail {
+    grid-column:1/-1;
+    min-width:0
+}
+
+.movie-tail-track {
+    display:flex;
+    gap:22px;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    scrollbar-width:thin;
+    padding-bottom:10px
+}
+
+.movie-tail-track>.movie-card,.movie-tail-track>.person-movie-card {
+    flex:0 0 calc((100% - 88px)/5);
+    min-width:0;
+    scroll-snap-align:start;
+    max-width:none
+}
+
+.movie-tail-controls {
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    margin-top:8px
+}
+
+.ml-app .person-filter-form {
+    display:flex;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:16px;
+    padding:20px;
+    margin:24px 0 32px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px
+}
+
+.person-filter-form label {
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    min-width:180px;
+    font-size:16px
+}
+
+.person-filter-form select {
+    width:100%;
+    min-width:180px;
+    max-width:100%;
+    min-height:46px;
+    padding:10px 34px 10px 12px;
+    border:1px solid var(--line);
+    border-radius:8px
+}
+
+.person-filter-form .btn {
+    min-height:46px
+}
+
+.person-section-head {
+    clear:both
+}
+
+.ml-app .person-biography p {
+    font-size:16px;
+    line-height:1.85;
+    overflow-wrap:anywhere
+}
+
+.login-recovery-links {
+    display:flex;
+    justify-content:center;
+    gap:18px;
+    align-items:center;
+    margin:20px 0 8px;
+    font-size:15px
+}
+
+.login-recovery-links a {
+    color:var(--red);
+    padding:7px 0
+}
+
+.login-recovery-links span {
+    color:var(--muted)
+}
+
+@media(max-width:720px) {
+    .ml-app .movie-grid,.ml-app .movie-grid.compact,.ml-app .browse-content .movie-grid,.ml-app .person-movie-grid {
+        grid-template-columns:repeat(2,minmax(0,1fr))!important
+    }
+
+    .movie-tail-track>.movie-card,.movie-tail-track>.person-movie-card {
+        flex-basis:calc((100% - 22px)/2)
+    }
+
+    .person-filter-form label {
+        flex:1 1 180px;
+        min-width:0
+    }
+
+}
+
+/* =========================================================
+0917 최종 보정
+- 헤더 로그인 상태 버튼을 movieLife 빨간색으로 통일
+- 라이트 모드 메인 히어로 이미지/포스터 가독성 개선
+========================================================= */
+/* ---------------------------------------------------------
+헤더 로그인 상태
+--------------------------------------------------------- */
+.ml-app .ml-header .ml-auth .auth-nickname {
+    color: var(--text) !important;
+    font-weight: 700;
+}
+
+.ml-app .ml-header .ml-auth .auth-admin-link {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: 68px;
+    min-height: 38px;
+    padding: 7px 12px;
+    border: 1px solid var(--red) !important;
+    border-radius: 8px;
+    background: var(--red) !important;
+    color: #ffffff !important;
+    font-weight: 800;
+}
+
+.ml-app .ml-header .ml-auth .auth-admin-link:hover {
+    background: var(--red-hover) !important;
+    border-color: var(--red-hover) !important;
+    color: #ffffff !important;
+}
+
+/* 로그아웃 버튼 - 기존 app.css의 흰/회색 버튼 스타일보다 우선 */
+.ml-app .ml-header .ml-auth button.auth-logout-button, .ml-app .ml-header .ml-auth button.auth-logout-button:link, .ml-app .ml-header .ml-auth button.auth-logout-button:visited, .ml-app .ml-header .ml-auth button.auth-logout-button:focus, .ml-app .ml-header .ml-auth button.auth-logout-button:active {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: 74px;
+    min-height: 38px;
+    padding: 7px 12px;
+    border: 1px solid var(--red) !important;
+    border-radius: 8px;
+    background: transparent !important;
+    color: var(--red) !important;
+    opacity: 1 !important;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: none !important;
+}
+
+.ml-app .ml-header .ml-auth button.auth-logout-button:hover {
+    border-color: var(--red) !important;
+    background: var(--red-soft) !important;
+    color: var(--red) !important;
+}
+
+/* ---------------------------------------------------------
+라이트 모드 메인 히어로
+기존 흰색 오버레이가 너무 강해 이미지가 날아가던 문제 보정
+--------------------------------------------------------- */
+html[data-theme="light"] .ml-app .hero {
+    background: #ffffff !important;
+}
+
+/* 배경 이미지 자체를 충분히 보이게 */
+html[data-theme="light"] .ml-app .hero-backdrop {
+    opacity: 0.92 !important;
+    filter: saturate(1.04) contrast(1.02) !important;
+}
+
+/* 왼쪽 글자는 읽히고, 가운데~오른쪽 영화 이미지는 잘 보이도록 */
+html[data-theme="light"] .ml-app .hero::after {
+    background:         linear-gradient(             90deg,             rgba(255,255,255,0.94) 0%,             rgba(255,255,255,0.82) 28%,             rgba(255,255,255,0.50) 49%,             rgba(255,255,255,0.18) 68%,             rgba(255,255,255,0.05) 100%         ) !important;
+}
+
+/* 히어로 안 텍스트 가독성 */
+html[data-theme="light"] .ml-app .hero h1, html[data-theme="light"] .ml-app .hero-pick-info h2 {
+    color: #111111 !important;
+}
+
+html[data-theme="light"] .ml-app .hero-description {
+    color: #4f4f4f !important;
+}
+
+html[data-theme="light"] .ml-app .hero .badge {
+    background: #fff0f2 !important;
+    border-color: #f1c8cd !important;
+    color: var(--red) !important;
+}
+
+/* 오른쪽 오늘의 발견 포스터를 또렷하게 */
+html[data-theme="light"] .ml-app .hero-poster {
+    opacity: 1 !important;
+    filter: none !important;
+    border: 1px solid #d8d8d8 !important;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.18) !important;
+}
+
+/* ---------------------------------------------------------
+작은 화면
+--------------------------------------------------------- */
+@media (max-width: 800px) {
+    .ml-app .ml-header .ml-auth .auth-admin-link,     .ml-app .ml-header .ml-auth button.auth-logout-button {
+        min-width: 62px;
+        min-height: 36px;
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+
+}

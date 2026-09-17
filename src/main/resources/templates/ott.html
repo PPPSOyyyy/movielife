@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragments/layout :: head('OTT')}">
+    </head>
+    <body class="ml-app">
+        <th:block th:replace="~{fragments/layout :: header}">
+        </th:block>
+        <main
+            id="main"
+            class="shell page"
+            data-ott-section
+            data-limit="20"
+        >
+            <div class="page-heading">
+                <p class="eyebrow">
+                    어디서 볼까요?
+                </p>
+                <h1>
+                    내 OTT에서 영화 찾기
+                </h1>
+                <p class="muted">
+                    이용 중인 OTT에서 볼 수 있는 영화를 찾아보세요.
+                </p>
+            </div>
+            <div
+                class="provider-tabs"
+                th:fragment="providers"
+                role="group"
+                aria-label="OTT 서비스 선택"
+            >
+<button type="button" th:each="p : ${krProviders}" th:data-provider="${p.id}" th:text="${p.name}" aria-pressed="false"></button><p th:if="${#lists.isEmpty(krProviders)}">KR 제공처 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</p>
+            </div>
+            <h2 class="ott-results-title" data-ott-heading>제공 영화</h2>
+            <div class="result-bar">
+                <span>
+                    한국 제공 정보 기준 · 구독/무료/광고/대여/구매 · 인기순
+                </span>
+                <span>
+                    제공 여부는 서비스 사정에 따라 달라질 수 있습니다.
+                </span>
+            </div>
+            <div
+                class="movie-grid"
+                data-ott-results
+                aria-live="polite"
+            >
+                <p class="loading">
+                    영화를 불러오는 중입니다.
+                </p>
+            </div>
+            <div class="actions" style="justify-content:center;margin-top:34px">
+                <button
+                    type="button"
+                    class="btn"
+                    data-ott-more
+                    hidden
+                >
+                    영화 더 보기
+                </button>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}">
+        </footer>
+        <script src="/js/auth-header.js?v=upgrade20">
+        </script>
+        <script src="/js/catalog.js?v=upgrade20">
+        </script>
+    </body>
+</html>

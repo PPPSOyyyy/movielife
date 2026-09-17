@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragments/layout :: head('준비 중')}">
+    </head>
+    <body class="ml-app">
+        <th:block th:replace="~{fragments/layout :: header}">
+        </th:block>
+        <main id="main" class="shell page ml-team-placeholder">
+            <div class="empty-state">
+                <p class="eyebrow">
+                    COMING SOON
+                </p>
+                <h1 th:text="${teamPageTitle}">
+                    영화
+                </h1>
+                <p>
+                    더 편리하게 영화를 만나실 수 있도록 준비하고 있습니다.
+                </p>
+                <a class="btn btn-primary" href="/movies">
+                    전체 영화 둘러보기
+                </a>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}">
+        </footer>
+        <script src="/js/auth-header.js?v=upgrade20">
+        </script>
+    </body>
+</html>

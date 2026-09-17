@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('아이디 찾기')}"></head>
+
+<body class="ml-app">
+
+<style>
+    .recovery-page {
+        min-height: calc(100vh - 170px);
+        padding: 70px 20px 100px;
+    }
+
+    .recovery-container {
+        width: 100%;
+        max-width: 650px;
+        margin: 0 auto;
+    }
+
+    .recovery-title-area {
+        margin-bottom: 28px;
+    }
+
+    .recovery-title-area .eyebrow {
+        margin: 0 0 10px;
+        color: #7441d8;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 1.2px;
+    }
+
+    .recovery-title-area h1 {
+        margin: 0;
+        color: var(--text);
+        font-size: 32px;
+        font-weight: 800;
+    }
+
+    .recovery-title-area p {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.7;
+    }
+
+    .recovery-card {
+        min-height: 360px;
+        padding: 46px 48px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.035);
+        box-sizing: border-box;
+    }
+
+    .form-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+    }
+
+    .recovery-field {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+    }
+
+    .recovery-field span {
+        color: var(--text);
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .recovery-field input {
+        width: 100%;
+        height: 58px;
+        padding: 0 17px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: var(--panel-2);
+        color: var(--text);
+        font-size: 16px;
+        outline: none;
+        box-sizing: border-box;
+        transition: 0.2s;
+    }
+
+    .recovery-field input:focus {
+        border-color: #7441d8;
+        box-shadow: 0 0 0 3px rgba(116, 65, 216, 0.10);
+    }
+
+    .recovery-field input::placeholder {
+        color: var(--muted);
+    }
+
+    .recovery-button {
+        width: 100%;
+        height: 54px;
+        margin-top: 4px;
+        border: 0;
+        border-radius: 10px;
+        background: #7441d8;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .recovery-button:hover {
+        background: #6535c7;
+    }
+
+    .recovery-status {
+        min-height: 20px;
+        margin: -5px 0 0;
+        color: #7441d8;
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1.5;
+    }
+
+    .recovery-links {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        margin-top: 34px;
+        color: var(--muted);
+        font-size: 14px;
+    }
+
+    .recovery-links a {
+        color: var(--muted);
+        text-decoration: none;
+    }
+
+    .recovery-links a:hover {
+        color: #7441d8;
+        text-decoration: underline;
+    }
+
+    @media (max-width: 700px) {
+        .recovery-page {
+            padding: 45px 16px 70px;
+        }
+
+        .recovery-card {
+            min-height: auto;
+            padding: 30px 22px;
+        }
+
+        .recovery-title-area h1 {
+            font-size: 28px;
+        }
+    }
+</style>
+
+<th:block th:replace="~{fragments/layout :: header}"></th:block>
+
+<main id="main" class="recovery-page">
+
+    <div class="recovery-container">
+
+        <div class="recovery-title-area">
+            <p class="eyebrow">ACCOUNT RECOVERY</p>
+
+            <h1>아이디 찾기</h1>
+
+            <p>
+                회원가입할 때 입력한 이름과 이메일을 입력해 주세요.
+            </p>
+        </div>
+
+        <section class="recovery-card">
+
+            <form id="findIdForm" class="form-stack">
+
+                <label class="recovery-field">
+                    <span>이름</span>
+
+                    <input
+                        name="name"
+                        type="text"
+                        maxlength="80"
+                        placeholder="이름을 입력해 주세요"
+                        required>
+                </label>
+
+                <label class="recovery-field">
+                    <span>이메일</span>
+
+                    <input
+                        name="email"
+                        type="email"
+                        maxlength="254"
+                        placeholder="이메일을 입력해 주세요"
+                        required>
+                </label>
+
+                <p
+                    class="recovery-status"
+                    role="status"
+                    data-status>
+                </p>
+
+                <button
+                    class="recovery-button"
+                    type="submit">
+                    아이디 확인
+                </button>
+
+            </form>
+
+            <div class="recovery-links">
+
+                <a href="/account/find-password">
+                    비밀번호 찾기
+                </a>
+
+                <span>|</span>
+
+                <a href="/login">
+                    로그인으로 돌아가기
+                </a>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<script src="/js/auth-header.js"></script>
+<script src="/js/account.js?v=upgrade21"></script>
+<script src="/js/account-management.js?v=upgrade22"></script>
+
+</body>
+</html>

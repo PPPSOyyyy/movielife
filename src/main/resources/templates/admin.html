@@ -1,0 +1,2233 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8"><script src="/js/theme.js?v=redblack-0917"></script>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>관리자 페이지 | movieLife</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        :root {
+
+            --background: #08090c;
+
+            --sidebar: #0d0f14;
+
+            --panel: #111319;
+
+            --panel2: #171a21;
+
+            --border: #252a34;
+
+            --border-soft: #1d2129;
+
+            --text: #f4f5f7;
+
+            --muted: #8d94a1;
+
+            --red: #ff3456;
+
+            --red-soft: rgba(255, 52, 86, 0.12);
+
+            --green: #53d68a;
+
+            --yellow: #efc866;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            background:
+                    var(--background);
+
+            color:
+                    var(--text);
+
+            font-family:
+                    Arial,
+                    "Noto Sans KR",
+                    sans-serif;
+        }
+
+
+        button,
+        input {
+
+            font:
+                    inherit;
+        }
+
+
+        button {
+
+            cursor:
+                    pointer;
+        }
+
+
+        a {
+
+            color:
+                    inherit;
+
+            text-decoration:
+                    none;
+        }
+
+
+        /* ======================================
+           전체 관리자 화면
+        ====================================== */
+
+        .admin-layout {
+
+            min-height:
+                    100vh;
+
+            display:
+                    grid;
+
+            grid-template-columns:
+                    230px 1fr;
+        }
+
+
+        /* ======================================
+           왼쪽 메뉴
+        ====================================== */
+
+        .sidebar {
+
+            position:
+                    sticky;
+
+            top:
+                    0;
+
+            height:
+                    100vh;
+
+            background:
+                    var(--sidebar);
+
+            border-right:
+                    1px solid var(--border-soft);
+
+            padding:
+                    26px 17px;
+
+            display:
+                    flex;
+
+            flex-direction:
+                    column;
+        }
+
+
+        .logo {
+
+            padding:
+                    4px 10px 28px;
+
+            font-size:
+                    25px;
+
+            font-weight:
+                    900;
+
+            letter-spacing:
+                    -1px;
+        }
+
+
+        .logo span {
+
+            color:
+                    var(--red);
+        }
+
+
+        .menu-label {
+
+            margin:
+                    4px 10px 9px;
+
+            color:
+                    #5f6673;
+
+            font-size:
+                    10px;
+
+            font-weight:
+                    800;
+
+            letter-spacing:
+                    1.5px;
+        }
+
+
+        .menu {
+
+            display:
+                    flex;
+
+            flex-direction:
+                    column;
+
+            gap:
+                    6px;
+        }
+
+
+        .menu button,
+        .menu a {
+
+            width:
+                    100%;
+
+            border:
+                    0;
+
+            border-radius:
+                    9px;
+
+            padding:
+                    12px 13px;
+
+            color:
+                    #a9afba;
+
+            background:
+                    transparent;
+
+            text-align:
+                    left;
+
+            font-size:
+                    13px;
+
+            font-weight:
+                    700;
+        }
+
+
+        .menu button:hover,
+        .menu a:hover {
+
+            background:
+                    #161920;
+
+            color:
+                    white;
+        }
+
+
+        .menu button.active {
+
+            background:
+                    var(--red-soft);
+
+            color:
+                    white;
+
+            box-shadow:
+                    inset 3px 0 0 var(--red);
+        }
+
+
+        .sidebar-bottom {
+
+            margin-top:
+                    auto;
+
+            border-top:
+                    1px solid var(--border-soft);
+
+            padding-top:
+                    16px;
+        }
+
+
+        .admin-info {
+
+            margin-bottom:
+                    10px;
+
+            padding:
+                    11px 12px;
+
+            border:
+                    1px solid var(--border);
+
+            border-radius:
+                    9px;
+
+            background:
+                    #12151b;
+        }
+
+
+        .admin-info small {
+
+            display:
+                    block;
+
+            color:
+                    var(--muted);
+
+            margin-bottom:
+                    4px;
+        }
+
+
+        .logout-button {
+
+            width:
+                    100%;
+
+            padding:
+                    10px;
+
+            border:
+                    1px solid #5a2b38;
+
+            border-radius:
+                    8px;
+
+            background:
+                    #201216;
+
+            color:
+                    #ff8da0;
+
+            font-weight:
+                    800;
+        }
+
+
+        .logout-button:hover {
+
+            background:
+                    var(--red);
+
+            color:
+                    white;
+
+            border-color:
+                    var(--red);
+        }
+
+
+        /* ======================================
+           오른쪽 화면
+        ====================================== */
+
+        .main {
+
+            min-width:
+                    0;
+
+            padding:
+                    0 35px 60px;
+        }
+
+
+        .topbar {
+
+            height:
+                    73px;
+
+            border-bottom:
+                    1px solid var(--border-soft);
+
+            display:
+                    flex;
+
+            justify-content:
+                    space-between;
+
+            align-items:
+                    center;
+        }
+
+
+        .topbar strong {
+
+            display:
+                    block;
+
+            margin-bottom:
+                    4px;
+        }
+
+
+        .topbar small {
+
+            color:
+                    var(--muted);
+        }
+
+
+        .home-button {
+
+            padding:
+                    9px 13px;
+
+            border:
+                    1px solid var(--border);
+
+            border-radius:
+                    8px;
+
+            background:
+                    #14171d;
+
+            font-size:
+                    12px;
+
+            font-weight:
+                    700;
+        }
+
+
+        .home-button:hover {
+
+            color:
+                    var(--red);
+
+            border-color:
+                    var(--red);
+        }
+
+
+        .content {
+
+            padding-top:
+                    31px;
+        }
+
+
+        .page {
+
+            display:
+                    none;
+        }
+
+
+        .page.active {
+
+            display:
+                    block;
+        }
+
+
+        .page-header {
+
+            margin-bottom:
+                    23px;
+        }
+
+
+        .page-header .label {
+
+            margin:
+                    0 0 7px;
+
+            color:
+                    var(--red);
+
+            font-size:
+                    10px;
+
+            font-weight:
+                    900;
+
+            letter-spacing:
+                    2px;
+        }
+
+
+        .page-header h1 {
+
+            margin:
+                    0 0 8px;
+
+            font-size:
+                    31px;
+        }
+
+
+        .page-header p {
+
+            margin:
+                    0;
+
+            color:
+                    var(--muted);
+
+            font-size:
+                    13px;
+        }
+
+
+        /* ======================================
+           통계
+        ====================================== */
+
+        .stats {
+
+            display:
+                    grid;
+
+            grid-template-columns:
+                    repeat(3, 1fr);
+
+            gap:
+                    14px;
+
+            margin-bottom:
+                    25px;
+        }
+
+
+        .stat {
+
+            padding:
+                    20px;
+
+            border:
+                    1px solid var(--border);
+
+            border-radius:
+                    13px;
+
+            background:
+                    linear-gradient(
+                            180deg,
+                            #13161d,
+                            #0f1116
+                    );
+        }
+
+
+        .stat-title {
+
+            color:
+                    var(--muted);
+
+            font-size:
+                    11px;
+
+            font-weight:
+                    700;
+        }
+
+
+        .stat-number {
+
+            margin-top:
+                    15px;
+
+            font-size:
+                    32px;
+
+            font-weight:
+                    900;
+        }
+
+
+        .stat-number span:last-child {
+
+            margin-left:
+                    4px;
+
+            color:
+                    var(--muted);
+
+            font-size:
+                    11px;
+        }
+
+
+        .stat small {
+
+            display:
+                    block;
+
+            margin-top:
+                    10px;
+
+            color:
+                    #646c79;
+        }
+
+
+        .quick-box {
+
+            border:
+                    1px solid var(--border);
+
+            border-radius:
+                    13px;
+
+            background:
+                    var(--panel);
+
+            padding:
+                    20px;
+        }
+
+
+        .quick-box h2 {
+
+            margin:
+                    0 0 7px;
+
+            font-size:
+                    17px;
+        }
+
+
+        .quick-box p {
+
+            margin:
+                    0 0 17px;
+
+            color:
+                    var(--muted);
+
+            font-size:
+                    12px;
+        }
+
+
+        .quick-buttons {
+
+            display:
+                    flex;
+
+            flex-wrap:
+                    wrap;
+
+            gap:
+                    8px;
+        }
+
+
+        .quick-buttons button {
+
+            border:
+                    1px solid var(--border);
+
+            border-radius:
+                    8px;
+
+            background:
+                    var(--panel2);
+
+            color:
+                    #cdd1d8;
+
+            padding:
+                    9px 13px;
+
+            font-size:
+                    12px;
+
+            font-weight:
+                    700;
+        }
+
+
+        .quick-buttons button:hover {
+
+            border-color:
+                    var(--red);
+
+            color:
+                    white;
+        }
+
+
+        /* ======================================
+           관리 목록
+        ====================================== */
+
+        .management {
+
+            border:
+                    1px solid var(--border);
+
+            border-radius:
+                    13px;
+
+            background:
+                    var(--panel);
+
+            overflow:
+                    hidden;
+        }
+
+
+        .management-header {
+
+            padding:
+                    15px 18px;
+
+            border-bottom:
+                    1px solid var(--border);
+
+            display:
+                    flex;
+
+            justify-content:
+                    space-between;
+
+            align-items:
+                    center;
+
+            gap:
+                    15px;
+        }
+
+
+        .management-title h2 {
+
+            margin:
+                    0 0 5px;
+
+            font-size:
+                    17px;
+        }
+
+
+        .management-title p {
+
+            margin:
+                    0;
+
+            color:
+                    var(--muted);
+
+            font-size:
+                    11px;
+        }
+
+
+        .management-tools {
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            gap:
+                    8px;
+        }
+
+
+        .search {
+
+            width:
+                    260px;
+
+            padding:
+                    10px 12px;
+
+            border:
+                    1px solid #2b303b;
+
+            border-radius:
+                    8px;
+
+            outline:
+                    none;
+
+            background:
+                    #0d0f14;
+
+            color:
+                    white;
+
+            font-size:
+                    12px;
+        }
+
+
+        .search:focus {
+
+            border-color:
+                    var(--red);
+        }
+
+
+        .count {
+
+            padding:
+                    9px 11px;
+
+            border:
+                    1px solid var(--border);
+
+            border-radius:
+                    8px;
+
+            background:
+                    var(--panel2);
+
+            color:
+                    #afb5bf;
+
+            font-size:
+                    11px;
+
+            font-weight:
+                    800;
+
+            white-space:
+                    nowrap;
+        }
+
+
+        .table-wrap {
+
+            max-height:
+                    530px;
+
+            overflow:
+                    auto;
+        }
+
+
+        table {
+
+            width:
+                    100%;
+
+            min-width:
+                    750px;
+
+            border-collapse:
+                    collapse;
+        }
+
+
+        thead {
+
+            position:
+                    sticky;
+
+            top:
+                    0;
+
+            z-index:
+                    2;
+
+            background:
+                    var(--panel2);
+        }
+
+
+        th {
+
+            padding:
+                    12px 15px;
+
+            color:
+                    #7c8490;
+
+            border-bottom:
+                    1px solid var(--border);
+
+            text-align:
+                    left;
+
+            font-size:
+                    10px;
+        }
+
+
+        td {
+
+            padding:
+                    14px 15px;
+
+            border-bottom:
+                    1px solid var(--border-soft);
+
+            color:
+                    #d7dbe1;
+
+            font-size:
+                    12px;
+        }
+
+
+        tbody tr:hover {
+
+            background:
+                    #151820;
+        }
+
+
+        .user-id {
+
+            color:
+                    white;
+
+            font-weight:
+                    800;
+        }
+
+
+        .muted {
+
+            color:
+                    #7d8490;
+        }
+
+
+        .rating {
+
+            color:
+                    var(--yellow);
+
+            font-weight:
+                    900;
+        }
+
+
+        .review-text {
+
+            max-width:
+                    380px;
+
+            color:
+                    #b8bec8;
+
+            line-height:
+                    1.5;
+        }
+
+
+        .date {
+
+            color:
+                    #747c88;
+
+            white-space:
+                    nowrap;
+
+            font-size:
+                    11px;
+        }
+
+
+        .badge {
+
+            display:
+                    inline-block;
+
+            padding:
+                    5px 9px;
+
+            border-radius:
+                    999px;
+
+            font-size:
+                    9px;
+
+            font-weight:
+                    900;
+        }
+
+
+        .badge-admin {
+
+            border:
+                    1px solid #6e3040;
+
+            background:
+                    #35161f;
+
+            color:
+                    #ff98aa;
+        }
+
+
+        .badge-user {
+
+            border:
+                    1px solid #333944;
+
+            background:
+                    #191c22;
+
+            color:
+                    #9da5b1;
+        }
+
+
+        .delete-button {
+
+            padding:
+                    7px 10px;
+
+            border:
+                    1px solid #582a36;
+
+            border-radius:
+                    7px;
+
+            background:
+                    transparent;
+
+            color:
+                    #ff7f95;
+
+            font-size:
+                    10px;
+
+            font-weight:
+                    900;
+        }
+
+
+        .delete-button:hover {
+
+            background:
+                    var(--red);
+
+            color:
+                    white;
+
+            border-color:
+                    var(--red);
+        }
+
+
+        .movie-button {
+
+            display:
+                    inline-block;
+
+            padding:
+                    7px 10px;
+
+            border:
+                    1px solid #343945;
+
+            border-radius:
+                    7px;
+
+            background:
+                    #161920;
+
+            color:
+                    #c9cdd5;
+
+            font-size:
+                    10px;
+
+            font-weight:
+                    800;
+        }
+
+
+        .movie-button:hover {
+
+            color:
+                    white;
+
+            border-color:
+                    var(--red);
+        }
+
+
+        .protected {
+
+            color:
+                    #666e7a;
+
+            font-size:
+                    10px;
+
+            font-weight:
+                    700;
+        }
+
+
+        .empty {
+
+            padding:
+                    45px;
+
+            text-align:
+                    center;
+
+            color:
+                    #646b77;
+
+            font-size:
+                    12px;
+        }
+
+
+        /* ======================================
+           메시지
+        ====================================== */
+
+        .toast {
+
+            position:
+                    fixed;
+
+            top:
+                    20px;
+
+            left:
+                    50%;
+
+            transform:
+                    translateX(-50%);
+
+            opacity:
+                    0;
+
+            pointer-events:
+                    none;
+
+            z-index:
+                    100;
+
+            padding:
+                    12px 16px;
+
+            border:
+                    1px solid #38453e;
+
+            border-radius:
+                    9px;
+
+            background:
+                    #16211a;
+
+            color:
+                    #b9e4c6;
+
+            font-size:
+                    12px;
+
+            transition:
+                    0.2s;
+        }
+
+
+        .toast.show {
+
+            opacity:
+                    1;
+        }
+
+
+        /* ======================================
+           반응형
+        ====================================== */
+
+        @media (
+            max-width: 800px
+        ) {
+
+            .admin-layout {
+
+                display:
+                        block;
+            }
+
+
+            .sidebar {
+
+                position:
+                        static;
+
+                height:
+                        auto;
+
+                border-right:
+                        0;
+
+                border-bottom:
+                        1px solid var(--border);
+            }
+
+
+            .logo,
+            .menu-label,
+            .admin-info {
+
+                display:
+                        none;
+            }
+
+
+            .menu {
+
+                flex-direction:
+                        row;
+
+                overflow-x:
+                        auto;
+            }
+
+
+            .menu button,
+            .menu a {
+
+                width:
+                        auto;
+
+                white-space:
+                        nowrap;
+            }
+
+
+            .sidebar-bottom {
+
+                margin-top:
+                        10px;
+            }
+
+
+            .logout-button {
+
+                width:
+                        auto;
+            }
+
+
+            .main {
+
+                padding:
+                        0 14px 50px;
+            }
+
+
+            .stats {
+
+                grid-template-columns:
+                        1fr;
+            }
+
+
+            .management-header {
+
+                flex-direction:
+                        column;
+
+                align-items:
+                        stretch;
+            }
+
+
+            .management-tools {
+
+                width:
+                        100%;
+            }
+
+
+            .search {
+
+                width:
+                        100%;
+            }
+        }
+
+    </style>
+
+<link rel="stylesheet" href="/css/admin-mint.css?v=redblack-0917">
+<link rel="stylesheet" href="/css/theme.css?v=redblack-0917"></head>
+
+
+<body class="mint-admin">
+
+
+<div class="admin-layout">
+
+
+    <!-- ==========================================
+         왼쪽 관리자 메뉴
+    =========================================== -->
+    <aside class="sidebar">
+
+
+		<a href="/"
+		   class="logo image-brand">
+
+		    <img
+		        src="/images/logo.png"
+		        alt="movieLife"
+		        class="admin-logo-image">
+
+		</a>
+
+
+        <div class="menu-label">
+
+            ADMIN MENU
+
+        </div>
+
+
+        <nav class="menu">
+
+
+            <a class="menu-button" href="/admin?view=dashboard" data-page="dashboardPage" th:classappend="${adminView == 'dashboard'} ? 'active' : ''" th:attr="aria-current=${adminView == 'dashboard' ? 'page' : null}">
+
+                ▦ 대시보드
+
+            </a>
+
+
+            <a class="menu-button" href="/admin?view=members" data-page="memberPage" th:classappend="${adminView == 'members'} ? 'active' : ''" th:attr="aria-current=${adminView == 'members' ? 'page' : null}">
+
+                ♙ 회원 관리
+
+            </a>
+
+
+            <a class="menu-button" href="/admin?view=reviews" data-page="reviewPage" th:classappend="${adminView == 'reviews'} ? 'active' : ''" th:attr="aria-current=${adminView == 'reviews' ? 'page' : null}">
+
+                ★ 리뷰 관리
+
+            </a>
+
+
+            <a class="menu-button" href="/admin?view=favorites" data-page="favoritePage" th:classappend="${adminView == 'favorites'} ? 'active' : ''" th:attr="aria-current=${adminView == 'favorites' ? 'page' : null}">
+
+                ♥ 찜 관리
+
+            </a>
+
+
+            <a href="/">
+
+                ↗ 사이트로 돌아가기
+
+            </a>
+
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+
+            <div class="admin-info">
+
+                <small>
+                    로그인 관리자
+                </small>
+
+                <strong th:text="${session.loginUserId}">
+                    admin
+                </strong>
+
+            </div>
+
+
+            <button type="button"
+                    id="logoutButton"
+                    class="logout-button">
+
+                로그아웃
+
+            </button>
+
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- ==========================================
+         오른쪽
+    =========================================== -->
+    <main class="main">
+
+
+        <header class="topbar"><label class="theme-control"><span aria-hidden="true">◐</span><select data-theme-select aria-label="화면 테마"><option value="system">시스템</option><option value="light">라이트</option><option value="dark">다크</option></select></label>
+
+
+            <div>
+
+                <strong>
+                    관리자 페이지
+                </strong>
+
+                <small>
+                    movieLife 서비스 관리
+                </small>
+
+            </div>
+
+
+            <a href="/"
+               class="home-button">
+
+                사이트 보기
+
+            </a>
+
+
+        </header>
+
+
+
+        <div class="content">
+
+
+            <!-- ==================================
+                 대시보드
+            =================================== -->
+            <section id="dashboardPage" class="page" th:hidden="${adminView != 'dashboard'}" th:classappend="${adminView == 'dashboard'} ? 'active' : ''">
+
+
+                <div class="page-header">
+
+                    <p class="label">
+                        MOVIELIFE ADMIN
+                    </p>
+
+                    <h1>
+                        관리자 대시보드
+                    </h1>
+
+                    <p>
+                        회원, 리뷰, 찜 현황을 한눈에 확인할 수 있습니다.
+                    </p>
+
+                </div>
+
+
+
+                <div class="stats">
+
+
+                    <div class="stat">
+
+                        <div class="stat-title">
+                            전체 회원
+                        </div>
+
+                        <div class="stat-number">
+
+                            <span th:text="${memberCount}">
+                                0
+                            </span>
+
+                            <span>
+                                명
+                            </span>
+
+                        </div>
+
+                        <small>
+                            가입된 전체 회원 수
+                        </small>
+
+                    </div>
+
+
+                    <div class="stat">
+
+                        <div class="stat-title">
+                            전체 리뷰
+                        </div>
+
+                        <div class="stat-number">
+
+                            <span th:text="${reviewCount}">
+                                0
+                            </span>
+
+                            <span>
+                                개
+                            </span>
+
+                        </div>
+
+                        <small>
+                            등록된 전체 리뷰 수
+                        </small>
+
+                    </div>
+
+
+                    <div class="stat">
+
+                        <div class="stat-title">
+                            전체 찜
+                        </div>
+
+                        <div class="stat-number">
+
+                            <span th:text="${favoriteCount}">
+                                0
+                            </span>
+
+                            <span>
+                                개
+                            </span>
+
+                        </div>
+
+                        <small>
+                            회원들이 등록한 전체 찜
+                        </small>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <div class="quick-box">
+
+                    <h2>
+                        빠른 관리
+                    </h2>
+
+                    <p>
+                        관리할 항목을 선택하세요.
+                    </p>
+
+                    <div class="quick-buttons">
+
+                        <a class="quick-button" href="/admin?view=members" data-page="memberPage" th:classappend="${adminView == 'members'} ? 'active' : ''" th:attr="aria-current=${adminView == 'members' ? 'page' : null}">
+
+                            회원 관리
+
+                        </a>
+
+
+                        <a class="quick-button" href="/admin?view=reviews" data-page="reviewPage" th:classappend="${adminView == 'reviews'} ? 'active' : ''" th:attr="aria-current=${adminView == 'reviews' ? 'page' : null}">
+
+                            리뷰 관리
+
+                        </a>
+
+
+                        <a class="quick-button" href="/admin?view=favorites" data-page="favoritePage" th:classappend="${adminView == 'favorites'} ? 'active' : ''" th:attr="aria-current=${adminView == 'favorites' ? 'page' : null}">
+
+                            찜 관리
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- ==================================
+                 회원 관리
+            =================================== -->
+            <section id="memberPage" class="page" th:hidden="${adminView != 'members'}" th:classappend="${adminView == 'members'} ? 'active' : ''">
+
+
+                <div class="page-header">
+
+                    <p class="label">
+                        MEMBER MANAGEMENT
+                    </p>
+
+                    <h1>
+                        회원 관리
+                    </h1>
+
+                    <p>
+                        가입된 회원을 확인하고 관리합니다.
+                    </p>
+
+                </div>
+
+
+
+                <div class="management">
+
+
+                    <div class="management-header">
+
+
+                        <div class="management-title">
+
+                            <h2>
+                                전체 회원
+                            </h2>
+
+                            <p>
+                                아이디 또는 닉네임으로 검색할 수 있습니다.
+                            </p>
+
+                        </div>
+
+
+                        <div class="management-tools">
+
+                            <input type="search"
+                                   id="memberSearch"
+                                   class="search"
+                                   placeholder="아이디 또는 닉네임 검색">
+
+
+                            <div class="count">
+
+                                <span th:text="${memberCount}">
+                                    0
+                                </span>
+
+                                명
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <div class="table-wrap">
+
+
+                        <table>
+
+
+                            <thead>
+
+                            <tr>
+
+                                <th>
+                                    회원번호
+                                </th>
+
+                                <th>
+                                    아이디
+                                </th>
+
+                                <th>
+                                    닉네임
+                                </th>
+
+                                <th>
+                                    구분
+                                </th>
+
+                                <th>
+                                    관리
+                                </th>
+
+                            </tr>
+
+                            </thead>
+
+
+
+                            <tbody id="memberRows">
+
+
+                            <tr th:each="member : ${members}"
+                                th:data-search="${#strings.toLowerCase(member.userId + ' ' + member.nickname)}">
+
+
+                                <td class="muted"
+                                    th:text="${member.id}">
+
+                                    1
+
+                                </td>
+
+
+                                <td class="user-id"
+                                    th:text="${member.userId}">
+
+                                    user01
+
+                                </td>
+
+
+                                <td th:text="${member.nickname}">
+
+                                    사용자
+
+                                </td>
+
+
+                                <td>
+
+
+                                    <span th:if="${member.userId == 'admin'}"
+                                          class="badge badge-admin">
+
+                                        ADMIN
+
+                                    </span>
+
+
+                                    <span th:unless="${member.userId == 'admin'}"
+                                          class="badge badge-user">
+
+                                        USER
+
+                                    </span>
+
+
+                                </td>
+
+
+                                <td>
+
+
+                                    <span th:if="${member.userId == 'admin'}"
+                                          class="protected">
+
+                                        보호 계정
+
+                                    </span>
+
+
+                                    <form th:unless="${member.userId == 'admin'}"
+                                          th:action="@{/admin/members/{userId}/delete(userId=${member.userId})}"
+                                          method="post"
+                                          style="margin:0;"
+                                          onsubmit="return confirm('이 회원을 삭제하시겠습니까?\n회원의 리뷰와 찜도 함께 삭제됩니다.');">
+
+
+                                        <button type="submit"
+                                                class="delete-button">
+
+                                            회원 삭제
+
+                                        </button>
+
+
+                                    </form>
+
+
+                                </td>
+
+
+                            </tr>
+
+
+                            </tbody>
+
+
+                        </table>
+
+
+                    </div>
+
+
+                    <div th:if="${#lists.isEmpty(members)}"
+                         class="empty">
+
+                        등록된 회원이 없습니다.
+
+                    </div>
+
+
+                    <div id="memberEmpty"
+                         class="empty"
+                         hidden>
+
+                        검색 결과가 없습니다.
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- ==================================
+                 리뷰 관리
+            =================================== -->
+            <section id="reviewPage" class="page" th:hidden="${adminView != 'reviews'}" th:classappend="${adminView == 'reviews'} ? 'active' : ''">
+
+
+                <div class="page-header">
+
+                    <p class="label">
+                        REVIEW MANAGEMENT
+                    </p>
+
+                    <h1>
+                        리뷰 관리
+                    </h1>
+
+                    <p>
+                        회원이 작성한 리뷰를 확인하고 삭제할 수 있습니다.
+                    </p>
+
+                </div>
+
+
+
+                <div class="management">
+
+
+                    <div class="management-header">
+
+
+                        <div class="management-title">
+
+                            <h2>
+                                전체 리뷰
+                            </h2>
+
+                            <p>
+                                회원 아이디, 영화명, 리뷰 내용으로 검색할 수 있습니다.
+                            </p>
+
+                        </div>
+
+
+                        <div class="management-tools">
+
+                            <input type="search"
+                                   id="reviewSearch"
+                                   class="search"
+                                   placeholder="작성자 또는 리뷰 검색">
+
+
+                            <div class="count">
+
+                                <span th:text="${reviewCount}">
+                                    0
+                                </span>
+
+                                개
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <div class="table-wrap">
+
+
+                        <table>
+
+
+                            <thead>
+
+                            <tr>
+
+                                <th>
+                                    작성자
+                                </th>
+
+                                <th>
+                                    영화명
+                                </th>
+
+                                <th>
+                                    별점
+                                </th>
+
+                                <th>
+                                    리뷰 내용
+                                </th>
+
+                                <th>
+                                    작성일
+                                </th>
+
+                                <th>
+                                    관리
+                                </th>
+
+                            </tr>
+
+                            </thead>
+
+
+
+                            <tbody id="reviewRows">
+
+
+                            <tr th:each="review : ${reviews}"
+                                th:data-search="${#strings.toLowerCase(review.userId + ' ' + movieTitles[review.movieId] + ' ' + review.content)}">
+
+
+                                <td class="user-id"
+                                    th:text="${review.userId}">
+
+                                    user01
+
+                                </td>
+
+
+                                <td class="movie-title"
+                                    th:text="${movieTitles[review.movieId]}">
+
+                                    영화 제목
+
+                                </td>
+
+
+                                <td class="rating"
+                                    th:text="'★ ' + ${review.rating} + '/10'">
+
+                                    ★ 10/10
+
+                                </td>
+
+
+                                <td class="review-text"
+                                    th:text="${review.content}">
+
+                                    리뷰 내용
+
+                                </td>
+
+
+                                <td class="date"
+                                    th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm')}">
+
+                                    2026-09-15
+
+                                </td>
+
+
+                                <td>
+
+
+                                    <form th:action="@{/admin/reviews/{reviewId}/delete(reviewId=${review.id})}"
+                                          method="post"
+                                          style="margin:0;"
+                                          onsubmit="return confirm('이 리뷰를 삭제하시겠습니까?');">
+
+
+                                        <button type="submit"
+                                                class="delete-button">
+
+                                            리뷰 삭제
+
+                                        </button>
+
+
+                                    </form>
+
+
+                                </td>
+
+
+                            </tr>
+
+
+                            </tbody>
+
+
+                        </table>
+
+
+                    </div>
+
+
+                    <div th:if="${#lists.isEmpty(reviews)}"
+                         class="empty">
+
+                        등록된 리뷰가 없습니다.
+
+                    </div>
+
+
+                    <div id="reviewEmpty"
+                         class="empty"
+                         hidden>
+
+                        검색 결과가 없습니다.
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- ==================================
+                 찜 관리
+            =================================== -->
+            <section id="favoritePage" class="page" th:hidden="${adminView != 'favorites'}" th:classappend="${adminView == 'favorites'} ? 'active' : ''">
+
+
+                <div class="page-header">
+
+                    <p class="label">
+                        FAVORITE MANAGEMENT
+                    </p>
+
+                    <h1>
+                        찜 관리
+                    </h1>
+
+                    <p>
+                        회원들이 찜한 영화를 확인하고 관리자 권한으로 삭제할 수 있습니다.
+                    </p>
+
+                </div>
+
+
+
+                <div class="management">
+
+
+                    <div class="management-header">
+
+
+                        <div class="management-title">
+
+                            <h2>
+                                전체 찜
+                            </h2>
+
+                            <p>
+                                회원 아이디 또는 영화명으로 검색할 수 있습니다.
+                            </p>
+
+                        </div>
+
+
+                        <div class="management-tools">
+
+                            <input type="search"
+                                   id="favoriteSearch"
+                                   class="search"
+                                   placeholder="회원 아이디 또는 영화명 검색">
+
+
+                            <div class="count">
+
+                                <span th:text="${favoriteCount}">
+                                    0
+                                </span>
+
+                                개
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <div class="table-wrap">
+
+
+                        <table>
+
+
+                            <thead>
+
+                            <tr>
+
+                                <th>
+                                    찜 번호
+                                </th>
+
+                                <th>
+                                    회원 아이디
+                                </th>
+
+                                <th>
+                                    영화명
+                                </th>
+
+                                <th>
+                                    영화
+                                </th>
+
+                                <th>
+                                    등록일
+                                </th>
+
+                                <th>
+                                    관리
+                                </th>
+
+                            </tr>
+
+                            </thead>
+
+
+
+                            <tbody id="favoriteRows">
+
+
+                            <tr th:each="favorite : ${favorites}"
+                                th:data-search="${#strings.toLowerCase(favorite.userId + ' ' + movieTitles[favorite.movieId])}">
+
+
+                                <td class="muted"
+                                    th:text="${favorite.id}">
+
+                                    1
+
+                                </td>
+
+
+                                <td class="user-id"
+                                    th:text="${favorite.userId}">
+
+                                    user01
+
+                                </td>
+
+
+                                <td class="movie-title"
+                                    th:text="${movieTitles[favorite.movieId]}">
+
+                                    영화 제목
+
+                                </td>
+
+
+                                <td>
+
+
+                                    <a th:href="@{/movies/{movieId}(movieId=${favorite.movieId})}"
+                                       class="movie-button"
+                                       target="_blank">
+
+                                        영화 보기
+
+                                    </a>
+
+
+                                </td>
+
+
+                                <td class="date"
+                                    th:text="${#temporals.format(favorite.createdAt, 'yyyy-MM-dd HH:mm')}">
+
+                                    2026-09-15
+
+                                </td>
+
+
+                                <td>
+
+
+                                    <form th:action="@{/admin/favorites/{favoriteId}/delete(favoriteId=${favorite.id})}"
+                                          method="post"
+                                          style="margin:0;"
+                                          onsubmit="return confirm('이 찜을 삭제하시겠습니까?');">
+
+
+                                        <button type="submit"
+                                                class="delete-button">
+
+                                            찜 삭제
+
+                                        </button>
+
+
+                                    </form>
+
+
+                                </td>
+
+
+                            </tr>
+
+
+                            </tbody>
+
+
+                        </table>
+
+
+                    </div>
+
+
+                    <div th:if="${#lists.isEmpty(favorites)}"
+                         class="empty">
+
+                        등록된 찜이 없습니다.
+
+                    </div>
+
+
+                    <div id="favoriteEmpty"
+                         class="empty"
+                         hidden>
+
+                        검색 결과가 없습니다.
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+
+<div id="toast"
+     class="toast">
+</div>
+
+
+
+<script src="/js/admin.js?v=upgrade20" defer></script>
+
+
+</body>
+
+</html>

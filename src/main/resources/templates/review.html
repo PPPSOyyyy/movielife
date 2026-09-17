@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragments/layout :: head('리뷰 작성')}">
+    </head>
+    <body class="ml-app">
+        <th:block th:replace="~{fragments/layout :: header}">
+        </th:block>
+        <main id="main" class="shell page review-editor">
+            <div class="page-heading">
+                <p class="eyebrow">
+                    MY MOVIE JOURNAL
+                </p>
+                <h1 th:text="${editMode} ? '리뷰 수정' : '리뷰 작성'">
+                    리뷰 작성
+                </h1>
+                <p class="muted">
+                    이 영화는 어떻게 기억되셨나요?
+                </p>
+            </div>
+            <a class="panel review-movie-summary" th:href="@{/movies/{id}(id=${movieId})}">
+                <img
+                    th:src="${movie.posterUrl}"
+                    th:alt="${movie.title}"
+                    data-poster
+                >
+                <div>
+                    <h2 th:text="${movie.title}">
+                    </h2>
+                    <p class="muted small" th:text="${movie.releaseDate}">
+                    </p>
+                    <span class="text-link">
+                        영화 상세 보기 →
+                    </span>
+                </div>
+            </a>
+            <form
+                class="panel"
+                id="reviewForm"
+                th:data-movie-id="${movieId}"
+                th:data-review-id="${editMode ? review.id : ''}"
+            >
+                <fieldset style="border:0;padding:0;margin:0">
+                    <legend class="field-label">
+                        나의 별점
+                        <span class="muted small">
+                            · 10점 만점
+                        </span>
+                    </legend>
+                    <div class="rating-picker">
+                        <label class="rating-option" th:each="n : ${#numbers.sequence(1,10)}">
+                            <input
+                                type="radio"
+                                name="rating"
+                                th:value="${n}"
+                                th:checked="${editMode and review.rating == n}"
+                                required
+                            >
+                            <span th:text="'★ ' + ${n}">
+                            </span>
+                        </label>
+                    </div>
+                </fieldset>
+                <label class="field">
+                    <span>
+                        나의 감상
+                    </span>
+                    <textarea
+                        id="reviewContent"
+                        name="content"
+                        maxlength="1000"
+                        required
+                        placeholder="좋았던 장면이나 아쉬웠던 점을 자유롭게 남겨 주세요."
+                        th:text="${editMode ? review.content : ''}"
+                    >
+                    </textarea>
+                </label>
+                <div class="editor-bottom">
+                    <span>
+                        다른 관객을 위해 스포일러는 본문에 미리 알려 주세요.
+                    </span>
+                    <span>
+                        <span id="characterCount">
+                            0
+                        </span>
+                        / 1,000
+                    </span>
+                </div>
+                <p
+                    class="error-text"
+                    id="reviewError"
+                    role="alert"
+                >
+                </p>
+                <div class="actions" style="justify-content:end">
+                    <a class="btn btn-ghost" th:href="@{/movies/{id}(id=${movieId})}">
+                        취소
+                    </a>
+                    <button
+                        class="btn btn-primary"
+                        type="submit"
+                        th:text="${editMode} ? '리뷰 수정하기' : '리뷰 등록하기'"
+                    >
+                        리뷰 등록하기
+                    </button>
+                </div>
+            </form>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}">
+        </footer>
+        <script src="/js/auth-header.js?v=upgrade20">
+        </script>
+        <script src="/js/reviews.js?v=upgrade20">
+        </script>
+    </body>
+</html>

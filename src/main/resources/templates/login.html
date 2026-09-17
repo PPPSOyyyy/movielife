@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragments/layout :: head('로그인')}">
+    </head>
+    <body class="ml-app">
+        <th:block th:replace="~{fragments/layout :: header}">
+        </th:block>
+        <main id="main" class="shell auth-page">
+            <section class="auth-intro">
+                <p class="eyebrow">
+                    WELCOME BACK
+                </p>
+                <h1>
+                    좋아하는 영화로
+                    <br>
+                    채우는
+                    <span>
+                        나의 일상.
+                    </span>
+                </h1>
+                <p>
+                    다시 만나 반갑습니다.
+                    <br>
+                    담아 둔 영화와 나의 감상을 이어서 만나 보세요.
+                </p>
+                <div class="auth-note">
+                    한 편을 발견하고, 한 줄을 남기는 즐거움.
+                </div>
+            </section>
+            <section class="auth-card">
+                <h2>
+                    로그인
+                </h2>
+                <p>
+                    movieLife에서 나의 영화 생활을 이어가세요.
+                </p>
+                <form id="loginForm" class="form-stack">
+                    <label class="field">
+                        <span>
+                            아이디
+                        </span>
+                        <input
+                            name="userId"
+                            id="loginUserId"
+                            autocomplete="username"
+                            placeholder="아이디를 입력해 주세요"
+                            required
+                            maxlength="50"
+                        >
+                    </label>
+                    <label class="field">
+                        <span>
+                            비밀번호
+                        </span>
+                        <div class="password-field">
+                            <input
+                                name="password"
+                                id="loginPassword"
+                                type="password"
+                                autocomplete="current-password"
+                                placeholder="비밀번호를 입력해 주세요"
+                                required
+                            >
+                            <button
+                                type="button"
+                                data-password-toggle="loginPassword"
+                                aria-label="비밀번호 표시"
+                            >
+                                보기
+                            </button>
+                        </div>
+                        <p
+                            class="error-text"
+                            id="loginError"
+                            role="alert"
+                        >
+                        </p>
+                    </label>
+                    <button class="btn btn-primary btn-wide" type="submit">
+                        로그인
+                    </button>
+                </form><nav class="login-recovery-links" aria-label="계정 찾기"><a href="/account/find-id">아이디 찾기</a><span aria-hidden="true">|</span><a href="/account/find-password">비밀번호 찾기</a></nav>
+                <p class="auth-bottom">
+                    아직 회원이 아니신가요?
+                    <a href="/signup" id="signupReturnLink">
+                        회원가입
+                    </a>
+                </p>
+            </section>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}">
+        </footer>
+        <script src="/js/auth-header.js?v=upgrade20">
+        </script>
+        <script src="/js/account.js?v=onboarding-0917-fix">
+        </script>
+    </body>
+</html>

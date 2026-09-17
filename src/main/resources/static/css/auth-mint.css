@@ -1,0 +1,288 @@
+/* =========================================================
+   movieLife 인증 / 헤더 공통 스타일
+   - 로그인 / 회원가입 / 관리자 / 로그아웃 버튼 색 통일
+========================================================= */
+
+/* 로고 */
+.ml-brand.image-brand {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 0;
+}
+
+.brand-logo-image {
+    display: block;
+    width: 150px;
+    max-width: 150px;
+    height: 62px;
+    max-height: 62px;
+    object-fit: contain;
+    object-position: left center;
+}
+
+/* 헤더 오른쪽 인증 영역 */
+.ml-header .ml-auth {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 9px;
+    white-space: nowrap;
+}
+
+/* 비로그인 - 로그인 */
+.ml-header .ml-auth > a[data-login-link] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 76px;
+    height: 40px;
+    padding: 0 15px;
+    border: 1px solid var(--red) !important;
+    border-radius: 9px;
+    background: transparent !important;
+    color: var(--red) !important;
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.ml-header .ml-auth > a[data-login-link]:hover {
+    background: var(--red-soft) !important;
+    color: var(--red) !important;
+}
+
+/* 비로그인 - 회원가입 */
+.ml-header .ml-auth .signup-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 82px;
+    height: 40px;
+    padding: 0 15px;
+    border: 1px solid var(--red) !important;
+    border-radius: 9px;
+    background: var(--red) !important;
+    color: #ffffff !important;
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.ml-header .ml-auth .signup-link:hover {
+    background: var(--red-hover) !important;
+    border-color: var(--red-hover) !important;
+    color: #ffffff !important;
+}
+
+/* 로그인 상태 - 닉네임 */
+.ml-header .ml-auth .auth-nickname {
+    display: inline-flex;
+    align-items: center;
+    color: var(--text) !important;
+    font-size: 14px;
+    font-weight: 700;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 로그인 상태 - 관리자 */
+.ml-header .ml-auth .auth-admin-link {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px;
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--red) !important;
+    border-radius: 9px;
+    background: var(--red) !important;
+    color: #ffffff !important;
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.ml-header .ml-auth .auth-admin-link:hover {
+    background: var(--red-hover) !important;
+    border-color: var(--red-hover) !important;
+    color: #ffffff !important;
+}
+
+/* 로그인 상태 - 로그아웃 */
+.ml-header .ml-auth .auth-logout-button {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: 76px;
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--red) !important;
+    border-radius: 9px;
+    background: transparent !important;
+    color: var(--red) !important;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.ml-header .ml-auth .auth-logout-button:hover {
+    background: var(--red-soft) !important;
+    border-color: var(--red) !important;
+    color: var(--red) !important;
+}
+
+/* 혹시 기존 .ml-auth button 스타일이 덮어써도 막기 위한 추가 보정 */
+.ml-header .ml-auth button.auth-logout-button,
+.ml-header .ml-auth button.auth-logout-button:visited,
+.ml-header .ml-auth button.auth-logout-button:active,
+.ml-header .ml-auth button.auth-logout-button:focus {
+    background: transparent !important;
+    color: var(--red) !important;
+    border: 1px solid var(--red) !important;
+}
+
+/* 인증 화면 공통 */
+.ml-app .auth-card,
+.ml-app .account-recovery-card,
+.ml-app .recovery-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+}
+
+/* 빨간 포인트 */
+.ml-app .auth-intro h1 span,
+.ml-app .eyebrow,
+.ml-app .auth-bottom a,
+.ml-app .login-recovery-links a,
+.ml-app .recovery-title-area .eyebrow {
+    color: var(--red) !important;
+}
+
+.ml-app .auth-note {
+    border-color: var(--line);
+    color: var(--muted);
+    background: transparent;
+}
+
+/* 입력창 */
+.ml-app .field input,
+.ml-app .field select,
+.ml-app .field textarea,
+.ml-app .recovery-field input,
+.ml-app .password-field input {
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+}
+
+.ml-app .field input:focus,
+.ml-app .field select:focus,
+.ml-app .field textarea:focus,
+.ml-app .recovery-field input:focus,
+.ml-app .password-field input:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px var(--red-soft);
+    outline: none;
+}
+
+/* 보조 버튼 */
+.ml-app .field-row .btn,
+.ml-app .password-field button {
+    border: 1px solid var(--red);
+    background: transparent;
+    color: var(--red);
+    border-radius: 9px;
+    font-weight: 700;
+    transition: 0.2s ease;
+}
+
+.ml-app .field-row .btn:hover,
+.ml-app .password-field button:hover {
+    background: var(--red-soft);
+    color: var(--red);
+}
+
+/* 주요 버튼 */
+.ml-app .btn-primary,
+.ml-app .mint-signup .btn-primary,
+.ml-app.mint-signup .btn-primary,
+.ml-app .recovery-button {
+    background: var(--red) !important;
+    border: 1px solid var(--red) !important;
+    color: #ffffff !important;
+    border-radius: 10px;
+    font-weight: 800;
+}
+
+.ml-app .btn-primary:hover,
+.ml-app .mint-signup .btn-primary:hover,
+.ml-app.mint-signup .btn-primary:hover,
+.ml-app .recovery-button:hover {
+    background: var(--red-hover) !important;
+    border-color: var(--red-hover) !important;
+}
+
+/* 문구 */
+.ml-app .error-text {
+    color: #c53349;
+}
+
+.ml-app .success-text {
+    color: var(--red);
+}
+
+/* 아이디/비밀번호 찾기 링크 */
+.ml-app .login-recovery-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    margin: 20px 0 8px;
+    font-size: 15px;
+}
+
+.ml-app .login-recovery-links span {
+    color: var(--muted);
+}
+
+.ml-app .auth-bottom a {
+    font-weight: 700;
+}
+
+/* 모바일 */
+@media (max-width: 800px) {
+    .brand-logo-image {
+        width: 125px;
+        max-width: 125px;
+        height: 52px;
+        max-height: 52px;
+    }
+
+    .ml-header .ml-auth {
+        gap: 6px;
+    }
+
+    .ml-header .ml-auth > a[data-login-link],
+    .ml-header .ml-auth .signup-link,
+    .ml-header .ml-auth .auth-admin-link,
+    .ml-header .ml-auth .auth-logout-button {
+        min-width: 64px;
+        height: 37px;
+        padding: 0 10px;
+        font-size: 13px;
+    }
+
+    .ml-header .ml-auth .auth-nickname {
+        max-width: 80px;
+        font-size: 13px;
+    }
+}

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragments/layout :: head('영화')}">
+    </head>
+    <body class="ml-app ml-browse-page">
+        <th:block th:replace="~{fragments/layout :: header}">
+        </th:block>
+        <main id="main" class="shell page">
+<div class="browse-layout"><details class="browse-sidebar" open><summary>영화 분류 · 필터</summary><div class="browse-sidebar-content"><nav class="browse-nav" aria-label="영화 둘러보기"><h2>영화 둘러보기</h2><a href="/movies">전체 영화</a><a href="/movies/domestic">국내영화</a><a href="/movies/foreign">해외영화</a><hr><a href="/movies?tab=topRated">평점 높은 영화</a><a href="/movies?tab=upcoming">개봉 예정 영화</a></nav><h3 class="filter-title">상세 필터</h3><form id="catalogFilterForm"
+                class="filter-form"
+                action="/movies"
+                method="get"
+
+            >
+                <input type="hidden" name="query" th:value="${query}"><input type="hidden" name="tab" th:value="${activeTab}"><label class="field">
+                    <span>
+                        장르
+                    </span>
+                    <select name="genre">
+                        <option value="">
+                            전체 장르
+                        </option>
+                        <option value="28" th:selected="${selectedGenre == 28}">
+                            액션
+                        </option>
+                        <option value="12" th:selected="${selectedGenre == 12}">
+                            모험
+                        </option>
+                        <option value="16" th:selected="${selectedGenre == 16}">
+                            애니메이션
+                        </option>
+                        <option value="35" th:selected="${selectedGenre == 35}">
+                            코미디
+                        </option>
+                        <option value="80" th:selected="${selectedGenre == 80}">
+                            범죄
+                        </option>
+                        <option value="18" th:selected="${selectedGenre == 18}">
+                            드라마
+                        </option>
+                        <option value="10751" th:selected="${selectedGenre == 10751}">
+                            가족
+                        </option>
+                        <option value="14" th:selected="${selectedGenre == 14}">
+                            판타지
+                        </option>
+                        <option value="27" th:selected="${selectedGenre == 27}">
+                            공포
+                        </option>
+                        <option value="10749" th:selected="${selectedGenre == 10749}">
+                            로맨스
+                        </option>
+                        <option value="878" th:selected="${selectedGenre == 878}">
+                            SF
+                        </option>
+                        <option value="53" th:selected="${selectedGenre == 53}">
+                            스릴러
+                        </option>
+                        <option value="99" th:selected="${selectedGenre == 99}">
+                            다큐멘터리
+                        </option>
+                        <option value="36" th:selected="${selectedGenre == 36}">
+                            역사
+                        </option>
+                        <option value="10402" th:selected="${selectedGenre == 10402}">
+                            음악
+                        </option>
+                        <option value="9648" th:selected="${selectedGenre == 9648}">
+                            미스터리
+                        </option>
+                        <option value="10752" th:selected="${selectedGenre == 10752}">
+                            전쟁
+                        </option>
+                        <option value="37" th:selected="${selectedGenre == 37}">
+                            서부
+                        </option>
+                        <option value="10770" th:selected="${selectedGenre == 10770}">
+                            TV 영화
+                        </option>
+                    </select>
+                </label>
+                <th:block th:replace="~{fragments/catalog-filters :: filters}"></th:block>
+                
+                
+                <div class="filter-actions">
+                    <a href="/movies" class="btn btn-ghost">
+                        초기화
+                    </a>
+                    <button class="btn btn-primary" type="submit">
+                        필터 적용
+                    </button>
+                </div>
+            </form><p class="filter-context" th:if="${!#strings.isEmpty(query)}">영화 제목과 인물을 함께 검색합니다. 상세 조건은 현재 페이지의 영화 결과에 적용합니다.</p><p class="filter-context" th:if="${#strings.isEmpty(query) and activeTab != 'all'}">선택한 분류에서 상세 조건으로 범위를 좁힐 수 있습니다.</p></div></details><div class="browse-content">
+<section th:if="${!#strings.isEmpty(query)}" class="section"><h2>배우·감독 검색 결과</h2><p th:if="${peopleError != null}" th:text="${peopleError}"></p><div class="person-search-grid"><a class="person-search-card" th:each="p : ${people}" th:href="@{/people/{id}(id=${p.id})}"><img th:src="${p['profile_path'] != null ? 'https://image.tmdb.org/t/p/w185'+p['profile_path'] : '/poster/no-poster.svg'}" th:alt="${p.name}" loading="lazy"><strong th:text="${p.name}"></strong><small th:text="${p['original_name']}"></small></a></div><p th:if="${#lists.isEmpty(people) and peopleError == null}">해당 인물 검색 결과가 없습니다.</p></section>
+
+            <div class="page-heading">
+                <p class="eyebrow">
+                    DISCOVER MOVIES
+                </p>
+                <h1 th:text="${pageTitle}">
+                    영화 둘러보기
+                </h1>
+                <p class="muted">
+                    보고 싶은 한 편, 여기서 찾아보세요.
+                </p>
+            </div>
+            
+            <div class="notice" th:if="${param.reviewRequired != null}">
+                리뷰를 작성할 영화를 선택해 주세요. 영화 상세 화면에서 리뷰를 남길 수 있습니다.
+            </div>
+            <p class="notice" th:if="${activeTab == 'upcoming'}">
+                한국 극장 개봉 예정일 기준으로 앞으로 6개월 이내 작품을 표시합니다. 재개봉 작품이 포함될 수 있습니다.
+            </p>
+            
+            <div class="result-bar">
+                <span>
+                    검색 후보
+                    <strong th:text="${#numbers.formatInteger(totalResults,1,'COMMA')}">
+                        0
+                    </strong>
+                    편
+                    <span th:if="${activeTab == 'all' and #strings.isEmpty(query)}">
+                        <span th:text="${filter.sort == 'latest' ? '· 최신순' : (filter.sort == 'recommended' ? '· 추천순' : '· 인기순')}"></span>
+                    </span>
+                    <span th:if="${activeTab == 'upcoming'}">
+                        · 한국 개봉일
+                    </span>
+                </span>
+                <a href="/movies" th:if="${!#strings.isEmpty(query)}">
+                    검색 초기화 →
+                </a>
+                <th:block th:replace="~{fragments/catalog-filters :: sortbar}"></th:block>
+            </div>
+            <div class="empty-state" th:if="${catalogError != null}">
+                <h3>
+                    잠시 연결이 원활하지 않습니다
+                </h3>
+                <p th:text="${catalogError}">
+                </p>
+                <button class="btn" data-reload>
+                    다시 시도
+                </button>
+            </div>
+            <div class="movie-grid" th:if="${!#lists.isEmpty(movies)}">
+                <th:block th:each="movie : ${movies}">
+                    <article th:replace="~{fragments/layout :: card(${movie})}">
+                    </article>
+                </th:block>
+            </div>
+            <div class="empty-state" th:if="${#lists.isEmpty(movies) and catalogError == null}">
+                <div class="empty-icon">
+                    ⌕
+                </div>
+                <h3>
+                    조건에 맞는 영화가 없습니다
+                </h3>
+                <p>
+                    다른 제목으로 검색하거나 필터를 변경해 보세요.
+                </p>
+                <a class="btn" href="/movies">
+                    전체 영화 보기
+                </a>
+            </div>
+            <nav
+                class="pagination"
+                aria-label="페이지 이동"
+                th:if="${totalPages > 1}"
+            >
+                <a
+                    th:if="${currentPage > 1}"
+                    th:href="@{/movies(query=${query},genre=${selectedGenre},minRating=${selectedMinRating},year=${selectedYear},provider=${selectedProvider},tab=${activeTab},period=${filter.period},rating=${filter.rating},startYear=${filter.startYear},endYear=${filter.endYear},certification=${filter.certification},sort=${filter.sort},page=${currentPage - 1})}"
+                >
+                    이전
+                </a>
+                <span class="disabled" th:if="${currentPage == 1}">
+                    이전
+                </span>
+                <a
+                    th:each="p : ${#numbers.sequence(startPage,endPage)}"
+                    th:href="@{/movies(query=${query},genre=${selectedGenre},minRating=${selectedMinRating},year=${selectedYear},provider=${selectedProvider},tab=${activeTab},period=${filter.period},rating=${filter.rating},startYear=${filter.startYear},endYear=${filter.endYear},certification=${filter.certification},sort=${filter.sort},page=${p})}"
+                    th:text="${p}"
+                    th:classappend="${p == currentPage} ? 'active'"
+                    th:attr="aria-current=${p == currentPage ? 'page' : null}"
+                >
+                </a>
+                <a
+                    th:if="${currentPage < totalPages}"
+                    th:href="@{/movies(query=${query},genre=${selectedGenre},minRating=${selectedMinRating},year=${selectedYear},provider=${selectedProvider},tab=${activeTab},period=${filter.period},rating=${filter.rating},startYear=${filter.startYear},endYear=${filter.endYear},certification=${filter.certification},sort=${filter.sort},page=${currentPage + 1})}"
+                >
+                    다음
+                </a>
+                <span class="disabled" th:if="${currentPage == totalPages}">
+                    다음
+                </span>
+            </nav>
+        </div></div></main>
+        <footer th:replace="~{fragments/layout :: footer}">
+        </footer>
+        <script src="/js/auth-header.js?v=upgrade20">
+        </script>
+    <script src="/js/catalog-controls.js?v=fix-0917" defer></script></body>
+</html>

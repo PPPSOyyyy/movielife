@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragments/layout :: head('마이페이지')}">
+    </head>
+    <body class="ml-app">
+        <th:block th:replace="~{fragments/layout :: header}">
+        </th:block>
+        <main
+            id="main"
+            class="shell page mint-account"
+            data-account-page
+        >
+            <div class="page-heading">
+                <p class="eyebrow">
+                    MY MOVIELIFE
+                </p>
+                <h1>
+                    마이페이지
+                </h1>
+                <p class="muted">
+                    좋아하는 영화가 모여, 나만의 취향이 됩니다.
+                </p>
+            </div>
+            <div class="account-layout">
+                <aside class="panel profile-panel">
+                    <div class="avatar avatar-large" data-avatar>
+                        M
+                    </div>
+                    <h2 data-nickname>
+                        불러오는 중
+                    </h2>
+                    <p data-user-id>
+                    </p>
+                    <a class="btn btn-wide" href="/profile">
+                        회원정보 관리
+                    </a>
+                    <nav class="account-menu" aria-label="내 활동">
+                        <a href="/favorite-movies">
+                            찜한 영화
+                        </a>
+                        <a href="/my-reviews">
+                            작성한 리뷰
+                        </a>
+                        <a href="/review">
+                            리뷰 쓰기
+                        </a>
+                    </nav>
+                </aside>
+                <div>
+                    <div class="stats-grid">
+                        <a class="stat-card" href="/favorite-movies">
+                            <p>
+                                내가 찜한 영화
+                            </p>
+                            <strong id="favoriteStat">
+                                —
+                            </strong>
+                        </a>
+                        <a class="stat-card" href="/my-reviews">
+                            <p>
+                                내가 작성한 리뷰
+                            </p>
+                            <strong id="reviewStat">
+                                —
+                            </strong>
+                        </a>
+                        <div class="stat-card">
+                            <p>
+                                내가 준 평균 별점 · 10점 만점
+                            </p>
+                            <strong class="gold" id="ratingStat">
+                                —
+                            </strong>
+                        </div>
+                    </div>
+                    <p
+                        class="error-text"
+                        id="statsError"
+                        role="alert"
+                    >
+                    </p>
+                    <div class="tabs account-tabs" role="tablist" aria-label="나의 영화 기록">
+<button type="button" id="savedTab" role="tab" aria-selected="true" aria-controls="savedPanel" data-account-tab="savedPanel" class="active">찜한 영화</button>
+<button type="button" id="reviewsTab" role="tab" aria-selected="false" aria-controls="reviewsPanel" data-account-tab="reviewsPanel" tabindex="-1">최근 작성 리뷰</button>
+</div>
+<section id="savedPanel" role="tabpanel" aria-labelledby="savedTab">
+<div class="section-head"><h2>다음에 볼 영화</h2><a class="text-link" href="/favorite-movies">찜 목록 전체보기 →</a></div>
+<div class="movie-grid" id="accountFavorites"><th:block th:each="movie, state : ${favoriteMovies}"><th:block th:if="${state.index lt 8}"><article th:replace="~{fragments/layout :: card(${movie})}"></article></th:block></th:block></div>
+<div class="empty-state" id="accountFavoritesEmpty" th:hidden="${!#lists.isEmpty(favoriteMovies)}"><h3>아직 찜한 영화가 없습니다</h3><p>영화 카드의 하트를 눌러 모아 보세요.</p><a href="/movies" class="btn btn-primary">영화 둘러보기</a></div>
+</section>
+                    <section class="section" id="reviewsPanel" role="tabpanel" aria-labelledby="reviewsTab" hidden>
+                        <div class="section-head">
+                            <h2>
+                                최근 남긴 감상
+                            </h2>
+                            <a class="text-link" href="/my-reviews">
+                                전체 보기 →
+                            </a>
+                        </div>
+                        <p class="muted">최근 감상 2편을 표시합니다. 전체 목록에서 리뷰를 수정·삭제할 수 있습니다.</p><div id="recentReviews" class="review-list">
+                            <p class="loading">
+                                기록을 불러오는 중입니다.
+                            </p>
+                        </div>
+                    </section>
+                    <div class="danger-zone">
+                        <div>
+                            <strong class="small">
+                                회원탈퇴
+                            </strong>
+                            <p>
+                                탈퇴하면 찜한 영화와 작성한 리뷰도 함께 삭제됩니다.
+                            </p>
+                        </div>
+                        <button class="btn btn-danger btn-sm" id="withdrawOpen">
+                            회원탈퇴
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <dialog class="ml-dialog" id="withdrawDialog">
+                <h2>
+                    회원탈퇴
+                </h2>
+                <p>
+                    계정과 영화 활동 기록이 모두 삭제됩니다.
+                    <br>
+                    계속하시려면 현재 비밀번호를 입력해 주세요.
+                </p>
+                <form id="withdrawForm">
+                    <label class="field">
+                        <span>
+                            현재 비밀번호
+                        </span>
+                        <input
+                            type="password"
+                            id="withdrawPassword"
+                            autocomplete="current-password"
+                            required
+                        >
+                    </label>
+                    <p
+                        class="error-text"
+                        id="withdrawError"
+                        role="alert"
+                    >
+                    </p>
+                    <div class="actions">
+                        <button
+                            type="button"
+                            class="btn"
+                            data-close-dialog
+                        >
+                            취소
+                        </button>
+                        <button type="submit" class="btn btn-danger">
+                            탈퇴하기
+                        </button>
+                    </div>
+                </form>
+            </dialog>
+        </main>
+        <footer th:replace="~{fragments/layout :: footer}">
+        </footer>
+        <script src="/js/auth-header.js?v=upgrade20">
+        </script>
+        <script src="/js/account.js?v=upgrade20">
+        </script>
+    </body>
+</html>

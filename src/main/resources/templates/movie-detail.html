@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+
+<html
+    lang="ko"
+    xmlns:th="http://www.thymeleaf.org"
+>
+
+<head
+    th:replace="~{fragments/layout :: head('영화 상세')}"
+>
+</head>
+
+<body class="ml-app movie-detail-page">
+
+
+<th:block
+    th:replace="~{fragments/layout :: header}"
+>
+</th:block>
+
+
+<main
+    id="main"
+    th:data-movie-id="${movie.id}"
+>
+
+
+    <section class="cinema-detail-hero">
+
+
+        <img
+            class="cinema-detail-backdrop"
+            th:if="${!#strings.isEmpty(movie.backdropUrl)}"
+            th:src="${movie.backdropUrl}"
+            alt=""
+        >
+
+
+        <div class="cinema-detail-overlay">
+        </div>
+
+
+        <div class="shell cinema-detail-shell">
+
+
+            <div class="cinema-detail-breadcrumb">
+
+                <a href="/movies">
+                    ← 영화 목록
+                </a>
+
+            </div>
+
+
+            <div class="cinema-detail-grid">
+
+
+                <div class="cinema-poster-column"><span class="age-badge" th:if="${movie.adultsOnly}">19</span>
+
+                    <img
+                        class="cinema-main-poster"
+                        th:src="${movie.posterUrl}"
+                        th:alt="${movie.title} + ' 포스터'"
+                        data-poster
+                    >
+
+                </div>
+
+
+                <div class="cinema-info-column">
+
+
+                    <h1
+                        class="cinema-title"
+                        th:text="${movie.title}"
+                    >
+                        영화 제목
+                    </h1>
+
+
+                    <p
+                        class="cinema-original-title"
+                        th:if="${!#strings.isEmpty(movie.originalTitle)}"
+                        th:text="${movie.originalTitle}"
+                    >
+                        Original Title
+                    </p>
+
+
+                    <div class="cinema-meta">
+
+
+                        <span
+                            th:text="${
+                                !#strings.isEmpty(movie.releaseDate)
+                                and #strings.length(movie.releaseDate) >= 4
+                                ? #strings.substring(movie.releaseDate, 0, 4)
+                                : '개봉일 정보 없음'
+                            }"
+                        >
+                            2026
+                        </span>
+
+
+                        <span
+                            th:if="${movie.runtime != null and movie.runtime > 0}"
+                            th:text="${movie.runtime} + '분'"
+                        >
+                            120분
+                        </span>
+
+
+                        <span
+                            th:if="${!#lists.isEmpty(movie.genres)}"
+                            th:text="${#strings.listJoin(movie.genres, ' · ')}"
+                        >
+                            액션 · SF
+                        </span>
+
+
+                        <span
+                            th:if="${!#lists.isEmpty(movie.productionCountries)}"
+                            th:text="${#strings.listJoin(movie.productionCountries, ', ')}"
+                        >
+                            미국
+                        </span>
+
+                    </div>
+
+
+                    <div class="cinema-rating-row">
+
+
+                        <div class="cinema-rating-main">
+
+                            <span class="cinema-star">
+                                ★
+                            </span>
+
+                            <strong
+                                th:text="${movie.voteAverage != null
+                                    ? #numbers.formatDecimal(movie.voteAverage, 1, 1)
+                                    : '—'}"
+                            >
+                                8.7
+                            </strong>
+
+                            <small>
+                                TMDB
+                            </small>
+
+                        </div>
+
+
+                        <div class="cinema-rating-divider">
+                        </div>
+
+
+                        <div class="cinema-rating-user">
+
+                            <span>
+                                ★
+                            </span>
+
+                            <strong data-average-rating>
+                                —
+                            </strong>
+
+                            <small>
+                                movieLife ·
+                                <span data-review-count>
+                                    0
+                                </span>
+                                명
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="cinema-actions">
+
+
+                        <button
+                            type="button"
+                            class="favorite-toggle favorite-full cinema-action-button"
+                            th:data-favorite="${movie.id}"
+                            th:data-title="${movie.title}"
+                            aria-pressed="false"
+                            data-full-label
+                        >
+                            ♡ 찜하기
+                        </button>
+
+
+                        <a
+                            class="btn btn-primary cinema-action-button"
+                            th:href="@{/review(movieId=${movie.id})}"
+                            data-review-link
+                        >
+                            리뷰 작성하기 ↗
+                        </a>
+
+
+                        <a
+                            class="btn btn-ghost cinema-action-button"
+                            th:if="${!#strings.isEmpty(movie.trailerUrl)}"
+                            th:href="${movie.trailerUrl}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            ▶ 예고편 보기
+                        </a>
+
+                    </div>
+
+
+                    <section class="cinema-overview">
+
+
+                        <h2>
+                            줄거리
+                        </h2>
+
+
+                        <p
+                            th:text="${#strings.isEmpty(movie.overview)
+                                ? '아직 등록된 줄거리 정보가 없습니다.'
+                                : movie.overview}"
+                        >
+                            줄거리
+                        </p>
+
+                    </section>
+
+                </div>
+
+
+                <aside class="cinema-side-card">
+
+
+                    <div class="cinema-fact">
+
+                        <span class="cinema-fact-label">
+                            감독
+                        </span>
+
+                        <strong
+                            th:text="${movie.director}"
+                        >
+                            감독
+                        </strong>
+
+                    </div>
+
+
+                    <div class="cinema-fact">
+
+                        <span class="cinema-fact-label">
+                            제작 국가
+                        </span>
+
+                        <strong
+                            th:text="${#lists.isEmpty(movie.productionCountries)
+                                ? '정보 없음'
+                                : #strings.listJoin(movie.productionCountries, ', ')}"
+                        >
+                            미국
+                        </strong>
+
+                    </div>
+
+
+                    <div class="cinema-fact">
+
+                        <span class="cinema-fact-label">
+                            관람 등급
+                        </span>
+
+                        <strong
+                            th:text="${movie.certification}"
+                        >
+                            정보 없음
+                        </strong>
+
+                    </div>
+
+
+                    <div class="cinema-fact">
+
+                        <span class="cinema-fact-label">
+                            장르
+                        </span>
+
+                        <strong
+                            th:text="${#lists.isEmpty(movie.genres)
+                                ? '정보 없음'
+                                : #strings.listJoin(movie.genres, ', ')}"
+                        >
+                            액션
+                        </strong>
+
+                    </div>
+
+
+                    <div class="cinema-fact">
+
+                        <span class="cinema-fact-label">
+                            주요 출연진
+                        </span>
+
+                        <strong
+                            th:text="${#lists.isEmpty(movie.cast)
+                                ? '정보 없음'
+                                : #strings.listJoin(movie.cast.size() > 8 ? movie.cast.subList(0,8) : movie.cast, ', ')}"
+                        >
+                            배우
+                        </strong>
+
+                    </div>
+
+
+                    <div class="cinema-fact">
+
+                        <span class="cinema-fact-label">
+                            OTT
+                        </span>
+
+
+                        <div
+                            class="cinema-ott-list"
+                            th:if="${!#lists.isEmpty(movie.ottLinks)}"
+                        >
+
+                            <a
+                                class="cinema-ott-chip"
+                                th:each="provider : ${movie.ottLinks}"
+                                th:href="${provider.url}"
+                                th:text="${provider.name}"
+                                th:title="${provider.name} + ' · ' + ${provider.type} + ' · 새 창에서 열기'"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Netflix
+                            </a>
+
+                        </div>
+
+
+                        <strong
+                            th:if="${#lists.isEmpty(movie.ottProviders)}"
+                        >
+                            등록된 시청 정보가 없습니다.
+                        </strong>
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <div class="shell cinema-content"><section class="cinema-section"><h2>감독</h2><div class="cinema-cast-list" data-drag-scroll tabindex="0" aria-label="인물 목록, 좌우 스크롤"><a class="cinema-cast-card cinema-cast-link" th:each="director : ${movie.directors}" th:href="@{/people/{id}(id=${director.id},role='director')}"><div class="cinema-cast-photo-wrap"><img class="cinema-cast-photo" th:src="${director.profileUrl}" th:alt="${director.name}" loading="lazy"></div><strong th:text="${director.name}"></strong><span>감독 필모그래피 →</span></a></div><p th:if="${#lists.isEmpty(movie.directors)}">등록된 감독 정보가 없습니다.</p></section>
+
+
+        <section
+            class="cinema-section"
+            th:if="${!#lists.isEmpty(movie.castMembers)}"
+        >
+
+
+            <div class="cinema-section-title">
+
+                <h2>
+                    출연진
+                </h2>
+
+            </div>
+
+
+            <div class="cinema-cast-list" data-drag-scroll tabindex="0" aria-label="인물 목록, 좌우 스크롤">
+
+
+                <a
+                    class="cinema-cast-card cinema-cast-link"
+                    th:each="cast : ${movie.castMembers}"
+                    th:if="${cast.id != null}"
+                    th:href="@{/people/{id}(id=${cast.id},role='cast')}"
+                >
+
+
+                    <div class="cinema-cast-photo-wrap">
+
+                        <img
+                            class="cinema-cast-photo"
+                            th:src="${cast.profileUrl}"
+                            th:alt="${cast.name}"
+                            loading="lazy"
+                        >
+
+                    </div>
+
+
+                    <strong
+                        th:text="${cast.name}"
+                    >
+                        배우 이름
+                    </strong>
+
+
+                    <span
+                        th:text="${#strings.isEmpty(cast.character)
+                            ? '배역 정보 없음'
+                            : cast.character}"
+                    >
+                        배역
+                    </span>
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <section
+            class="cinema-section cinema-review-section"
+            id="reviews"
+        >
+
+
+            <div class="cinema-section-head">
+
+
+                <div>
+
+                    <p class="eyebrow">
+                        AUDIENCE REVIEWS
+                    </p>
+
+                    <h2>
+                        관객들의 감상
+                    </h2>
+
+                </div>
+
+
+                <div class="cinema-review-summary">
+
+
+                    <div class="cinema-review-score">
+
+                        <span>
+                            ★
+                        </span>
+
+                        <strong data-average-rating>
+                            —
+                        </strong>
+
+                        <small>
+                            / 10
+                        </small>
+
+                    </div>
+
+
+                    <span class="cinema-review-count">
+
+                        <strong data-review-count>
+                            0
+                        </strong>
+
+                        개의 리뷰
+
+                    </span>
+
+
+                    <a
+                        class="btn btn-primary btn-sm"
+                        th:href="@{/review(movieId=${movie.id})}"
+                        data-review-link
+                    >
+                        리뷰 작성하기
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="cinema-review-toolbar">
+
+                <span class="muted small">
+                    이 영화를 본 관객들의 솔직한 감상입니다.
+                </span>
+
+
+                <label class="cinema-review-sort">
+
+                    <span>
+                        정렬
+                    </span>
+
+                    <select
+                        class="input"
+                        id="reviewSort"
+                    >
+
+                        <option value="latest">
+                            최신순
+                        </option>
+
+                        <option value="high">
+                            별점 높은순
+                        </option>
+
+                        <option value="low">
+                            별점 낮은순
+                        </option>
+
+                    </select>
+
+                </label>
+
+            </div>
+
+
+            <div
+                class="review-list cinema-review-list"
+                id="movieReviews"
+                aria-live="polite"
+            >
+
+                <p class="loading">
+                    리뷰를 불러오는 중입니다.
+                </p>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+
+<footer
+    th:replace="~{fragments/layout :: footer}"
+>
+</footer>
+
+
+<script src="/js/auth-header.js?v=upgrade20">
+</script>
+
+<script src="/js/reviews.js?v=review-comment-0917-2">
+</script>
+
+
+</body>
+
+</html>
