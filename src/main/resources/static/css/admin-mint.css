@@ -749,3 +749,242 @@ html[data-theme="dark"]
         transition: none !important;
     }
 }
+
+/* =========================================
+   찜 관리 - 영화 보기 버튼 색상 보정
+========================================= */
+
+.admin-page a[href*="/movies/"],
+.admin-page .movie-view-btn,
+.admin-page .admin-movie-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    min-width: 58px !important;
+    height: 34px !important;
+    padding: 0 12px !important;
+
+    border: 1px solid #ef3340 !important;
+    border-radius: 8px !important;
+
+    background: #ffffff !important;
+    color: #ef3340 !important;
+
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+
+    transition: 0.18s ease !important;
+}
+
+.admin-page a[href*="/movies/"]:hover,
+.admin-page .movie-view-btn:hover,
+.admin-page .admin-movie-link:hover {
+    background: #ef3340 !important;
+    color: #ffffff !important;
+}
+
+
+/* 다크모드 */
+html[data-theme="dark"] .admin-page a[href*="/movies/"],
+html[data-theme="dark"] .admin-page .movie-view-btn,
+html[data-theme="dark"] .admin-page .admin-movie-link {
+    background: transparent !important;
+    color: #ff5b66 !important;
+    border-color: #ff5b66 !important;
+}
+
+html[data-theme="dark"] .admin-page a[href*="/movies/"]:hover,
+html[data-theme="dark"] .admin-page .movie-view-btn:hover,
+html[data-theme="dark"] .admin-page .admin-movie-link:hover {
+    background: #ef3340 !important;
+    color: #ffffff !important;
+}
+
+/* =========================================================
+   관리자 페이지 검정 요소 최종 보정
+   - 영화 보기 버튼
+   - USER / ADMIN 역할 배지
+========================================================= */
+
+
+/* -----------------------------------------
+   영화 보기 계열 버튼
+----------------------------------------- */
+
+.admin-content table a,
+.admin-content table .btn,
+.admin-content table button:not(.delete-btn):not([class*="delete"]),
+.admin-main table a,
+.admin-main table .btn {
+    background: #ffffff !important;
+    color: #e32636 !important;
+
+    border: 1px solid #e32636 !important;
+    border-radius: 8px !important;
+
+    min-height: 32px !important;
+    padding: 6px 12px !important;
+
+    font-size: 12px !important;
+    font-weight: 700 !important;
+
+    text-decoration: none !important;
+    box-shadow: none !important;
+}
+
+
+/* 마우스 올렸을 때 */
+
+.admin-content table a:hover,
+.admin-content table .btn:hover,
+.admin-content table button:not(.delete-btn):not([class*="delete"]):hover,
+.admin-main table a:hover,
+.admin-main table .btn:hover {
+    background: #e32636 !important;
+    color: #ffffff !important;
+
+    border-color: #e32636 !important;
+}
+
+
+
+/* -----------------------------------------
+   USER / ADMIN 역할 배지
+----------------------------------------- */
+
+.admin-content table .badge,
+.admin-content table .role,
+.admin-content table .role-badge,
+.admin-content table .user-role,
+.admin-content table [class*="role"],
+.admin-content table [class*="badge"],
+.admin-main table .badge,
+.admin-main table [class*="role"],
+.admin-main table [class*="badge"] {
+    background: #fff0f1 !important;
+    color: #d92234 !important;
+
+    border: 1px solid #f0b8bd !important;
+    border-radius: 999px !important;
+
+    padding: 5px 10px !important;
+
+    font-size: 11px !important;
+    font-weight: 800 !important;
+
+    box-shadow: none !important;
+}
+
+
+/* ADMIN은 조금 더 진하게 */
+
+.admin-content table .admin,
+.admin-content table .admin-badge,
+.admin-content table [class*="admin"][class*="badge"],
+.admin-main table .admin,
+.admin-main table .admin-badge {
+    background: #d92234 !important;
+    color: #ffffff !important;
+
+    border-color: #d92234 !important;
+}
+
+
+
+/* -----------------------------------------
+   회원 삭제 / 찜 삭제는 지금처럼 연한 빨강 유지
+----------------------------------------- */
+
+.admin-content table .delete-btn,
+.admin-content table [class*="delete"],
+.admin-main table .delete-btn,
+.admin-main table [class*="delete"] {
+    background: #f8f8f8 !important;
+    color: #df4754 !important;
+
+    border: 1px solid #dddddd !important;
+}
+
+
+.admin-content table .delete-btn:hover,
+.admin-content table [class*="delete"]:hover,
+.admin-main table .delete-btn:hover,
+.admin-main table [class*="delete"]:hover {
+    background: #df4754 !important;
+    color: #ffffff !important;
+
+    border-color: #df4754 !important;
+}
+
+
+
+/* -----------------------------------------
+   다크모드
+----------------------------------------- */
+
+html[data-theme="dark"] .admin-content table a,
+html[data-theme="dark"] .admin-content table .btn,
+html[data-theme="dark"] .admin-main table a,
+html[data-theme="dark"] .admin-main table .btn {
+    background: transparent !important;
+    color: #ff5965 !important;
+
+    border-color: #ff5965 !important;
+}
+
+
+html[data-theme="dark"] .admin-content table a:hover,
+html[data-theme="dark"] .admin-content table .btn:hover,
+html[data-theme="dark"] .admin-main table a:hover,
+html[data-theme="dark"] .admin-main table .btn:hover {
+    background: #e32636 !important;
+    color: #ffffff !important;
+}
+
+/* =========================================================
+   0917 관리자 표 색상/영화 이동 버튼 최종 보정
+========================================================= */
+
+.mint-admin .movie-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 64px !important;
+    min-height: 32px !important;
+    padding: 6px 11px !important;
+    border: 1px solid var(--red) !important;
+    border-radius: 8px !important;
+    background: transparent !important;
+    color: var(--red) !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+}
+
+.mint-admin .movie-button:hover {
+    background: var(--red) !important;
+    color: #ffffff !important;
+    border-color: var(--red) !important;
+}
+
+.mint-admin .badge-user {
+    border: 1px solid rgba(227, 38, 54, 0.34) !important;
+    background: rgba(227, 38, 54, 0.08) !important;
+    color: #d92234 !important;
+}
+
+.mint-admin .badge-admin {
+    border: 1px solid var(--red) !important;
+    background: var(--red) !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .mint-admin .badge-user {
+    border-color: rgba(255, 89, 101, 0.45) !important;
+    background: rgba(255, 89, 101, 0.12) !important;
+    color: #ff7b86 !important;
+}
+
