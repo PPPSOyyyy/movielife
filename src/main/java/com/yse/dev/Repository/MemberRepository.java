@@ -14,4 +14,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select m from Member m where m.userId = :userId")
     Optional<Member> findByUserIdForUpdate(@Param("userId") String userId);
+    boolean existsByEmail(String email);
+    Optional<Member> findByNameAndEmail(String name, String email);
+
 }

@@ -33,11 +33,19 @@
     return data;
   };
 
-  ML.returnUrl = () => {
-    const value = new URLSearchParams(location.search).get('returnUrl');
-    return value && value.startsWith('/') && !value.startsWith('//') ? value : '/';
+  ML.safeReturn = (value,fallback='/') => {
+    if(!value || !value.startsWith('/') || value.startsWith('//') || /[\\\u0000-\u001f]/.test(value))return fallback;
+    try {const u=new URL(value,location.origin);return u.origin===location.origin?u.pathname+u.search+u.hash:fallback;}catch{return fallback;}
   };
-
+  ML.returnUrl = () => ML.safeReturn(new URLSearchParams(location.search).get('returnUrl'));
+  ML.reviewReturn = () => {
+    const path=location.pathname+location.search;
+    try {sessionStorage.setItem('ml-review-scroll',JSON.stringify({path,y:scrollY,at:Date.now()}));}catch{}
+    return encodeURIComponent(path+(location.pathname==='/mypage'?'#reviewsPanel':location.pathname.startsWith('/movies/')?'#reviews':''));
+  };
+  ML.restoreReviewScroll = () => {
+    try {const raw=sessionStorage.getItem('ml-review-scroll');if(!raw)return;const v=JSON.parse(raw);if(v.path===location.pathname+location.search && Date.now()-v.at<1800000){requestAnimationFrame(()=>scrollTo({top:v.y,behavior:'instant'}));sessionStorage.removeItem('ml-review-scroll');}}catch{}
+  };
   ML.ready = ML.request('/api/members/me')
     .then(member => (ML.member = member, member))
     .catch(() => null);
@@ -73,7 +81,7 @@
     wrap.id = 'mlGlobalDialog';
     wrap.innerHTML = `<div class="ml-core-backdrop"><div class="ml-core-dialog"><h3></h3><p></p><div class="ml-core-actions"></div></div></div>`;
     const style = document.createElement('style');
-    style.textContent = `.ml-core-backdrop{position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.72);display:grid;place-items:center;padding:20px}.ml-core-dialog{width:min(420px,100%);background:#12141a;border:1px solid #30343e;border-radius:18px;padding:28px;color:#fff;box-shadow:0 24px 80px rgba(0,0,0,.5)}.ml-core-dialog h3{margin:0 0 10px;font-size:21px}.ml-core-dialog p{margin:0;white-space:pre-line;color:#aeb3bf;line-height:1.65}.ml-core-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}.ml-core-actions button{border:0;border-radius:9px;padding:10px 16px;cursor:pointer}.ml-core-ok{background:#d92234;color:#fff}.ml-core-cancel{background:#292c34;color:#ddd}`;
+    style.textContent = `.ml-core-backdrop{position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.72);display:grid;place-items:center;padding:20px}.ml-core-dialog{width:min(420px,100%);background:#12141a;border:1px solid #30343e;border-radius:18px;padding:28px;color:#fff;box-shadow:0 24px 80px rgba(0,0,0,.5)}.ml-core-dialog h3{margin:0 0 10px;font-size:21px}.ml-core-dialog p{margin:0;white-space:pre-line;color:#aeb3bf;line-height:1.65}.ml-core-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}.ml-core-actions button{border:0;border-radius:9px;padding:10px 16px;cursor:pointer}.ml-core-ok{background:var(--red,#d92234);color:#ffffff}.ml-core-cancel{background:#292c34;color:#ddd}`;
     wrap.appendChild(style);
     wrap.querySelector('h3').textContent = title || '알림';
     wrap.querySelector('p').textContent = message || '';
@@ -110,7 +118,7 @@
     const wrap=ML.el('div','poster-wrap');
     const a=document.createElement('a'); a.href='/movies/'+movie.id;
     const img=document.createElement('img'); img.src=movie.posterUrl||'/poster/no-poster.svg'; img.alt=(movie.title||'영화')+' 포스터'; img.loading='lazy'; ML.poster(img);
-    a.append(img); wrap.append(a);
+    a.append(img); wrap.append(a); if(movie.adultsOnly){const badge=ML.el("span","age-badge","19");badge.setAttribute("aria-label","청소년 관람불가");wrap.append(badge);}
     const fav=ML.el('button','favorite-toggle','♡'); fav.type='button'; fav.dataset.favorite=movie.id; fav.dataset.title=movie.title||''; fav.setAttribute('aria-pressed','false'); wrap.append(fav);
     const info=ML.el('div','movie-info'); const h3=document.createElement('h3'); const title=document.createElement('a'); title.href='/movies/'+movie.id; title.textContent=movie.title||'제목 없음'; h3.append(title); info.append(h3,ML.el('p','',movie.releaseDate||'개봉일 정보 없음'));
     article.append(wrap,info); return article;
@@ -145,6 +153,7 @@
         ML.favorites.add(id); ML.toast('찜에 추가했습니다.');
       }
       ML.syncFavorites();
+      document.dispatchEvent(new CustomEvent("ml:favorites-changed", {detail:{id, active:ML.favorites.has(id)}}));
     } catch (e) { ML.handleError(e); }
     finally { button.disabled = false; }
   });

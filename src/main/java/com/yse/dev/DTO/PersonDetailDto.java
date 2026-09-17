@@ -12,6 +12,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PersonDetailDto {
+    private int page=1;
+    private int totalPages=1;
+    private String role="cast";
+    private String certification="";
+
 
 
     // =========================================================
@@ -121,6 +126,8 @@ public class PersonDetailDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class PersonMovieDto {
+        private boolean adultsOnly;
+
 
 
         private Long id;

@@ -8,4 +8,9 @@ public class MemberDto {
     private String userId;   // 회원 아이디
     private String password; // 비밀번호
     private String nickname; // 닉네임
+    private String name;
+    private String email;
+    private String securityQuestion;
+    private String securityAnswer;
+
 }

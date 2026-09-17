@@ -1,3 +1,5 @@
+> 2026-09-16 수정본: 실행 전 [README_UPGRADE_KO.md](README_UPGRADE_KO.md)와 [변경사항 정리](docs/CHANGELOG_KO.md)를 확인하세요. 기존 리뷰를 10점 만점으로 한 번 환산합니다.
+
 # movieLife
 
 Spring Boot / Thymeleaf / MySQL 기반 영화 검색 · 찜 · 별점 · 리뷰 웹 서비스입니다.

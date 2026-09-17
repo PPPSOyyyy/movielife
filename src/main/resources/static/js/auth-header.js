@@ -20,16 +20,17 @@ function updateActiveNav() {
         path === "/movies/domestic"
         || path.startsWith("/movies/domestic/")
     ) {
-        activeNav = "domestic";
+        activeNav = "movies";
     }
     else if (
         path === "/movies/foreign"
         || path.startsWith("/movies/foreign/")
     ) {
-        activeNav = "foreign";
+        activeNav = "movies";
     }
     else if (
-        path === "/movies"
+        path === "/popular"
+        || path === "/movies"
         || (
             path.startsWith("/movies/")
             && !path.startsWith("/movies/domestic")
@@ -51,6 +52,7 @@ function updateActiveNav() {
         path.startsWith("/mypage")
         || path.startsWith("/profile")
         || path.startsWith("/favorites")
+        || path.startsWith("/favorite-movies")
         || path.startsWith("/my-reviews")
     ) {
         activeNav = "mypage";

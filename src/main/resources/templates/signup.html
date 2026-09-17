@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
     <head th:replace="~{fragments/layout :: head('회원가입')}">
     </head>
-    <body class="ml-app">
+    <body class="ml-app mint-signup">
         <th:block th:replace="~{fragments/layout :: header}">
         </th:block>
         <main id="main" class="shell auth-page">
@@ -33,7 +33,11 @@
                 <p>
                     나만의 영화 기록을 시작해 보세요.
                 </p>
-                <form id="signupForm" class="form-stack">
+                <form id="signupForm" class="form-stack"><label class="field">이름<input id="signupName" maxlength="80" autocomplete="name" required></label>
+<label class="field">이메일<div class="field-row"><input id="signupEmail" type="email" maxlength="254" autocomplete="email" required><button type="button" class="btn" data-check="email">중복확인</button></div><small id="emailCheck" aria-live="polite"></small></label>
+<label class="field">보안 질문<select id="signupQuestion" data-security-questions required><option value="">질문을 선택하세요</option><option th:each="q : ${securityQuestions}" th:value="${q.key}" th:text="${q.value}"></option></select></label>
+<label class="field">보안 질문 답변<input id="signupAnswer" type="text" maxlength="200" autocomplete="off" required><small>비밀번호를 찾을 때 사용할 답변입니다. 기억하기 쉽게 입력해 주세요.</small></label>
+
                     <label class="field">
                         <span>
                             아이디
@@ -146,9 +150,9 @@
         </main>
         <footer th:replace="~{fragments/layout :: footer}">
         </footer>
-        <script src="/js/auth-header.js?v=20260915-3">
+        <script src="/js/auth-header.js?v=upgrade20">
         </script>
-        <script src="/js/account.js?v=20260915-3">
+        <script src="/js/account.js?v=onboarding-0917-fix">
         </script>
-    </body>
+    <script src="/js/account-management.js?v=refine-0917"></script></body>
 </html>

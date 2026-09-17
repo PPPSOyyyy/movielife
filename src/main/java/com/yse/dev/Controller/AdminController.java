@@ -1,6 +1,10 @@
 package com.yse.dev.Controller;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.yse.dev.Entity.Favorite;
 import com.yse.dev.Entity.Member;
@@ -15,6 +20,7 @@ import com.yse.dev.Entity.Review;
 import com.yse.dev.Repository.FavoriteRepository;
 import com.yse.dev.Repository.MemberRepository;
 import com.yse.dev.Repository.ReviewRepository;
+import com.yse.dev.Service.MovieService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +40,7 @@ public class AdminController {
     private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
     private final FavoriteRepository favoriteRepository;
+    private final MovieService movieService;
 
 
     // ==========================================
@@ -41,6 +48,7 @@ public class AdminController {
     // ==========================================
     @GetMapping("/admin")
     public String adminPage(
+            @RequestParam(value = "view", defaultValue = "dashboard") String view,
             HttpSession session,
             Model model) {
 
@@ -80,13 +88,26 @@ public class AdminController {
         // 전체 목록
         // ==========================================
         List<Member> members =
-                memberRepository.findAll();
+                memberRepository.findAll(org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC,"id"));
 
         List<Review> reviews =
-                reviewRepository.findAll();
+                reviewRepository.findAll(org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC,"createdAt","id"));
 
         List<Favorite> favorites =
-                favoriteRepository.findAll();
+                favoriteRepository.findAll(org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC,"createdAt","id"));
+
+
+        // ==========================================
+        // 관리자 화면에서 사용할 영화 제목 조회
+        //
+        // Review / Favorite에는 TMDB 영화 ID만 저장되어 있으므로
+        // 화면에 숫자 ID 대신 영화명을 보여 주기 위해 제목 맵을 만든다.
+        // ==========================================
+        Map<Long, String> movieTitles =
+                buildMovieTitleMap(
+                        reviews,
+                        favorites
+                );
 
 
         // ==========================================
@@ -122,8 +143,108 @@ public class AdminController {
                 favorites
         );
 
+        model.addAttribute(
+                "movieTitles",
+                movieTitles
+        );
+
+
+        // 허용된 관리자 화면만 사용
+        String adminView = switch (view) {
+            case "members", "reviews", "favorites" -> view;
+            default -> "dashboard";
+        };
+
+        model.addAttribute(
+                "adminView",
+                adminView
+        );
 
         return "admin";
+    }
+
+
+    // ==========================================
+    // 리뷰 / 찜에 들어 있는 영화 ID를 영화명으로 변환
+    // ==========================================
+    private Map<Long, String> buildMovieTitleMap(
+            List<Review> reviews,
+            List<Favorite> favorites) {
+
+
+        Set<Long> movieIds =
+                new LinkedHashSet<>();
+
+
+        for (Review review : reviews) {
+
+            if (
+                review != null &&
+                review.getMovieId() != null
+            ) {
+
+                movieIds.add(
+                        review.getMovieId()
+                );
+            }
+        }
+
+
+        for (Favorite favorite : favorites) {
+
+            if (
+                favorite != null &&
+                favorite.getMovieId() != null
+            ) {
+
+                movieIds.add(
+                        favorite.getMovieId()
+                );
+            }
+        }
+
+
+        Map<Long, String> movieTitles =
+                new LinkedHashMap<>();
+
+
+        for (Long movieId : movieIds) {
+
+            String title;
+
+
+            try {
+
+                title =
+                        movieService.getMovieTitle(
+                                movieId
+                        );
+
+
+                if (
+                    title == null ||
+                    title.isBlank()
+                ) {
+
+                    title = "영화 정보 없음";
+                }
+
+            } catch (Exception e) {
+
+                // TMDB가 일시적으로 응답하지 않아도
+                // 관리자 페이지 전체가 오류 나지 않도록 처리
+                title = "영화 정보 없음";
+            }
+
+
+            movieTitles.put(
+                    movieId,
+                    title
+            );
+        }
+
+
+        return movieTitles;
     }
 
 
@@ -146,7 +267,7 @@ public class AdminController {
         // 관리자 자기 자신은 삭제 금지
         if (ADMIN_USER_ID.equals(userId)) {
 
-            return "redirect:/admin?cannotDeleteAdmin=true";
+            return "redirect:/admin?view=members&cannotDeleteAdmin=true";
         }
 
 
@@ -175,7 +296,7 @@ public class AdminController {
         }
 
 
-        return "redirect:/admin?memberDeleted=true";
+        return "redirect:/admin?view=members&memberDeleted=true";
     }
 
 
@@ -203,7 +324,7 @@ public class AdminController {
         }
 
 
-        return "redirect:/admin?reviewDeleted=true";
+        return "redirect:/admin?view=reviews&reviewDeleted=true";
     }
 
 
@@ -231,7 +352,7 @@ public class AdminController {
         }
 
 
-        return "redirect:/admin?favoriteDeleted=true";
+        return "redirect:/admin?view=favorites&favoriteDeleted=true";
     }
 
 

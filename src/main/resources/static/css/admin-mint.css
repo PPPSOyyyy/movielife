@@ -1,0 +1,751 @@
+/* =========================================================
+   movieLife 관리자 페이지 전용 스타일
+   - 라이트 / 다크 / 시스템 모드 대응
+   - 빨간색 포인트 통일
+   - 관리자 로고 크기 강제 고정
+========================================================= */
+
+
+/* =========================================================
+   기본
+========================================================= */
+
+body.mint-admin {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family:
+        Pretendard,
+        "Noto Sans KR",
+        "Apple SD Gothic Neo",
+        "Malgun Gothic",
+        sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+}
+
+.mint-admin * {
+    box-sizing: border-box;
+}
+
+.mint-admin a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.mint-admin button,
+.mint-admin input,
+.mint-admin select {
+    font: inherit;
+}
+
+.mint-admin button {
+    cursor: pointer;
+}
+
+.mint-admin [hidden] {
+    display: none !important;
+}
+
+
+/* =========================================================
+   전체 관리자 레이아웃
+========================================================= */
+
+.mint-admin .admin-layout {
+    min-height: 100vh;
+    background: var(--bg);
+}
+
+
+/* =========================================================
+   왼쪽 사이드바
+========================================================= */
+
+.mint-admin .sidebar {
+    background: var(--panel) !important;
+    border-right: 1px solid var(--line) !important;
+}
+
+
+/* =========================================================
+   관리자 로고
+   ★ 대왕 로고 방지 핵심 부분
+========================================================= */
+
+.mint-admin .logo,
+.mint-admin .logo.image-brand {
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    width: 100% !important;
+    height: 92px !important;
+
+    padding: 4px 8px 22px !important;
+
+    overflow: hidden !important;
+}
+
+/* 어떤 CSS가 덮어써도 이 크기 이상 커지지 않음 */
+.mint-admin .logo img,
+.mint-admin .logo.image-brand img,
+.mint-admin img.admin-logo-image {
+    display: block !important;
+
+    width: 165px !important;
+    max-width: 165px !important;
+
+    height: 70px !important;
+    max-height: 70px !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    object-fit: contain !important;
+    object-position: left center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    transform: none !important;
+}
+
+
+/* =========================================================
+   ADMIN MENU 글자
+========================================================= */
+
+.mint-admin .menu-label {
+    margin: 4px 10px 10px;
+
+    color: var(--muted);
+
+    font-size: 12px;
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+}
+
+
+/* =========================================================
+   왼쪽 메뉴
+========================================================= */
+
+.mint-admin .menu {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+.mint-admin .menu .menu-button,
+.mint-admin .menu > a {
+    display: block;
+
+    width: 100%;
+
+    padding: 14px 16px;
+
+    border: 0;
+    border-radius: 10px;
+
+    background: transparent;
+
+    color: var(--muted);
+
+    text-align: left;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.mint-admin .menu .menu-button:hover,
+.mint-admin .menu > a:hover {
+    background: var(--panel-2);
+
+    color: var(--text);
+}
+
+
+/* 현재 선택 메뉴 */
+
+.mint-admin .menu .menu-button.active,
+.mint-admin .menu .menu-button[aria-current="page"] {
+    background: var(--red-soft);
+
+    color: var(--red);
+
+    box-shadow:
+        inset 3px 0 0 var(--red);
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   사이드바 아래 관리자 정보
+========================================================= */
+
+.mint-admin .sidebar-bottom {
+    border-top: 1px solid var(--line);
+}
+
+.mint-admin .admin-info {
+    padding: 13px;
+
+    border: 1px solid var(--line);
+    border-radius: 10px;
+
+    background: var(--panel-2);
+
+    color: var(--text);
+}
+
+.mint-admin .admin-info small {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: var(--muted);
+}
+
+.mint-admin .admin-info strong {
+    color: var(--text);
+}
+
+
+/* =========================================================
+   로그아웃 버튼
+========================================================= */
+
+.mint-admin .logout-button {
+    width: 100%;
+
+    padding: 11px 14px;
+
+    border: 1px solid var(--red);
+    border-radius: 10px;
+
+    background: transparent;
+
+    color: var(--red);
+
+    font-weight: 800;
+
+    transition: 0.2s ease;
+}
+
+.mint-admin .logout-button:hover {
+    background: var(--red);
+
+    color: #ffffff;
+
+    border-color: var(--red);
+}
+
+
+/* =========================================================
+   오른쪽 메인 영역
+========================================================= */
+
+.mint-admin .main {
+    background: var(--bg);
+
+    color: var(--text);
+}
+
+
+/* =========================================================
+   관리자 상단바
+========================================================= */
+
+.mint-admin .topbar {
+    min-height: 74px;
+
+    background: var(--bg);
+
+    border-bottom: 1px solid var(--line);
+
+    color: var(--text);
+}
+
+.mint-admin .topbar strong {
+    color: var(--text);
+
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.mint-admin .topbar small {
+    color: var(--muted);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   테마 선택
+========================================================= */
+
+.mint-admin .theme-control {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+}
+
+.mint-admin .theme-control > span {
+    color: var(--muted);
+
+    font-size: 14px;
+}
+
+.mint-admin .theme-control select {
+    height: 40px;
+
+    padding: 0 11px;
+
+    border: 1px solid var(--line);
+    border-radius: 9px;
+
+    background: var(--panel-2);
+
+    color: var(--text);
+
+    outline: none;
+}
+
+.mint-admin .theme-control select:focus {
+    border-color: var(--red);
+
+    box-shadow:
+        0 0 0 3px var(--red-soft);
+}
+
+
+/* =========================================================
+   사이트 보기 버튼
+========================================================= */
+
+.mint-admin .home-button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 92px;
+    height: 40px;
+
+    padding: 0 14px;
+
+    border: 1px solid var(--red);
+    border-radius: 9px;
+
+    background: transparent;
+
+    color: var(--red);
+
+    font-size: 14px;
+    font-weight: 800;
+
+    transition: 0.2s ease;
+}
+
+.mint-admin .home-button:hover {
+    background: var(--red);
+
+    border-color: var(--red);
+
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   페이지 제목
+========================================================= */
+
+.mint-admin .page-header .label {
+    color: var(--red);
+
+    font-size: 13px;
+    font-weight: 900;
+
+    letter-spacing: 1.6px;
+}
+
+.mint-admin .page-header h1 {
+    color: var(--text);
+
+    font-size: 34px;
+}
+
+.mint-admin .page-header p {
+    color: var(--muted);
+
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   통계 카드
+========================================================= */
+
+.mint-admin .stats {
+    gap: 16px;
+}
+
+.mint-admin .stat {
+    padding: 20px;
+
+    border: 1px solid var(--line);
+    border-radius: 13px;
+
+    background: var(--panel) !important;
+
+    color: var(--text);
+
+    box-shadow: var(--shadow);
+}
+
+
+/* 라이트 */
+
+html[data-theme="light"]
+.mint-admin .stat {
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff,
+            #f7f7f7
+        ) !important;
+}
+
+
+/* 다크 */
+
+html[data-theme="dark"]
+.mint-admin .stat {
+    background:
+        linear-gradient(
+            180deg,
+            #171717,
+            #101010
+        ) !important;
+}
+
+
+.mint-admin .stat-title {
+    color: var(--muted);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.mint-admin .stat-number {
+    margin-top: 15px;
+
+    color: var(--text);
+
+    font-size: 34px;
+    font-weight: 900;
+}
+
+.mint-admin .stat-number span:last-child {
+    margin-left: 4px;
+
+    color: var(--muted);
+
+    font-size: 12px;
+}
+
+.mint-admin .stat small {
+    display: block;
+
+    margin-top: 10px;
+
+    color: var(--muted);
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   빠른 관리 박스
+========================================================= */
+
+.mint-admin .quick-box {
+    background: var(--panel);
+
+    border: 1px solid var(--line);
+    border-radius: 13px;
+
+    color: var(--text);
+
+    box-shadow: var(--shadow);
+}
+
+.mint-admin .quick-box h2 {
+    color: var(--text);
+}
+
+.mint-admin .quick-box p {
+    color: var(--muted);
+}
+
+
+/* =========================================================
+   빠른 관리 버튼
+========================================================= */
+
+.mint-admin .quick-button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 12px 22px;
+
+    border: 1px solid var(--line);
+    border-radius: 9px;
+
+    background: var(--panel-2);
+
+    color: var(--text);
+
+    font-size: 15px;
+
+    transition: 0.2s ease;
+}
+
+.mint-admin .quick-button:hover {
+    border-color: var(--red);
+
+    color: var(--red);
+}
+
+
+/* =========================================================
+   관리 표 카드
+========================================================= */
+
+.mint-admin .table-card {
+    background: var(--panel);
+
+    border: 1px solid var(--line);
+    border-radius: 13px;
+
+    color: var(--text);
+
+    box-shadow: var(--shadow);
+}
+
+.mint-admin .table-title,
+.mint-admin .table-title h2 {
+    color: var(--text);
+}
+
+.mint-admin .table-title p {
+    color: var(--muted);
+}
+
+
+/* =========================================================
+   검색창
+========================================================= */
+
+.mint-admin input[type="search"],
+.mint-admin input[type="text"] {
+    background: var(--panel-2);
+
+    color: var(--text);
+
+    border: 1px solid var(--line);
+
+    border-radius: 9px;
+
+    font-size: 15px;
+}
+
+.mint-admin input::placeholder {
+    color: var(--muted);
+}
+
+.mint-admin input[type="search"]:focus,
+.mint-admin input[type="text"]:focus {
+    border-color: var(--red);
+
+    outline: none;
+
+    box-shadow:
+        0 0 0 3px var(--red-soft);
+}
+
+
+/* =========================================================
+   테이블
+========================================================= */
+
+.mint-admin table {
+    color: var(--text);
+}
+
+.mint-admin table,
+.mint-admin th,
+.mint-admin td {
+    border-color: var(--line);
+}
+
+.mint-admin th {
+    color: var(--muted);
+}
+
+.mint-admin td {
+    color: var(--text);
+}
+
+.mint-admin tbody tr:hover {
+    background: var(--panel-2);
+}
+
+
+/* =========================================================
+   일반 버튼
+========================================================= */
+
+.mint-admin .action-button,
+.mint-admin .table-card button:not(.delete-button) {
+    border: 1px solid var(--line);
+    border-radius: 9px;
+
+    background: var(--panel-2);
+
+    color: var(--text);
+
+    transition: 0.2s ease;
+}
+
+.mint-admin .action-button:hover,
+.mint-admin .table-card button:not(.delete-button):hover {
+    color: var(--red);
+
+    border-color: var(--red);
+}
+
+
+/* =========================================================
+   삭제 버튼
+========================================================= */
+
+.mint-admin .delete-button {
+    border: 1px solid #c42b40;
+
+    background: transparent;
+
+    color: #c42b40;
+}
+
+.mint-admin .delete-button:hover {
+    background: #c42b40;
+
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   토스트
+========================================================= */
+
+.mint-admin .toast {
+    border: 1px solid var(--red);
+
+    background: var(--red-soft);
+
+    color: var(--text);
+}
+
+
+/* =========================================================
+   포커스
+========================================================= */
+
+.mint-admin a:focus-visible,
+.mint-admin button:focus-visible,
+.mint-admin input:focus-visible,
+.mint-admin select:focus-visible {
+    outline: 2px solid var(--red);
+
+    outline-offset: 3px;
+}
+
+
+/* =========================================================
+   모바일
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .mint-admin .logo,
+    .mint-admin .logo.image-brand {
+        height: 78px !important;
+
+        padding-bottom: 15px !important;
+    }
+
+    .mint-admin .logo img,
+    .mint-admin .logo.image-brand img,
+    .mint-admin img.admin-logo-image {
+        width: 140px !important;
+        max-width: 140px !important;
+
+        height: 58px !important;
+        max-height: 58px !important;
+    }
+
+    .mint-admin .menu .menu-button,
+    .mint-admin .menu > a {
+        padding: 12px 13px;
+
+        font-size: 14px;
+    }
+
+    .mint-admin .page-header h1 {
+        font-size: 28px;
+    }
+
+    .mint-admin .topbar {
+        flex-wrap: wrap;
+
+        gap: 12px;
+    }
+
+    .mint-admin .quick-buttons {
+        flex-wrap: wrap;
+    }
+
+    .mint-admin .quick-button {
+        flex: 1;
+
+        min-width: 130px;
+    }
+}
+
+
+/* =========================================================
+   모션 최소화 설정
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .mint-admin * {
+        scroll-behavior: auto !important;
+
+        transition: none !important;
+    }
+}

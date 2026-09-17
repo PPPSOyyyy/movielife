@@ -55,7 +55,7 @@
             <div class="cinema-detail-grid">
 
 
-                <div class="cinema-poster-column">
+                <div class="cinema-poster-column"><span class="age-badge" th:if="${movie.adultsOnly}">19</span>
 
                     <img
                         class="cinema-main-poster"
@@ -313,7 +313,7 @@
                         <strong
                             th:text="${#lists.isEmpty(movie.cast)
                                 ? '정보 없음'
-                                : #strings.listJoin(movie.cast, ', ')}"
+                                : #strings.listJoin(movie.cast.size() > 8 ? movie.cast.subList(0,8) : movie.cast, ', ')}"
                         >
                             배우
                         </strong>
@@ -330,16 +330,20 @@
 
                         <div
                             class="cinema-ott-list"
-                            th:if="${!#lists.isEmpty(movie.ottProviders)}"
+                            th:if="${!#lists.isEmpty(movie.ottLinks)}"
                         >
 
-                            <span
+                            <a
                                 class="cinema-ott-chip"
-                                th:each="provider : ${movie.ottProviders}"
-                                th:text="${provider}"
+                                th:each="provider : ${movie.ottLinks}"
+                                th:href="${provider.url}"
+                                th:text="${provider.name}"
+                                th:title="${provider.name} + ' · ' + ${provider.type} + ' · 새 창에서 열기'"
+                                target="_blank"
+                                rel="noopener noreferrer"
                             >
                                 Netflix
-                            </span>
+                            </a>
 
                         </div>
 
@@ -361,7 +365,7 @@
     </section>
 
 
-    <div class="shell cinema-content">
+    <div class="shell cinema-content"><section class="cinema-section"><h2>감독</h2><div class="cinema-cast-list" data-drag-scroll tabindex="0" aria-label="인물 목록, 좌우 스크롤"><a class="cinema-cast-card cinema-cast-link" th:each="director : ${movie.directors}" th:href="@{/people/{id}(id=${director.id},role='director')}"><div class="cinema-cast-photo-wrap"><img class="cinema-cast-photo" th:src="${director.profileUrl}" th:alt="${director.name}" loading="lazy"></div><strong th:text="${director.name}"></strong><span>감독 필모그래피 →</span></a></div><p th:if="${#lists.isEmpty(movie.directors)}">등록된 감독 정보가 없습니다.</p></section>
 
 
         <section
@@ -379,14 +383,14 @@
             </div>
 
 
-            <div class="cinema-cast-list">
+            <div class="cinema-cast-list" data-drag-scroll tabindex="0" aria-label="인물 목록, 좌우 스크롤">
 
 
                 <a
                     class="cinema-cast-card cinema-cast-link"
                     th:each="cast : ${movie.castMembers}"
                     th:if="${cast.id != null}"
-                    th:href="@{/people/{id}(id=${cast.id})}"
+                    th:href="@{/people/{id}(id=${cast.id},role='cast')}"
                 >
 
 
@@ -460,7 +464,7 @@
                         </strong>
 
                         <small>
-                            / 5
+                            / 10
                         </small>
 
                     </div>
@@ -552,10 +556,10 @@
 </footer>
 
 
-<script src="/js/auth-header.js?v=20260915-3">
+<script src="/js/auth-header.js?v=upgrade20">
 </script>
 
-<script src="/js/reviews.js?v=20260915-3">
+<script src="/js/reviews.js?v=review-comment-0917-2">
 </script>
 
 

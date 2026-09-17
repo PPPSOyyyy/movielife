@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('취향 설정')}"></head>
+
+<body class="ml-app preference-page">
+
+<th:block th:replace="~{fragments/layout :: header}"></th:block>
+
+<main class="shell preference-main" id="main">
+
+    <section class="preference-intro">
+        <p class="eyebrow">FIRST RECOMMENDATION</p>
+        <h1>좋아하는 영화 취향을 알려주세요.</h1>
+        <p>
+            처음에는 여기서 고른 장르를 중심으로 추천하고,<br>
+            이후에는 찜·별점·자주 본 영화 기록을 함께 반영해 추천이 점점 바뀝니다.
+        </p>
+    </section>
+
+    <section class="preference-card">
+
+        <div class="preference-card-head">
+            <div>
+                <span class="step-badge">STEP 1</span>
+                <h2>좋아하는 장르를 3~5개 골라주세요.</h2>
+                <p>나중에 바꿀 수 있습니다.</p>
+            </div>
+
+            <strong id="selectedCount">0 / 5</strong>
+        </div>
+
+        <div class="preference-grid" id="genreChoices">
+
+            <button
+                th:each="genre : ${genreOptions}"
+                type="button"
+                class="preference-choice"
+                th:data-genre-id="${genre.id}"
+                th:classappend="${#lists.contains(selectedGenres, genre.id)} ? ' selected' : ''"
+                th:text="${genre.name}"
+            >
+                액션
+            </button>
+
+        </div>
+
+        <p class="preference-error" id="preferenceError" role="alert"></p>
+
+        <div class="preference-actions">
+
+            <button
+                type="button"
+                class="btn btn-ghost"
+                id="skipPreference"
+            >
+                나중에 설정
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-primary"
+                id="savePreference"
+            >
+                이 취향으로 시작하기
+            </button>
+
+        </div>
+
+    </section>
+
+    <section class="preference-how">
+        <div>
+            <strong>처음에는</strong>
+            <p>가입할 때 고른 장르를 많이 반영합니다.</p>
+        </div>
+
+        <div>
+            <strong>사용할수록</strong>
+            <p>찜·별점·영화 상세 조회 기록의 비중이 커집니다.</p>
+        </div>
+
+        <div>
+            <strong>결과적으로</strong>
+            <p>내가 실제로 좋아한 영화에 가까운 추천으로 바뀝니다.</p>
+        </div>
+    </section>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<style>
+    .preference-main {
+        max-width: 980px;
+        padding-block: 64px 90px;
+    }
+
+    .preference-intro {
+        margin-bottom: 28px;
+    }
+
+    .preference-intro h1 {
+        margin-bottom: 12px;
+        font-size: 36px;
+    }
+
+    .preference-intro > p:last-child {
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.8;
+    }
+
+    .preference-card {
+        padding: 34px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+    }
+
+    .preference-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 24px;
+        margin-bottom: 26px;
+    }
+
+    .preference-card-head h2 {
+        margin: 8px 0 7px;
+        font-size: 25px;
+    }
+
+    .preference-card-head p {
+        color: var(--muted);
+        font-size: 14px;
+    }
+
+    .step-badge {
+        display: inline-flex;
+        padding: 5px 9px;
+        border-radius: 999px;
+        background: var(--red-soft);
+        color: var(--red);
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    #selectedCount {
+        color: var(--red);
+        font-size: 18px;
+        white-space: nowrap;
+    }
+
+    .preference-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .preference-choice {
+        min-height: 58px;
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: var(--panel-2);
+        color: var(--text);
+        font-size: 15px;
+        font-weight: 750;
+        cursor: pointer;
+        transition: 0.16s ease;
+    }
+
+    .preference-choice:hover {
+        border-color: var(--red);
+        color: var(--red);
+    }
+
+    .preference-choice.selected {
+        border-color: var(--red);
+        background: var(--red);
+        color: #ffffff;
+        box-shadow: 0 0 0 3px var(--red-soft);
+    }
+
+    .preference-error {
+        min-height: 24px;
+        margin-top: 16px;
+        color: #c53349;
+        font-size: 14px;
+    }
+
+    .preference-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 6px;
+    }
+
+    .preference-how {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 22px;
+    }
+
+    .preference-how > div {
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--panel);
+    }
+
+    .preference-how strong {
+        color: var(--red);
+        font-size: 14px;
+    }
+
+    .preference-how p {
+        margin-top: 7px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.65;
+    }
+
+    @media (max-width: 760px) {
+        .preference-main {
+            padding-block: 40px 70px;
+        }
+
+        .preference-intro h1 {
+            font-size: 30px;
+        }
+
+        .preference-card {
+            padding: 24px;
+        }
+
+        .preference-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .preference-how {
+            grid-template-columns: 1fr;
+        }
+
+        .preference-actions {
+            flex-direction: column-reverse;
+        }
+
+        .preference-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<script src="/js/preference-setup.js?v=0917"></script>
+<script src="/js/auth-header.js?v=0917" defer></script>
+
+</body>
+</html>

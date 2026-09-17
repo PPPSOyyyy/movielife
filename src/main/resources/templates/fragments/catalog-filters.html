@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<th:block th:fragment="filters">
+
+    <label class="field">
+        TMDB 평점 · 10점 만점
+
+        <select name="rating">
+            <option value="">
+                전체 평점
+            </option>
+
+            <option
+                value="under5"
+                th:selected="${filter.rating == 'under5'}"
+            >
+                5점 미만
+            </option>
+
+            <option
+                th:each="n : ${#numbers.sequence(5,9)}"
+                th:value="${n}"
+                th:text="${n} + '점 이상'"
+                th:selected="${filter.rating == #strings.toString(n)}"
+            >
+            </option>
+        </select>
+    </label>
+
+
+    <label class="field">
+        개봉 연도
+
+        <select name="period">
+            <option value="">
+                전체 연도
+            </option>
+
+            <option
+                th:each="y : ${ {2020,2010,2000,1990,1980,1970,1960,1950} }"
+                th:value="${y}"
+                th:text="${y} + '년대'"
+                th:selected="${filter.period == #strings.toString(y)}"
+            >
+            </option>
+
+            <option
+                value="older"
+                th:selected="${filter.period == 'older'}"
+            >
+                1950년 이전
+            </option>
+        </select>
+    </label>
+
+
+    <label class="field">
+        관람등급 · 한국
+
+        <select name="certification">
+            <option value="">
+                전체 관람등급 (성인 제외)
+            </option>
+
+            <option
+                value="ALL"
+                th:selected="${filter.certification == 'ALL'}"
+            >
+                전체관람가
+            </option>
+
+            <option
+                value="12"
+                th:selected="${filter.certification == '12'}"
+            >
+                12세 이상
+            </option>
+
+            <option
+                value="15"
+                th:selected="${filter.certification == '15'}"
+            >
+                15세 이상
+            </option>
+
+            <option
+                value="19"
+                th:selected="${filter.certification == '19'}"
+            >
+                청소년 관람불가 (19)
+            </option>
+
+            <option
+                value="UNKNOWN"
+                th:selected="${filter.certification == 'UNKNOWN'}"
+            >
+                한국 등급 정보 없음
+            </option>
+        </select>
+    </label>
+
+
+    <label class="field">
+        OTT 제공처
+
+        <select name="provider">
+            <option value="">
+                전체 서비스
+            </option>
+
+            <option
+                th:each="p : ${krProviders}"
+                th:value="${p.id}"
+                th:text="${p.name}"
+                th:selected="${selectedProvider == p.id}"
+            >
+            </option>
+        </select>
+
+        <small>
+            KR 제공 정보 · 구독/무료/광고/대여/구매 포함
+        </small>
+    </label>
+
+    <p
+        class="error-text"
+        th:if="${providerError != null}"
+        th:text="${providerError}"
+    >
+    </p>
+
+
+    <label class="field">
+        정렬
+
+        <select
+            name="sort"
+            th:disabled="${!#strings.isEmpty(query)}"
+        >
+            <option
+                value="latest"
+                th:selected="${filter.sort == 'latest'}"
+            >
+                최신순
+            </option>
+
+            <option
+                value="popular"
+                th:selected="${filter.sort == 'popular'}"
+            >
+                인기순
+            </option>
+
+            <option
+                value="recommended"
+                th:selected="${filter.sort == 'recommended'}"
+            >
+                추천순
+            </option>
+        </select>
+
+        <small>
+            추천순: 회원 별점이 있는 영화는 회원 평균 별점 우선 · 나머지는 TMDB 평점·평가 수·인기도 반영
+        </small>
+    </label>
+
+</th:block>
+
+
+<th:block th:fragment="sortbar">
+
+    <div
+        class="catalog-sort"
+        aria-label="영화 정렬"
+    >
+        <span>
+            TMDB 기준
+        </span>
+
+        <button
+            type="submit"
+            form="catalogFilterForm"
+            name="sort"
+            value="latest"
+            th:classappend="${filter.sort == 'latest'} ? 'active'"
+            th:disabled="${!#strings.isEmpty(query)}"
+        >
+            최신순
+        </button>
+
+        <button
+            type="submit"
+            form="catalogFilterForm"
+            name="sort"
+            value="popular"
+            th:classappend="${filter.sort == 'popular'} ? 'active'"
+            th:disabled="${!#strings.isEmpty(query)}"
+        >
+            인기순
+        </button>
+
+        <button
+            type="submit"
+            form="catalogFilterForm"
+            name="sort"
+            value="recommended"
+            th:classappend="${filter.sort == 'recommended'} ? 'active'"
+            th:disabled="${!#strings.isEmpty(query)}"
+        >
+            추천순
+        </button>
+    </div>
+
+</th:block>
+
+</body>
+</html>

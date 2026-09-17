@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice(assignableTypes = {MemberController.class, FavoriteController.class, ReviewController.class})
+@RestControllerAdvice(assignableTypes = {AccountController.class, MemberController.class, FavoriteController.class, ReviewController.class})
 public class ApiExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> invalid(IllegalArgumentException e) {

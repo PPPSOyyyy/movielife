@@ -93,7 +93,7 @@ public class MemberController {
 
             return ResponseEntity.ok(
                     Map.of(
-                            "message", "로그인에 성공했습니다.",
+                            "message", "",
                             "userId", member.getUserId(),
                             "nickname", member.getNickname()
                     )
@@ -146,20 +146,12 @@ public class MemberController {
                         );
 
 
-        return ResponseEntity.ok(
-
-                Map.of(
-
-                        "userId",
-                        member.getUserId(),
-
-                        "nickname",
-                        member.getNickname()
-
-                )
-
-        );
-
+        Map<String,Object> info=new java.util.LinkedHashMap<>();
+        info.put("userId",member.getUserId()); info.put("nickname",member.getNickname());
+        info.put("name",member.getName()); info.put("email",member.getEmail());
+        info.put("securityQuestion",member.getSecurityQuestion());
+        info.put("recoveryReady",member.getSecurityAnswerHash()!=null);
+        return ResponseEntity.ok(info);
     }
 
 

@@ -33,28 +33,28 @@
   $('#loginPassword')?.addEventListener('input',()=>$('#loginPassword').removeAttribute('aria-invalid'));
   const signup=$('#signupForm');
   if(signup){
-    const checked={userId:null,nickname:null};
-    const fields={userId:$('#signupUserId'),nickname:$('#signupNickname')};
-    const patterns={userId:/^[A-Za-z0-9_]{4,20}$/,nickname:/^[가-힣A-Za-z0-9_]{2,20}$/};
+    const checked={userId:null,nickname:null,email:null};
+    const fields={userId:$('#signupUserId'),nickname:$('#signupNickname'),email:$('#signupEmail')};
+    const patterns={userId:/^[A-Za-z0-9_]{4,20}$/,nickname:/^[가-힣A-Za-z0-9_]{2,20}$/,email:/^[^\s@]+@[^\s@]+\.[^\s@]+$/};
     for(const key of Object.keys(fields))fields[key].addEventListener('input',()=>{checked[key]=null;$('#'+key+'Check').textContent='';});
     document.querySelectorAll('[data-check]').forEach(button=>button.addEventListener('click',async()=>{
       const key=button.dataset.check,input=fields[key],hint=$('#'+key+'Check'),value=input.value.trim();
       input.value=value;
       checked[key]=null;
-      if(!patterns[key].test(value)){hint.textContent=key==='userId'?'아이디 입력 형식을 확인해 주세요.':'닉네임 입력 형식을 확인해 주세요.';
-      hint.style.color='#ff8194';
+      if(!patterns[key].test(value)){hint.textContent=({userId:'아이디',nickname:'닉네임',email:'이메일'}[key])+' 입력 형식을 확인해 주세요.';
+      hint.style.color='#bd3047';
       input.reportValidity();
       return;
       }
       button.disabled=true;
       try{
-        const duplicate=await ML.request('/api/members/check-'+(key==='userId'?'userid':'nickname')+'?'+key+'='+encodeURIComponent(value));
+        const duplicate=await ML.request('/api/members/check-'+(key==='userId'?'userid':key)+'?'+key+'='+encodeURIComponent(value));
         if(input.value.trim()!==value)return;
         checked[key]=duplicate?null:value;
         hint.textContent=duplicate?'이미 사용 중입니다.':'사용할 수 있습니다.';
-        hint.style.color=duplicate?'#ff8194':'#8be0b9';
+        hint.style.color=duplicate?'#bd3047':'var(--red)';
       }catch(e){hint.textContent=e.message;
-      hint.style.color='#ff8194';
+      hint.style.color='#bd3047';
       }
       finally{button.disabled=false;
       }
@@ -63,7 +63,7 @@
       event.preventDefault();
       const error=$('#signupError');
       error.textContent='';
-      if(checked.userId!==fields.userId.value.trim()||checked.nickname!==fields.nickname.value.trim()){error.textContent='아이디와 닉네임 중복확인을 완료해 주세요.';
+      if(Object.keys(fields).some(key=>checked[key]!==fields[key].value.trim())){error.textContent='아이디, 닉네임, 이메일 중복확인을 완료해 주세요.';
       return;
       }
       const password=$('#signupPassword').value;
@@ -76,11 +76,55 @@
       const button=signup.querySelector('[type=submit]');
       button.disabled=true;
       try{
-        await ML.request('/api/members/signup',ML.json('POST',{userId:fields.userId.value.trim(),nickname:fields.nickname.value.trim(),password}));
-        // 자동 이동하지 않고 사용자가 확인을 누른 뒤 이동합니다.
-        await ML.dialog({title:'회원가입이 완료되었습니다',message:'movieLife에 오신 것을 환영합니다.\n로그인하고 나만의 영화 기록을 시작해 보세요.'});
-        location.href='/login?returnUrl='+encodeURIComponent(returnUrl);
-      }catch(e){error.textContent=e.message;
+        const userId=fields.userId.value.trim();
+
+        // 1) 회원가입
+        await ML.request(
+          '/api/members/signup',
+          ML.json('POST',{
+            userId,
+            nickname:fields.nickname.value.trim(),
+            password,
+            name:$('#signupName').value.trim(),
+            email:fields.email.value.trim(),
+            securityQuestion:$('#signupQuestion').value,
+            securityAnswer:$('#signupAnswer').value
+          })
+        );
+
+        // 2) 회원가입 직후 자동 로그인
+        //    사용자가 다시 로그인할 필요 없이 바로 취향 설정으로 이동합니다.
+        await ML.request(
+          '/api/members/login',
+          ML.json('POST',{userId,password})
+        );
+
+        // 로그인 세션이 정상 생성됐는지 한 번 확인
+        await ML.request('/api/members/me');
+
+        await ML.dialog({
+          title:'회원가입이 완료되었습니다',
+          message:'movieLife에 오신 것을 환영합니다.\n이제 좋아하는 장르를 선택해 첫 추천을 만들어 보세요.'
+        });
+
+        // 3) 최초 취향 설정 페이지로 바로 이동
+        const nextAfterPreference =
+          returnUrl && !returnUrl.startsWith('/preferences/setup')
+            ? returnUrl
+            : '/';
+
+        location.href=
+          '/preferences/setup?next='
+          + encodeURIComponent(nextAfterPreference);
+
+      }catch(e){
+        // 회원가입은 됐지만 자동 로그인만 실패한 경우에도
+        // 존재하지 않는 중첩 returnUrl 대신 정상 취향 설정 경로로 안내합니다.
+        if(e.status===400 || e.status===401){
+          error.textContent=e.message;
+        }else{
+          error.textContent=e.message || '회원가입 처리 중 오류가 발생했습니다.';
+        }
       }
       finally{button.disabled=false;
       }
@@ -94,7 +138,7 @@
       document.querySelectorAll('[data-nickname]').forEach(e=>e.textContent=member.nickname);
       document.querySelectorAll('[data-user-id]').forEach(e=>e.textContent='@'+member.userId);
       document.querySelectorAll('[data-avatar]').forEach(e=>e.textContent=member.nickname.slice(0,1));
-      if($('#profileUserId')){$('#profileUserId').value=member.userId;
+      if($('#profileUserId') && $('#profileForm')){$('#profileUserId').value=member.userId;
       $('#profileNickname').value=member.nickname;
       }
     });
@@ -141,12 +185,13 @@
       recent.replaceChildren();
       reviews.slice(0,2).forEach(review=>{
         const a=ML.el('a','review-item');
-        a.href='/review?reviewId='+review.id;
+        a.href='/review?reviewId='+review.id; a.addEventListener('click',()=>a.href='/review?reviewId='+review.id+'&returnUrl='+ML.reviewReturn());
         const head=ML.el('div','review-top');
-        head.append(ML.el('strong','small',review.movieTitle||'영화 정보 없음'),ML.el('span','review-rating','★ '+review.rating+' / 5'));
+        head.append(ML.el('strong','small',review.movieTitle||'영화 정보 없음'),ML.el('span','review-rating','★ '+review.rating+' / 10'));
         a.append(head,ML.el('p','review-content',review.content.length>110?review.content.slice(0,110)+'…':review.content));
         recent.append(a);
       });
+      ML.restoreReviewScroll();
       if(!reviews.length)recent.append(ML.empty('아직 남긴 감상이 없습니다','영화 한 편에 나만의 별점과 리뷰를 남겨 보세요.','/review','리뷰 작성하기'));
     }else $('#recentReviews').replaceChildren(ML.empty('기록을 불러오지 못했습니다','잠시 후 다시 시도해 주세요.'));
     if(results.some(r=>r.status==='rejected')){

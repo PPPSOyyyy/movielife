@@ -1,503 +1,54 @@
 package com.yse.dev.Service;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Value;
+import java.util.*;
+import java.util.function.Supplier;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import com.yse.dev.DTO.PersonDetailDto;
+import lombok.RequiredArgsConstructor;
+import com.yse.dev.DTO.*;
 import com.yse.dev.DTO.PersonDetailDto.PersonMovieDto;
-
-
-@Service
+@Service @RequiredArgsConstructor
 public class PersonService {
-
-
-    @Value("${tmdb.api.key}")
-    private String apiKey;
-
-
-    @Value("${tmdb.api.base-url}")
-    private String baseUrl;
-
-
-    private final RestTemplate restTemplate =
-            new RestTemplate();
-
-
-    // =========================================================
-    // 배우 상세
-    // =========================================================
-
-    public PersonDetailDto getPersonDetail(
-            Long personId) {
-
-
-        if (
-            personId == null ||
-            personId <= 0
-        ) {
-
-            throw new IllegalArgumentException(
-                    "배우 정보가 올바르지 않습니다."
-            );
+    private final MovieService tmdb;
+    public PersonDetailDto getPersonDetail(Long id){return getPersonDetail(id,1,"","");}
+    public PersonDetailDto getPersonDetail(Long id,int page,String role,String certification){
+        if(id==null||id<=0)throw new IllegalArgumentException("인물 정보가 올바르지 않습니다.");
+        // 인물 기본정보 / 필모그래피 / 영어 이름을 병렬로 조회합니다.
+        List<Supplier<Map<String,Object>>> tasks=List.of(
+            ()->tmdb.tmdb("/person/"+id,Map.of()),
+            ()->tmdb.tmdb("/person/"+id+"/movie_credits",Map.of()),
+            // TMDB person detail does not promise original_name: retrieve English name explicitly.
+            ()->{try {return tmdb.tmdb("/person/"+id,Map.of("language","en-US"));}
+                 catch(org.springframework.web.client.RestClientException e){return Map.of();}}
+        );
+        List<Map<String,Object>> loaded=tmdb.parallel(tasks);
+        Map<String,Object> p=loaded.get(0);
+        Map<String,Object> credits=loaded.get(1);
+        PersonDetailDto dto=new PersonDetailDto();dto.setId(id);
+        dto.setName(text(p,"name"));dto.setProfilePath(text(p,"profile_path"));dto.setBiography(text(p,"biography"));
+        dto.setBirthday(text(p,"birthday"));dto.setDeathday(text(p,"deathday"));dto.setPlaceOfBirth(text(p,"place_of_birth"));dto.setKnownForDepartment(text(p,"known_for_department"));
+        if(!dto.getBiography().matches("(?s).*[가-힣].*"))dto.setBiography("");
+        dto.setOriginalName(text(loaded.get(2),"name"));
+        if(!List.of("cast","director").contains(role))role="Directing".equals(dto.getKnownForDepartment())?"director":"cast";
+        dto.setRole(role);certification="19".equals(certification)?"19":"";dto.setCertification(certification);
+        Map<Long,Map<?,?>> unique=new LinkedHashMap<>();
+        Object value=credits.get("director".equals(role)?"crew":"cast");
+        if(value instanceof List<?> list)for(Object o:list)if(o instanceof Map<?,?> m && m.get("id") instanceof Number n){
+            if("director".equals(role)&&!"Director".equals(m.get("job")))continue;
+            // 성인 콘텐츠(TMDB adult)는 필모그래피와 페이지 수 계산에서 제외합니다.
+            if(Boolean.TRUE.equals(m.get("adult")))continue;
+            unique.putIfAbsent(n.longValue(),m);
         }
-
-
-        // =====================================================
-        // 배우 기본 정보
-        // =====================================================
-
-        Map<String, Object> person =
-                request(
-                        "/person/"
-                        + personId
-                );
-
-
-        // =====================================================
-        // 배우 영화 출연작
-        // =====================================================
-
-        Map<String, Object> credits =
-                request(
-                        "/person/"
-                        + personId
-                        + "/movie_credits"
-                );
-
-
-        PersonDetailDto dto =
-                new PersonDetailDto();
-
-
-        dto.setId(
-                personId
-        );
-
-
-        dto.setName(
-                text(
-                        person,
-                        "name",
-                        "이름 정보 없음"
-                )
-        );
-
-
-        dto.setOriginalName(
-                text(
-                        person,
-                        "original_name",
-                        ""
-                )
-        );
-
-
-        dto.setProfilePath(
-                text(
-                        person,
-                        "profile_path",
-                        ""
-                )
-        );
-
-
-        dto.setBiography(
-                text(
-                        person,
-                        "biography",
-                        ""
-                )
-        );
-
-
-        dto.setBirthday(
-                text(
-                        person,
-                        "birthday",
-                        ""
-                )
-        );
-
-
-        dto.setDeathday(
-                text(
-                        person,
-                        "deathday",
-                        ""
-                )
-        );
-
-
-        dto.setPlaceOfBirth(
-                text(
-                        person,
-                        "place_of_birth",
-                        ""
-                )
-        );
-
-
-        dto.setKnownForDepartment(
-                text(
-                        person,
-                        "known_for_department",
-                        ""
-                )
-        );
-
-
-        dto.setPopularity(
-                number(
-                        person,
-                        "popularity"
-                )
-                .doubleValue()
-        );
-
-
-        // =====================================================
-        // 대표 출연작
-        // =====================================================
-
-        List<PersonMovieDto> movies =
-                new ArrayList<>();
-
-
-        Object castValue =
-                credits.get(
-                        "cast"
-                );
-
-
-        if (
-            castValue instanceof List<?> castList
-        ) {
-
-
-            for (
-                Object item :
-                castList
-            ) {
-
-
-                if (
-                    !(item instanceof Map<?, ?> movie)
-                ) {
-
-                    continue;
-                }
-
-
-                if (
-                    !(movie.get("id")
-                            instanceof Number movieId)
-                ) {
-
-                    continue;
-                }
-
-
-                String posterPath =
-                        text(
-                                movie,
-                                "poster_path",
-                                ""
-                        );
-
-
-                // 포스터 없는 작품 제외
-                if (
-                    posterPath.isBlank()
-                ) {
-
-                    continue;
-                }
-
-
-                PersonMovieDto work =
-                        new PersonMovieDto();
-
-
-                work.setId(
-                        movieId.longValue()
-                );
-
-
-                work.setTitle(
-                        text(
-                                movie,
-                                "title",
-                                "제목 정보 없음"
-                        )
-                );
-
-
-                work.setPosterPath(
-                        posterPath
-                );
-
-
-                work.setReleaseDate(
-                        text(
-                                movie,
-                                "release_date",
-                                ""
-                        )
-                );
-
-
-                work.setVoteAverage(
-                        number(
-                                movie,
-                                "vote_average"
-                        )
-                        .doubleValue()
-                );
-
-
-                work.setVoteCount(
-                        number(
-                                movie,
-                                "vote_count"
-                        )
-                        .intValue()
-                );
-
-
-                work.setPopularity(
-                        number(
-                                movie,
-                                "popularity"
-                        )
-                        .doubleValue()
-                );
-
-
-                work.setCharacter(
-                        text(
-                                movie,
-                                "character",
-                                ""
-                        )
-                );
-
-
-                movies.add(
-                        work
-                );
-            }
+        List<Map<?,?>> works=new ArrayList<>(unique.values());
+        works.sort(Comparator.comparing((Map<?,?> m)->text(m,"release_date")).reversed());
+        int pages=Math.max(1,(works.size()+23)/24);page=Math.max(1,Math.min(page,pages));dto.setPage(page);dto.setTotalPages(pages);
+        List<Map<?,?>> chunk=works.subList(Math.min(works.size(),(page-1)*24),Math.min(works.size(),page*24));
+        List<MovieDto> visible=tmdb.convertToMovieList(Map.of("results",chunk),certification);
+        List<PersonMovieDto> output=new ArrayList<>();
+        for(MovieDto movie:visible){
+            Map<?,?> source=unique.get(movie.getId());PersonMovieDto work=new PersonMovieDto();
+            work.setId(movie.getId());work.setTitle(movie.getTitle());work.setPosterPath(movie.getPosterPath());work.setReleaseDate(movie.getReleaseDate());work.setVoteAverage(movie.getVoteAverage());work.setAdultsOnly(movie.isAdultsOnly());
+            work.setCharacter("director".equals(role)?"감독":text(source,"character"));output.add(work);
         }
-
-
-        // =====================================================
-        // 대표작 정렬
-        //
-        // 평가 수가 많은 작품을 우선으로 해서
-        // 단편/행사영상/인지도 낮은 작품이 앞에 뜨는 것을 줄임
-        // =====================================================
-
-        movies.sort(
-
-                Comparator
-                        .comparingInt(
-                                (PersonMovieDto movie) ->
-                                        movie.getVoteCount() == null
-                                                ? 0
-                                                : movie.getVoteCount()
-                        )
-                        .reversed()
-
-                        .thenComparing(
-                                Comparator.comparingDouble(
-                                        (PersonMovieDto movie) ->
-                                                movie.getPopularity() == null
-                                                        ? 0.0
-                                                        : movie.getPopularity()
-                                )
-                                .reversed()
-                        )
-
-                        .thenComparing(
-                                Comparator.comparingDouble(
-                                        (PersonMovieDto movie) ->
-                                                movie.getVoteAverage() == null
-                                                        ? 0.0
-                                                        : movie.getVoteAverage()
-                                )
-                                .reversed()
-                        )
-        );
-
-
-        // =====================================================
-        // 같은 영화 중복 제거
-        // =====================================================
-
-        List<PersonMovieDto> representativeMovies =
-                new ArrayList<>();
-
-
-        Set<Long> usedMovieIds =
-                new HashSet<>();
-
-
-        for (
-            PersonMovieDto movie :
-            movies
-        ) {
-
-
-            if (
-                movie.getId() == null ||
-                usedMovieIds.contains(
-                        movie.getId()
-                )
-            ) {
-
-                continue;
-            }
-
-
-            usedMovieIds.add(
-                    movie.getId()
-            );
-
-
-            representativeMovies.add(
-                    movie
-            );
-
-
-            // 대표작 18개
-            if (
-                representativeMovies.size()
-                        >= 18
-            ) {
-
-                break;
-            }
-        }
-
-
-        dto.setMovies(
-                representativeMovies
-        );
-
-
-        return dto;
+        dto.setMovies(output);return dto;
     }
-
-
-    // =========================================================
-    // TMDB 요청
-    // =========================================================
-
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> request(
-            String path) {
-
-
-        String url =
-                UriComponentsBuilder
-                        .fromUriString(
-                                baseUrl + path
-                        )
-                        .queryParam(
-                                "api_key",
-                                apiKey
-                        )
-                        .queryParam(
-                                "language",
-                                "ko-KR"
-                        )
-                        .build()
-                        .encode()
-                        .toUriString();
-
-
-        Map<String, Object> response =
-                restTemplate.getForObject(
-                        url,
-                        Map.class
-                );
-
-
-        if (
-            response == null
-        ) {
-
-            throw new IllegalArgumentException(
-                    "배우 정보를 불러오지 못했습니다."
-            );
-        }
-
-
-        return response;
-    }
-
-
-    // =========================================================
-    // 값 안전하게 가져오기
-    // =========================================================
-
-    private String text(
-
-            Map<?, ?> map,
-
-            String key,
-
-            String fallback) {
-
-
-        Object value =
-                map.get(
-                        key
-                );
-
-
-        if (
-            value == null ||
-            value.toString().isBlank()
-        ) {
-
-            return fallback;
-        }
-
-
-        return value.toString();
-    }
-
-
-    private Number number(
-
-            Map<?, ?> map,
-
-            String key) {
-
-
-        Object value =
-                map.get(
-                        key
-                );
-
-
-        if (
-            value instanceof Number number
-        ) {
-
-            return number;
-        }
-
-
-        return 0;
-    }
+    private static String text(Map<?,?> m,String key){return Objects.toString(m.get(key),"");}
 }

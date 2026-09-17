@@ -9,13 +9,14 @@
             id="main"
             class="shell page"
             data-ott-section
+            data-limit="20"
         >
             <div class="page-heading">
                 <p class="eyebrow">
-                    ON YOUR SCREEN
+                    어디서 볼까요?
                 </p>
                 <h1>
-                    오늘은, 집에서 한 편.
+                    내 OTT에서 영화 찾기
                 </h1>
                 <p class="muted">
                     이용 중인 OTT에서 볼 수 있는 영화를 찾아보세요.
@@ -27,45 +28,12 @@
                 role="group"
                 aria-label="OTT 서비스 선택"
             >
-                <button
-                    type="button"
-                    data-provider="8"
-                    aria-pressed="true"
-                >
-                    Netflix
-                </button>
-                <button
-                    type="button"
-                    data-provider="337"
-                    aria-pressed="false"
-                >
-                    Disney+
-                </button>
-                <button
-                    type="button"
-                    data-provider="356"
-                    aria-pressed="false"
-                >
-                    TVING
-                </button>
-                <button
-                    type="button"
-                    data-provider="309"
-                    aria-pressed="false"
-                >
-                    Wavve
-                </button>
-                <button
-                    type="button"
-                    data-provider="97"
-                    aria-pressed="false"
-                >
-                    Watcha
-                </button>
+<button type="button" th:each="p : ${krProviders}" th:data-provider="${p.id}" th:text="${p.name}" aria-pressed="false"></button><p th:if="${#lists.isEmpty(krProviders)}">KR 제공처 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</p>
             </div>
+            <h2 class="ott-results-title" data-ott-heading>제공 영화</h2>
             <div class="result-bar">
                 <span>
-                    한국 구독 서비스 기준 · 인기순
+                    한국 제공 정보 기준 · 구독/무료/광고/대여/구매 · 인기순
                 </span>
                 <span>
                     제공 여부는 서비스 사정에 따라 달라질 수 있습니다.
@@ -93,9 +61,9 @@
         </main>
         <footer th:replace="~{fragments/layout :: footer}">
         </footer>
-        <script src="/js/auth-header.js?v=20260915-3">
+        <script src="/js/auth-header.js?v=upgrade20">
         </script>
-        <script src="/js/catalog.js?v=20260915-3">
+        <script src="/js/catalog.js?v=upgrade20">
         </script>
     </body>
 </html>

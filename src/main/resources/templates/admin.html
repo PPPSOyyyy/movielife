@@ -4,7 +4,7 @@
 
 <head>
 
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"><script src="/js/theme.js?v=redblack-0917"></script>
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
@@ -1260,10 +1260,11 @@
 
     </style>
 
-</head>
+<link rel="stylesheet" href="/css/admin-mint.css?v=redblack-0917">
+<link rel="stylesheet" href="/css/theme.css?v=redblack-0917"></head>
 
 
-<body>
+<body class="mint-admin">
 
 
 <div class="admin-layout">
@@ -1275,12 +1276,15 @@
     <aside class="sidebar">
 
 
-        <a href="/"
-           class="logo">
+		<a href="/"
+		   class="logo image-brand">
 
-            movie<span>Life</span>
+		    <img
+		        src="/images/logo.png"
+		        alt="movieLife"
+		        class="admin-logo-image">
 
-        </a>
+		</a>
 
 
         <div class="menu-label">
@@ -1293,40 +1297,32 @@
         <nav class="menu">
 
 
-            <button type="button"
-                    class="menu-button active"
-                    data-page="dashboardPage">
+            <a class="menu-button" href="/admin?view=dashboard" data-page="dashboardPage" th:classappend="${adminView == 'dashboard'} ? 'active' : ''" th:attr="aria-current=${adminView == 'dashboard' ? 'page' : null}">
 
                 ▦ 대시보드
 
-            </button>
+            </a>
 
 
-            <button type="button"
-                    class="menu-button"
-                    data-page="memberPage">
+            <a class="menu-button" href="/admin?view=members" data-page="memberPage" th:classappend="${adminView == 'members'} ? 'active' : ''" th:attr="aria-current=${adminView == 'members' ? 'page' : null}">
 
                 ♙ 회원 관리
 
-            </button>
+            </a>
 
 
-            <button type="button"
-                    class="menu-button"
-                    data-page="reviewPage">
+            <a class="menu-button" href="/admin?view=reviews" data-page="reviewPage" th:classappend="${adminView == 'reviews'} ? 'active' : ''" th:attr="aria-current=${adminView == 'reviews' ? 'page' : null}">
 
                 ★ 리뷰 관리
 
-            </button>
+            </a>
 
 
-            <button type="button"
-                    class="menu-button"
-                    data-page="favoritePage">
+            <a class="menu-button" href="/admin?view=favorites" data-page="favoritePage" th:classappend="${adminView == 'favorites'} ? 'active' : ''" th:attr="aria-current=${adminView == 'favorites' ? 'page' : null}">
 
                 ♥ 찜 관리
 
-            </button>
+            </a>
 
 
             <a href="/">
@@ -1377,7 +1373,7 @@
     <main class="main">
 
 
-        <header class="topbar">
+        <header class="topbar"><label class="theme-control"><span aria-hidden="true">◐</span><select data-theme-select aria-label="화면 테마"><option value="system">시스템</option><option value="light">라이트</option><option value="dark">다크</option></select></label>
 
 
             <div>
@@ -1411,8 +1407,7 @@
             <!-- ==================================
                  대시보드
             =================================== -->
-            <section id="dashboardPage"
-                     class="page active">
+            <section id="dashboardPage" class="page" th:hidden="${adminView != 'dashboard'}" th:classappend="${adminView == 'dashboard'} ? 'active' : ''">
 
 
                 <div class="page-header">
@@ -1527,31 +1522,25 @@
 
                     <div class="quick-buttons">
 
-                        <button type="button"
-                                class="quick-button"
-                                data-page="memberPage">
+                        <a class="quick-button" href="/admin?view=members" data-page="memberPage" th:classappend="${adminView == 'members'} ? 'active' : ''" th:attr="aria-current=${adminView == 'members' ? 'page' : null}">
 
                             회원 관리
 
-                        </button>
+                        </a>
 
 
-                        <button type="button"
-                                class="quick-button"
-                                data-page="reviewPage">
+                        <a class="quick-button" href="/admin?view=reviews" data-page="reviewPage" th:classappend="${adminView == 'reviews'} ? 'active' : ''" th:attr="aria-current=${adminView == 'reviews' ? 'page' : null}">
 
                             리뷰 관리
 
-                        </button>
+                        </a>
 
 
-                        <button type="button"
-                                class="quick-button"
-                                data-page="favoritePage">
+                        <a class="quick-button" href="/admin?view=favorites" data-page="favoritePage" th:classappend="${adminView == 'favorites'} ? 'active' : ''" th:attr="aria-current=${adminView == 'favorites' ? 'page' : null}">
 
                             찜 관리
 
-                        </button>
+                        </a>
 
                     </div>
 
@@ -1565,8 +1554,7 @@
             <!-- ==================================
                  회원 관리
             =================================== -->
-            <section id="memberPage"
-                     class="page">
+            <section id="memberPage" class="page" th:hidden="${adminView != 'members'}" th:classappend="${adminView == 'members'} ? 'active' : ''">
 
 
                 <div class="page-header">
@@ -1790,8 +1778,7 @@
             <!-- ==================================
                  리뷰 관리
             =================================== -->
-            <section id="reviewPage"
-                     class="page">
+            <section id="reviewPage" class="page" th:hidden="${adminView != 'reviews'}" th:classappend="${adminView == 'reviews'} ? 'active' : ''">
 
 
                 <div class="page-header">
@@ -1825,7 +1812,7 @@
                             </h2>
 
                             <p>
-                                회원 아이디, 영화 ID, 리뷰 내용으로 검색할 수 있습니다.
+                                회원 아이디, 영화명, 리뷰 내용으로 검색할 수 있습니다.
                             </p>
 
                         </div>
@@ -1871,7 +1858,7 @@
                                 </th>
 
                                 <th>
-                                    영화 ID
+                                    영화명
                                 </th>
 
                                 <th>
@@ -1900,7 +1887,7 @@
 
 
                             <tr th:each="review : ${reviews}"
-                                th:data-search="${#strings.toLowerCase(review.userId + ' ' + review.movieId + ' ' + review.content)}">
+                                th:data-search="${#strings.toLowerCase(review.userId + ' ' + movieTitles[review.movieId] + ' ' + review.content)}">
 
 
                                 <td class="user-id"
@@ -1911,18 +1898,18 @@
                                 </td>
 
 
-                                <td class="muted"
-                                    th:text="${review.movieId}">
+                                <td class="movie-title"
+                                    th:text="${movieTitles[review.movieId]}">
 
-                                    100
+                                    영화 제목
 
                                 </td>
 
 
                                 <td class="rating"
-                                    th:text="'★ ' + ${review.rating} + '/5'">
+                                    th:text="'★ ' + ${review.rating} + '/10'">
 
-                                    ★ 5/5
+                                    ★ 10/10
 
                                 </td>
 
@@ -2005,8 +1992,7 @@
             <!-- ==================================
                  찜 관리
             =================================== -->
-            <section id="favoritePage"
-                     class="page">
+            <section id="favoritePage" class="page" th:hidden="${adminView != 'favorites'}" th:classappend="${adminView == 'favorites'} ? 'active' : ''">
 
 
                 <div class="page-header">
@@ -2040,7 +2026,7 @@
                             </h2>
 
                             <p>
-                                회원 아이디 또는 영화 ID로 검색할 수 있습니다.
+                                회원 아이디 또는 영화명으로 검색할 수 있습니다.
                             </p>
 
                         </div>
@@ -2051,7 +2037,7 @@
                             <input type="search"
                                    id="favoriteSearch"
                                    class="search"
-                                   placeholder="회원 아이디 또는 영화 ID 검색">
+                                   placeholder="회원 아이디 또는 영화명 검색">
 
 
                             <div class="count">
@@ -2090,7 +2076,7 @@
                                 </th>
 
                                 <th>
-                                    영화 ID
+                                    영화명
                                 </th>
 
                                 <th>
@@ -2115,7 +2101,7 @@
 
 
                             <tr th:each="favorite : ${favorites}"
-                                th:data-search="${#strings.toLowerCase(favorite.userId + ' ' + favorite.movieId)}">
+                                th:data-search="${#strings.toLowerCase(favorite.userId + ' ' + movieTitles[favorite.movieId])}">
 
 
                                 <td class="muted"
@@ -2134,10 +2120,10 @@
                                 </td>
 
 
-                                <td class="muted"
-                                    th:text="${favorite.movieId}">
+                                <td class="movie-title"
+                                    th:text="${movieTitles[favorite.movieId]}">
 
-                                    123
+                                    영화 제목
 
                                 </td>
 
@@ -2239,429 +2225,7 @@
 
 
 
-<script>
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        () => {
-
-
-            // ==========================================
-            // 메뉴 화면 전환
-            // ==========================================
-            const menuButtons =
-                document.querySelectorAll(
-                    ".menu-button"
-                );
-
-
-            const pages =
-                document.querySelectorAll(
-                    ".page"
-                );
-
-
-            function openPage(
-                pageId
-            ) {
-
-
-                pages.forEach(
-                    page => {
-
-                        page.classList.toggle(
-                            "active",
-                            page.id === pageId
-                        );
-
-                    }
-                );
-
-
-                menuButtons.forEach(
-                    button => {
-
-                        button.classList.toggle(
-                            "active",
-                            button.dataset.page === pageId
-                        );
-
-                    }
-                );
-
-
-                window.scrollTo(
-                    {
-                        top: 0,
-                        behavior: "smooth"
-                    }
-                );
-
-            }
-
-
-            menuButtons.forEach(
-                button => {
-
-                    button.addEventListener(
-                        "click",
-                        () => {
-
-                            openPage(
-                                button.dataset.page
-                            );
-
-                        }
-                    );
-
-                }
-            );
-
-
-            // ==========================================
-            // 대시보드 빠른 이동
-            // ==========================================
-            document
-                .querySelectorAll(
-                    ".quick-button"
-                )
-                .forEach(
-                    button => {
-
-                        button.addEventListener(
-                            "click",
-                            () => {
-
-                                openPage(
-                                    button.dataset.page
-                                );
-
-                            }
-                        );
-
-                    }
-                );
-
-
-            // ==========================================
-            // 검색 기능
-            // ==========================================
-            function connectSearch(
-                inputId,
-                tbodyId,
-                emptyId
-            ) {
-
-
-                const input =
-                    document.getElementById(
-                        inputId
-                    );
-
-
-                const tbody =
-                    document.getElementById(
-                        tbodyId
-                    );
-
-
-                const empty =
-                    document.getElementById(
-                        emptyId
-                    );
-
-
-                if (
-                    !input ||
-                    !tbody ||
-                    !empty
-                ) {
-
-                    return;
-                }
-
-
-                input.addEventListener(
-                    "input",
-                    () => {
-
-
-                        const keyword =
-                            input.value
-                                .trim()
-                                .toLowerCase();
-
-
-                        const rows =
-                            tbody.querySelectorAll(
-                                "tr"
-                            );
-
-
-                        let visibleCount =
-                            0;
-
-
-                        rows.forEach(
-                            row => {
-
-
-                                const text =
-                                    (
-                                        row.dataset.search
-                                        ||
-                                        ""
-                                    ).toLowerCase();
-
-
-                                const visible =
-                                    keyword === ""
-                                    ||
-                                    text.includes(
-                                        keyword
-                                    );
-
-
-                                row.hidden =
-                                    !visible;
-
-
-                                if (visible) {
-
-                                    visibleCount++;
-                                }
-
-
-                            }
-                        );
-
-
-                        empty.hidden =
-                            visibleCount > 0;
-
-                    }
-                );
-
-            }
-
-
-            connectSearch(
-                "memberSearch",
-                "memberRows",
-                "memberEmpty"
-            );
-
-
-            connectSearch(
-                "reviewSearch",
-                "reviewRows",
-                "reviewEmpty"
-            );
-
-
-            connectSearch(
-                "favoriteSearch",
-                "favoriteRows",
-                "favoriteEmpty"
-            );
-
-
-            // ==========================================
-            // 로그아웃
-            // ==========================================
-            const logoutButton =
-                document.getElementById(
-                    "logoutButton"
-                );
-
-
-            if (logoutButton) {
-
-
-                logoutButton.addEventListener(
-                    "click",
-                    async () => {
-
-
-                        try {
-
-
-                            const response =
-                                await fetch(
-                                    "/api/members/logout",
-                                    {
-                                        method:
-                                            "POST",
-
-                                        credentials:
-                                            "same-origin"
-                                    }
-                                );
-
-
-                            if (!response.ok) {
-
-
-                                alert(
-                                    "로그아웃 처리 중 오류가 발생했습니다."
-                                );
-
-
-                                return;
-                            }
-
-
-                            window.location.href =
-                                "/login?returnUrl=/admin";
-
-
-                        }
-                        catch (error) {
-
-
-                            console.error(
-                                error
-                            );
-
-
-                            alert(
-                                "로그아웃 처리 중 오류가 발생했습니다."
-                            );
-
-
-                        }
-
-
-                    }
-                );
-
-
-            }
-
-
-            // ==========================================
-            // 삭제 후 메시지
-            // ==========================================
-            const params =
-                new URLSearchParams(
-                    window.location.search
-                );
-
-
-            let message =
-                "";
-
-
-            if (
-                params.get(
-                    "memberDeleted"
-                ) === "true"
-            ) {
-
-
-                message =
-                    "회원이 삭제되었습니다.";
-
-
-                openPage(
-                    "memberPage"
-                );
-
-
-            }
-            else if (
-                params.get(
-                    "reviewDeleted"
-                ) === "true"
-            ) {
-
-
-                message =
-                    "리뷰가 삭제되었습니다.";
-
-
-                openPage(
-                    "reviewPage"
-                );
-
-
-            }
-            else if (
-                params.get(
-                    "favoriteDeleted"
-                ) === "true"
-            ) {
-
-
-                message =
-                    "찜이 삭제되었습니다.";
-
-
-                openPage(
-                    "favoritePage"
-                );
-
-
-            }
-            else if (
-                params.get(
-                    "cannotDeleteAdmin"
-                ) === "true"
-            ) {
-
-
-                message =
-                    "관리자 계정은 삭제할 수 없습니다.";
-
-
-                openPage(
-                    "memberPage"
-                );
-
-
-            }
-
-
-            // ==========================================
-            // 토스트 메시지
-            // ==========================================
-            if (message !== "") {
-
-
-                const toast =
-                    document.getElementById(
-                        "toast"
-                    );
-
-
-                toast.textContent =
-                    message;
-
-
-                toast.classList.add(
-                    "show"
-                );
-
-
-                setTimeout(
-                    () => {
-
-                        toast.classList.remove(
-                            "show"
-                        );
-
-                    },
-                    2500
-                );
-
-
-            }
-
-
-        }
-    );
-
-</script>
+<script src="/js/admin.js?v=upgrade20" defer></script>
 
 
 </body>

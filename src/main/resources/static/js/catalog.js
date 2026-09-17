@@ -15,7 +15,7 @@
 
         let provider = buttons.some(
             button => button.dataset.provider === selected
-        ) ? selected : '8';
+        ) ? selected : (buttons[0]?.dataset.provider || '');
 
         let page = 1;
         let revision = 0;
@@ -56,13 +56,14 @@
             }
 
             try {
-                const movies = await ML.request(
-                    '/api/ott-movies?provider='
+                const response = await ML.request(
+                    '/api/ott-page?provider='
                     + encodeURIComponent(provider)
                     + '&page='
                     + page
                 );
 
+                const movies=response.movies;
                 // 다른 OTT로 전환한 뒤 도착한 이전 응답은 무시합니다.
                 if (requestRevision !== revision) {
                     return;
@@ -93,7 +94,7 @@
                 }
 
                 if (more) {
-                    more.hidden = movies.length < 20 || page >= 500;
+                    more.hidden = !response.hasMore || page >= 500;
                 }
 
                 await ML.ready;
@@ -176,6 +177,7 @@
             }
         });
 
-        load();
+        if(buttons.length)load();
+        else result.textContent="KR 제공처 정보를 불러오지 못했습니다.";
     });
 })();

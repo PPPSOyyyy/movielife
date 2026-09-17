@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.yse.dev.Entity.Review;
 import com.yse.dev.Repository.ReviewRepository;
+import com.yse.dev.Repository.ReviewCommentRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +24,9 @@ public class ReviewService {
 
     private final ReviewRepository
             reviewRepository;
+
+    private final ReviewCommentRepository
+            reviewCommentRepository;
 
     private final MemberRepository memberRepository;
 
@@ -185,6 +189,10 @@ public class ReviewService {
         }
 
 
+        reviewCommentRepository.deleteByReviewId(
+                reviewId
+        );
+
         reviewRepository.delete(
                 review
         );
@@ -343,15 +351,15 @@ public class ReviewService {
             String content) {
 
 
-        // 별점 1~5
+        // 별점 1~10
         if (
             rating == null ||
             rating < 1 ||
-            rating > 5
+            rating > 10
         ) {
 
             throw new IllegalArgumentException(
-                    "별점은 1점부터 5점까지 입력해주세요."
+                    "별점은 1점부터 10점까지 입력해주세요."
             );
 
         }

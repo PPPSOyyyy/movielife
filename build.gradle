@@ -72,3 +72,5 @@ tasks.named('test') {
 	useJUnitPlatform()
 
 }
+// Preserve MVC parameter metadata for Gradle builds; controller names are also explicit.
+tasks.withType(JavaCompile).configureEach { options.compilerArgs.add("-parameters") }

@@ -15,7 +15,7 @@
                 >
                 <div>
                     <p class="eyebrow">
-                        A FILM FOR YOUR LIFE
+                        발견하고, 기록하는 나의 영화 취향
                     </p>
                     <h1>
                         오늘의 영화가,
@@ -28,7 +28,7 @@
                     <p class="hero-description">
                         취향에 맞는 영화를 발견하고,
                         <br>
-                        오래 기억하고 싶은 순간을 기록해 보세요.
+                        별점과 리뷰로 감상을 남겨보세요.
                     </p>
                     <div class="actions">
                         <a class="btn btn-primary" href="/movies">
@@ -45,7 +45,7 @@
                 <div class="hero-pick" th:if="${bestMovie != null}">
                     <div class="hero-pick-info">
                         <span class="badge">
-                            TODAY'S PICK
+                            오늘의 발견
                         </span>
                         <h2 th:text="${bestMovie.title}">
                             오늘의 영화
@@ -61,7 +61,7 @@
                             </span>
                             · TMDB
                         </p>
-                    </div>
+                    <a class="text-link hero-detail" th:href="@{/movies/{id}(id=${bestMovie.id})}">상세보기 →</a></div>
                     <a th:href="@{/movies/{id}(id=${bestMovie.id})}">
                         <img
                             class="hero-poster"
@@ -129,7 +129,7 @@
                 <div class="section-head">
                     <div>
                         <p class="eyebrow">
-                            TRENDING NOW
+                            지금, 영화 한 편
                         </p>
                         <h2>
                             지금 주목받는 영화
@@ -167,7 +167,7 @@
                 <article class="panel feature-panel">
                     <div>
                         <span class="feature-label">
-                            BEST MOVIE
+                            오늘의 영화
                         </span>
                         <h2>
                             한 편의 좋은 영화.
@@ -189,28 +189,28 @@
                         data-poster
                     >
                 </article>
-                <article class="panel feature-panel">
+                <article class="panel feature-panel" id="homeFavorite" th:data-logged-in="${userLoggedIn}"><span id="homeFavoriteBadge" class="age-badge" th:hidden="${myMovie == null or !myMovie.adultsOnly}">19</span>
                     <div>
                         <span class="feature-label">
-                            MY COLLECTION
+                            나의 찜 목록
                         </span>
                         <h2>
                             다음에 보고 싶은 영화.
                         </h2>
                         <p
-                            th:text="${myMovie != null ? myMovie.title : (userLoggedIn ? '마음에 드는 영화의 하트를 눌러 담아 보세요.' : '로그인하고 나만의 영화 목록을 만들어 보세요.')}"
+                            id="homeFavoriteTitle" th:text="${myMovie != null ? myMovie.title : (userLoggedIn ? '마음에 드는 영화의 하트를 눌러 담아 보세요.' : '로그인하고 나만의 영화 목록을 만들어 보세요.')}"
                         >
                             내가 찜한 영화
                         </p>
                         <a class="btn btn-sm" href="/favorite-movies">
                             내가 찜한 영화 →
                         </a>
-                    </div>
+                    <div class="actions"><a id="homeFavoriteLink" class="text-link" th:href="${myMovie != null ? '/movies/'+myMovie.id : '/favorite-movies'}">영화 상세 →</a><button type="button" class="btn btn-sm" id="favoriteNext" hidden>다음</button><button type="button" class="btn btn-sm" id="favoritePause" hidden>자동 전환 정지</button></div></div>
                     <img
-                        class="feature-poster"
-                        th:if="${myMovie != null}"
-                        th:src="${myMovie.posterUrl}"
-                        th:alt="${myMovie.title}"
+                        id="homeFavoritePoster" class="feature-poster"
+                        th:hidden="${myMovie == null}"
+                        th:src="${myMovie != null ? myMovie.posterUrl : '/poster/no-poster.svg'}"
+                        th:alt="${myMovie != null ? myMovie.title : '찜한 영화'}"
                         data-poster
                     >
                 </article>
@@ -223,7 +223,7 @@
                 <div class="section-head">
                     <div>
                         <p class="eyebrow">
-                            ON YOUR SCREEN
+                            내 OTT에서 찾기
                         </p>
                         <h2>
                             OTT에서 지금 볼 수 있는 영화
@@ -265,9 +265,9 @@
         </main>
         <footer th:replace="~{fragments/layout :: footer}">
         </footer>
-        <script src="/js/auth-header.js?v=20260915-3">
+        <script src="/js/auth-header.js?v=upgrade20">
         </script>
-        <script src="/js/catalog.js?v=20260915-4">
+        <script src="/js/catalog.js?v=upgrade20">
         </script>
     </body>
 </html>

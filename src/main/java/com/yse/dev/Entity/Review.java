@@ -22,9 +22,12 @@ public class Review {
     @Column(name = "movie_id", nullable = false)
     private Long movieId;
 
-    // 별점 (0.5 ~ 5.0)
+    // 별점: 1~10 정수. 기존 1~5점 데이터는 시작 시 한 번만 환산합니다.
     @Column(nullable = false)
     private Integer rating;
+
+    @Column(name="rating_scale")
+    private Integer ratingScale = 10;
 
     // 리뷰 내용
     @Column(nullable = false, length = 1000)

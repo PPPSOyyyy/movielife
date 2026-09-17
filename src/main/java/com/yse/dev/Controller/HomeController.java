@@ -5,7 +5,9 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,8 +21,10 @@ import org.springframework.web.client.RestClientException;
 import com.yse.dev.DTO.MovieDetailDto;
 import com.yse.dev.DTO.MovieDto;
 import com.yse.dev.Entity.Favorite;
+import com.yse.dev.Service.CatalogModel;
 import com.yse.dev.Service.FavoriteService;
 import com.yse.dev.Service.MovieService;
+import com.yse.dev.Service.PreferenceService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +35,8 @@ public class HomeController {
 
     private final FavoriteService favoriteService;
     private final MovieService movieService;
+    private final CatalogModel catalogModel;
+    private final PreferenceService preferenceService;
 
     private LocalDate pickDate;
     private MovieDto dailyPick;
@@ -152,19 +158,46 @@ public class HomeController {
 
     // 마이페이지
     @GetMapping("/mypage")
-    public String mypagePage(HttpSession session) {
+    public String mypagePage(HttpSession session, Model model) {
         String userId = (String) session.getAttribute("loginUserId");
 
         if (userId == null) {
             return "redirect:/login?required=true&returnUrl=/mypage";
         }
 
+        // 기존 찜 목록 조회를 재사용하여 마이페이지 카드에 표시합니다.
+        favoriteMoviesPage(session, model);
         return "mypage";
+    }
+
+    // 취향 설정 페이지
+    @GetMapping("/preferences/setup")
+    public String preferenceSetupPage(
+            HttpSession session,
+            Model model) {
+
+        String userId = (String) session.getAttribute("loginUserId");
+
+        if (userId == null) {
+            return "redirect:/login?returnUrl=/preferences/setup";
+        }
+
+        model.addAttribute("genreOptions", preferenceService.genreOptions());
+        model.addAttribute("selectedGenres", preferenceService.getGenreIds(userId));
+
+        return "preference-setup";
     }
 
     // 영화 추천
     @GetMapping({"/movie-recommend", "/recommend"})
-    public String movieRecommendPage() {
+    public String movieRecommendPage(HttpSession session) {
+        String userId = (String) session.getAttribute("loginUserId");
+
+        // 로그인 회원인데 아직 최초 취향 설정을 안 했다면 먼저 온보딩으로 이동합니다.
+        if (userId != null && !preferenceService.isCompleted(userId)) {
+            return "redirect:/preferences/setup";
+        }
+
         return "movie-recommend";
     }
 
@@ -278,24 +311,35 @@ public class HomeController {
         }
 
         List<Favorite> favorites = favoriteService.getMyFavorites(userId);
-        List<MovieDetailDto> favoriteMovies = new ArrayList<>();
+
+        // 찜한 영화는 카드에 필요한 요약 정보만 병렬로 조회합니다.
+        // (기존: 영화마다 상세 5회 순차 호출)
+        List<Supplier<MovieDto>> tasks = new ArrayList<>();
 
         for (Favorite favorite : favorites) {
-            try {
-                MovieDetailDto movie = movieService.getMovieDetail(
-                        favorite.getMovieId()
-                );
+            tasks.add(() -> {
+                try {
+                    return movieService.getMovieSummary(favorite.getMovieId());
 
-                favoriteMovies.add(movie);
+                } catch (Exception e) {
+                    MovieDto movie = new MovieDto();
 
-            } catch (Exception e) {
-                MovieDetailDto movie = new MovieDetailDto();
+                    movie.setId(favorite.getMovieId());
+                    movie.setTitle("영화 정보를 불러올 수 없습니다.");
+                    movie.setGenreIds(new ArrayList<>());
+                    movie.setOttProviders(new ArrayList<>());
 
-                movie.setId(favorite.getMovieId());
-                movie.setTitle("영화 정보를 불러올 수 없습니다.");
+                    return movie;
+                }
+            });
+        }
 
-                favoriteMovies.add(movie);
-            }
+        List<MovieDto> favoriteMovies = new ArrayList<>(movieService.parallel(tasks));
+
+        try {
+            catalogModel.attachMemberRatings(favoriteMovies);
+        } catch (Exception e) {
+            // 회원 별점 조회가 실패해도 찜 목록은 표시합니다.
         }
 
         model.addAttribute("favoriteMovies", favoriteMovies);
@@ -325,5 +369,86 @@ public class HomeController {
         }
 
         return "profile";
+    }
+
+    @GetMapping("/api/home-favorite") @ResponseBody
+    public ResponseEntity<?> homeFavorite(@RequestParam(name="index", defaultValue="0") int index,HttpSession session){
+        String id=(String)session.getAttribute("loginUserId");if(id==null)return ResponseEntity.status(401).body(Map.of("message","로그인이 필요합니다."));
+        List<Favorite> items=favoriteService.getMyFavorites(id);
+        if(items.isEmpty())return ResponseEntity.ok(Map.of("count",0));
+        int at=Math.floorMod(index,items.size());
+        try {return ResponseEntity.ok(Map.of("count",items.size(),"index",at,"movie",movieService.getMovieSummary(items.get(at).getMovieId())));}
+        catch(RestClientException e){return ResponseEntity.status(503).body(Map.of("message","찜한 영화 정보를 불러오지 못했습니다."));}
+    }
+
+
+    @GetMapping("/api/ott-page") @ResponseBody
+    public ResponseEntity<?> ottPageData(
+            @RequestParam(name="provider", required=false) Integer provider,
+            @RequestParam(name="page", defaultValue="1") int page) {
+
+        // 화면의 한 페이지는 20편(5열 x 4행)을 목표로 합니다.
+        // TMDB 한 페이지에서 국내 관람등급/성인 필터 후 편수가 줄 수 있으므로
+        // 화면 1페이지당 TMDB 최대 4페이지를 묶어 충분한 후보를 확보합니다.
+        page = Math.max(1, Math.min(125, page));
+        int firstApiPage = (page - 1) * 4 + 1;
+
+        try {
+            List<Object> combined = new ArrayList<>();
+            int totalApiPages = firstApiPage;
+            int lastFetchedPage = firstApiPage - 1;
+
+            for (int apiPage = firstApiPage; apiPage <= Math.min(firstApiPage + 3, totalApiPages); apiPage++) {
+                Map<String,Object> raw = movieService.getOttMovies(provider, apiPage);
+
+                if (apiPage == firstApiPage && raw.get("total_pages") instanceof Number n) {
+                    totalApiPages = Math.max(1, Math.min(500, n.intValue()));
+                }
+
+                if (raw.get("results") instanceof List<?> rows) {
+                    combined.addAll(rows);
+                }
+
+                lastFetchedPage = apiPage;
+            }
+
+            List<MovieDto> converted = movieService.convertToMovieList(
+                    Map.of("results", combined),
+                    ""
+            );
+            LinkedHashMap<Long, MovieDto> unique = new LinkedHashMap<>();
+            for (MovieDto movie : converted) {
+                unique.putIfAbsent(movie.getId(), movie);
+            }
+
+            List<MovieDto> visible = new ArrayList<>(unique.values());
+            int visibleCount = Math.min(20, (visible.size() / 5) * 5);
+
+            // 아주 마지막 구간에서 5편 미만만 남은 경우에는 결과 자체를
+            // 없애지 않기 위해 그대로 보여 줍니다. 일반 페이지는 5개 단위입니다.
+            if (visibleCount == 0 && !visible.isEmpty()) {
+                visibleCount = visible.size();
+            }
+
+            if (visible.size() > visibleCount) {
+                visible = new ArrayList<>(visible.subList(0, visibleCount));
+            }
+
+            boolean hasMore = lastFetchedPage < totalApiPages;
+
+            return ResponseEntity.ok(
+                    Map.of(
+                            "movies", visible,
+                            "hasMore", hasMore
+                    )
+            );
+
+        } catch(RestClientException e) {
+            return ResponseEntity.status(503)
+                    .body(Map.of(
+                            "message",
+                            "OTT 영화를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."
+                    ));
+        }
     }
 }

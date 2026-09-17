@@ -34,6 +34,18 @@ public class MovieDto {
     // 평점
     private Double voteAverage;
 
+    // TMDB 평가 참여 수
+    private Integer voteCount;
+
+    // TMDB 인기도
+    private Double popularity;
+
+    // MovieLife 회원 평균 별점 (10점 만점)
+    private Double memberRatingAverage;
+
+    // MovieLife 회원 별점 참여 수
+    private Long memberRatingCount;
+
     // 장르 번호 목록
     private List<Integer> genreIds;
 
@@ -131,4 +143,18 @@ public class MovieDto {
     public String getBackdropUrl() {
         return backdropPath == null || backdropPath.isBlank() ? "" : "https://image.tmdb.org/t/p/w1280" + backdropPath;
     }
+
+    // TMDB adult 플래그 (목록에서는 항상 제외됨)
+    private boolean adult;
+
+    // 한국 관람등급 코드 (ALL / 12 / 15 / 19 / RESTRICTED / UNKNOWN)
+    private String certificationCode = "UNKNOWN";
+
+    // 한국 관람등급을 실제로 확인했는지 여부.
+    // false 이면 UNKNOWN 은 "아직 확인 안 됨"을 뜻하므로 카드에 '정보 없음'을 표시하지 않습니다.
+    private boolean certificationChecked;
+
+    public boolean isAdultsOnly(){ return "19".equals(certificationCode); }
+    public String getCertificationLabel(){ return com.yse.dev.Service.KoreanCertification.label(certificationCode); }
+
 }

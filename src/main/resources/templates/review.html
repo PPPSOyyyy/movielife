@@ -43,11 +43,11 @@
                     <legend class="field-label">
                         나의 별점
                         <span class="muted small">
-                            · 5점 만점
+                            · 10점 만점
                         </span>
                     </legend>
                     <div class="rating-picker">
-                        <label class="rating-option" th:each="n : ${#numbers.sequence(1,5)}">
+                        <label class="rating-option" th:each="n : ${#numbers.sequence(1,10)}">
                             <input
                                 type="radio"
                                 name="rating"
@@ -107,9 +107,9 @@
         </main>
         <footer th:replace="~{fragments/layout :: footer}">
         </footer>
-        <script src="/js/auth-header.js?v=20260915-3">
+        <script src="/js/auth-header.js?v=upgrade20">
         </script>
-        <script src="/js/reviews.js?v=20260915-3">
+        <script src="/js/reviews.js?v=upgrade20">
         </script>
     </body>
 </html>

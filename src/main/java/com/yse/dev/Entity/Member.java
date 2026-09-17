@@ -29,4 +29,11 @@ public class Member {
         entity.setNickname(dto.getNickname());
         return entity;
     }
+
+    // Nullable: 기존 회원은 로그인 후 회원정보 관리에서 복구 정보를 등록합니다.
+    @Column(length=80) private String name;
+    @Column(length=254, unique=true) private String email;
+    @Column(name="security_question", length=30) private String securityQuestion;
+    @Column(name="security_answer_hash", length=100) private String securityAnswerHash;
+
 }

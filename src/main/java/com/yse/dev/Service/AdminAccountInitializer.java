@@ -22,7 +22,9 @@ public class AdminAccountInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        Member admin = memberRepository.findByUserId(ADMIN_ID).orElseGet(Member::new);
+        // 기존 관리자 비밀번호를 재시작 때 덮어쓰지 않습니다.
+        if (memberRepository.findByUserId(ADMIN_ID).isPresent()) return;
+        Member admin = new Member();
         admin.setUserId(ADMIN_ID);
         admin.setPassword(passwordEncoder.encode(ADMIN_PASSWORD));
 

@@ -34,12 +34,15 @@ public class PersonController {
             @PathVariable("personId")
             Long personId,
 
+            @org.springframework.web.bind.annotation.RequestParam(name="page",defaultValue="1") int page,
+            @org.springframework.web.bind.annotation.RequestParam(name="role",defaultValue="") String role,
+            @org.springframework.web.bind.annotation.RequestParam(name="certification",defaultValue="") String certification,
             Model model) {
 
 
         PersonDetailDto person =
                 personService.getPersonDetail(
-                        personId
+                        personId, page, role, certification
                 );
 
 
